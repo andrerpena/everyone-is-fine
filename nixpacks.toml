@@ -1,0 +1,5 @@
+[phases.build]
+cmds = ["npm run build:web"]
+
+[start]
+cmd = "echo 'Static site - no start command needed'"

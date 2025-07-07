@@ -1,0 +1,15 @@
+.rdg-sort-arrow {
+  color: currentColor;
+  flex-shrink: 0;
+}
+
+.rdg-header-sort-cell {
+  display: flex;
+  align-items: center;
+}
+
+.rdg-header-sort-name {
+  flex-grow: 1;
+  overflow: clip;
+  text-overflow: ellipsis;
+}

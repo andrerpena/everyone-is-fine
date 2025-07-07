@@ -1,0 +1,46 @@
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent iOS bounce/overscroll */
+    overscroll-behavior: none;
+    /* Prevent page-level scrolling */
+    overflow: hidden;
+    height: 100%;
+  }
+
+  /* Color scheme based on theme */
+  :root,
+  [data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  [data-theme="light"] {
+    color-scheme: light;
+  }
+
+  body {
+    font-family: "Source Code Pro", monospace;
+    background-color: var(--background);
+    color: var(--foreground);
+    /* Prevent iOS bounce/overscroll */
+    overscroll-behavior: none;
+    /* Prevent text selection during touch */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Prevent page-level scrolling */
+    overflow: hidden;
+    height: 100%;
+    /* Disable all browser touch gestures - handled by JS */
+    touch-action: none;
+  }
+
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
+}

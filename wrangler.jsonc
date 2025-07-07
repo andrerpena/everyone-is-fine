@@ -1,0 +1,7 @@
+{
+  "name": "everyone-is-fine",
+  "compatibility_date": "2026-02-27",
+  "assets": {
+    "directory": "./dist"
+  }
+}

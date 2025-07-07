@@ -1,0 +1,57 @@
+GIMP Palette
+Name: Colony Sim 32
+Columns: 8
+#
+# Colony Sim Universal Palette (32 colors)
+# For use in GIMP, Aseprite, and other image editors
+#
+
+# === BASICS (2) ===
+  0   0   0	Black
+  0   0   0	Void (transparent)
+
+# === GRAYS (6) ===
+ 26  26  26	Charcoal
+ 58  58  58	Dark Gray
+ 92  92  92	Gray
+122 122 122	Medium Gray
+160 160 160	Light Gray
+208 208 208	Silver
+
+# === WHITES (1) ===
+255 255 255	White
+
+# === BROWNS (4) ===
+ 61  46  32	Dark Bark
+ 92  72  51	Bark
+122  90  16	Dirt
+156 122  30	Tan
+
+# === GREENS (4) ===
+  0  51   0	Deep Forest
+  0 100   0	Forest
+ 34 139  34	Green
+ 50 205  50	Lime
+
+# === TEALS (2) ===
+ 46 139  87	Sea Green
+ 60 179 113	Medium Sea
+
+# === BLUES (4) ===
+ 10  42  74	Deep Ocean
+ 30  80 144	Ocean
+ 64 144 208	Water
+128 192 240	Sky
+
+# === WARM (5) ===
+170  34   0	Crimson
+255  69   0	Lava
+255 140   0	Orange
+255 204   0	Gold
+212 184 150	Sand
+
+# === SKIN & SPECIAL (4) ===
+245 222 179	Light Skin
+193 154 107	Medium Skin
+139  90  43	Dark Skin
+107 142  35	Olive

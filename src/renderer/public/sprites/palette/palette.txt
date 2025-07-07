@@ -1,0 +1,55 @@
+# Colony Sim Universal Palette (32 colors)
+# Format: char = #RRGGBB  Name
+#
+# Use these characters in source.txt pixel grids.
+# All sprites must use only colors from this palette.
+
+# === BASICS (2) ===
+. = transparent    Void
+0 = #000000        Black
+
+# === GRAYS (6) - Stone, Metal, Shadows ===
+1 = #1A1A1A        Charcoal
+2 = #3A3A3A        Dark Gray
+3 = #5C5C5C        Gray
+4 = #7A7A7A        Medium Gray
+5 = #A0A0A0        Light Gray
+6 = #D0D0D0        Silver
+
+# === WHITES (1) ===
+W = #FFFFFF        White
+
+# === BROWNS (4) - Soil, Wood, Bark ===
+A = #3D2E20        Dark Bark
+B = #5C4833        Bark
+C = #7A5A10        Dirt
+D = #9C7A1E        Tan
+
+# === GREENS (4) - Vegetation ===
+G = #003300        Deep Forest
+H = #006400        Forest
+I = #228B22        Green
+J = #32CD32        Lime
+
+# === TEALS (2) - Shallow Water, Vegetation ===
+K = #2E8B57        Sea Green
+L = #3CB371        Medium Sea
+
+# === BLUES (4) - Water, Sky ===
+M = #0A2A4A        Deep Ocean
+N = #1E5090        Ocean
+O = #4090D0        Water
+P = #80C0F0        Sky
+
+# === WARM (5) - Lava, Fire, Sand ===
+R = #AA2200        Crimson
+S = #FF4500        Lava
+T = #FF8C00        Orange
+U = #FFCC00        Gold
+V = #D4B896        Sand
+
+# === SKIN & SPECIAL (4) ===
+X = #F5DEB3        Light Skin
+Y = #C19A6B        Medium Skin
+Z = #8B5A2B        Dark Skin
+Q = #6B8E23        Olive

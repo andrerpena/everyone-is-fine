@@ -1,0 +1,27 @@
+import type { FC, ReactNode } from "react";
+
+export type ModalFrameProps = {
+  onClose?: () => void;
+  children: ReactNode;
+  className?: string;
+  "data-testid"?: string;
+};
+
+export const ModalFrame: FC<ModalFrameProps> = ({
+  children,
+  className = "",
+  "data-testid": testId,
+}) => {
+  return (
+    <div
+      className={`rounded-xl bg-[var(--card)] text-[var(--card-foreground)] shadow-sm border border-[var(--border)] p-4 overflow-y-auto ${className}`}
+      style={{
+        minHeight: "100px",
+        maxHeight: "min(600px, calc(100vh - 2rem))",
+      }}
+      data-testid={testId}
+    >
+      {children}
+    </div>
+  );
+};

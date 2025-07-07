@@ -1,0 +1,112 @@
+import type { TerrainProperties, TerrainType } from "../types";
+
+export const TERRAIN_REGISTRY: Record<TerrainType, TerrainProperties> = {
+  soil: {
+    type: "soil",
+    fertility: 1.0,
+    hardness: 0.2,
+    isPassable: true,
+    isDiggable: true,
+    movementCost: 1.0,
+  },
+  sand: {
+    type: "sand",
+    fertility: 0.1,
+    hardness: 0.1,
+    isPassable: true,
+    isDiggable: true,
+    movementCost: 1.2,
+  },
+  clay: {
+    type: "clay",
+    fertility: 0.7,
+    hardness: 0.3,
+    isPassable: true,
+    isDiggable: true,
+    movementCost: 1.1,
+  },
+  gravel: {
+    type: "gravel",
+    fertility: 0.0,
+    hardness: 0.4,
+    isPassable: true,
+    isDiggable: true,
+    movementCost: 1.3,
+  },
+  rock: {
+    type: "rock",
+    fertility: 0.0,
+    hardness: 0.8,
+    isPassable: true,
+    isDiggable: true,
+    movementCost: 1.0,
+  },
+  granite: {
+    type: "granite",
+    fertility: 0.0,
+    hardness: 0.95,
+    isPassable: true,
+    isDiggable: true,
+    movementCost: 1.0,
+  },
+  limestone: {
+    type: "limestone",
+    fertility: 0.0,
+    hardness: 0.7,
+    isPassable: true,
+    isDiggable: true,
+    movementCost: 1.0,
+  },
+  marble: {
+    type: "marble",
+    fertility: 0.0,
+    hardness: 0.75,
+    isPassable: true,
+    isDiggable: true,
+    movementCost: 1.0,
+  },
+  obsidian: {
+    type: "obsidian",
+    fertility: 0.0,
+    hardness: 1.0,
+    isPassable: true,
+    isDiggable: true,
+    movementCost: 1.0,
+  },
+  water_shallow: {
+    type: "water_shallow",
+    fertility: 0.0,
+    hardness: 0.0,
+    isPassable: true,
+    isDiggable: false,
+    movementCost: 2.0,
+  },
+  water_deep: {
+    type: "water_deep",
+    fertility: 0.0,
+    hardness: 0.0,
+    isPassable: false,
+    isDiggable: false,
+    movementCost: Number.POSITIVE_INFINITY,
+  },
+  lava: {
+    type: "lava",
+    fertility: 0.0,
+    hardness: 0.0,
+    isPassable: false,
+    isDiggable: false,
+    movementCost: Number.POSITIVE_INFINITY,
+  },
+  void: {
+    type: "void",
+    fertility: 0.0,
+    hardness: 0.0,
+    isPassable: false,
+    isDiggable: false,
+    movementCost: Number.POSITIVE_INFINITY,
+  },
+};
+
+export function getTerrainProperties(type: TerrainType): TerrainProperties {
+  return TERRAIN_REGISTRY[type];
+}
