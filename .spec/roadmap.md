@@ -65,7 +65,7 @@
 
 ## Phase 4 — Needs System
 
-- [ ] 44. Implement needs framework (need type, current value, decay rate, thresholds)
+- [x] 44. Implement needs framework (need type, current value, decay rate, thresholds) <!-- Ticket 0007 -->
 - [ ] 45. Add hunger need with tick-based decay
 - [ ] 46. Add rest/energy need with tick-based decay
 - [ ] 47. Add mood/happiness composite need

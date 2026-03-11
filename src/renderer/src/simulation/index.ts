@@ -40,6 +40,15 @@ export {
   smootherStep,
   smoothStep,
 } from "./movement";
+// Needs
+export {
+  getNeedThreshold,
+  NEED_CONFIGS,
+  type NeedConfig,
+  type NeedId,
+  NeedsSystem,
+  type NeedThreshold,
+} from "./needs";
 // Pathfinding
 export {
   ALL_DIRECTIONS,

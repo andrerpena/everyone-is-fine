@@ -12,6 +12,7 @@ import {
   findPath,
   IdleBehaviorSystem,
   MovementSystem,
+  NeedsSystem,
   simulationLoop,
 } from "../simulation";
 import { JobProcessor } from "../simulation/jobs";
@@ -624,6 +625,12 @@ const idleBehavior = new IdleBehaviorSystem(
 );
 
 // =============================================================================
+// NEEDS SYSTEM SETUP
+// =============================================================================
+
+const needsSystem = new NeedsSystem(entityStore);
+
+// =============================================================================
 // SIMULATION LOOP SETUP
 // =============================================================================
 
@@ -641,6 +648,9 @@ let lastTpsTimestamp = performance.now();
 simulationLoop.setTickCallback((deltaTime, tick) => {
   // --- Profiled system updates ---
   const t0 = performance.now();
+
+  // Decay colonist needs (hunger, energy, mood)
+  needsSystem.update(deltaTime);
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();
