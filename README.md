@@ -4,6 +4,9 @@
 
 While RimWorld is better than [everyoneisfine.com](everyoneisfine.com), then everyone is still fine.
 
+<img width="1486" height="952" alt="image" src="https://github.com/user-attachments/assets/341903dc-1cf1-4f1e-a61b-cb2636356860" />
+
+
 ## Autonomous Development
 
 This is an experiment where Claude Code runs  `/dev-cycle` on my Mac Mini, every 1h, and tries to build this game.
