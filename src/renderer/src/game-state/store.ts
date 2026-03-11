@@ -17,6 +17,7 @@ import {
   MoodThoughtSystem,
   MovementSystem,
   NeedsSystem,
+  SleepBehavior,
   simulationLoop,
 } from "../simulation";
 import { JobProcessor } from "../simulation/jobs";
@@ -691,6 +692,12 @@ const forageBehavior = new ForageBehavior(
 );
 
 // =============================================================================
+// SLEEP BEHAVIOR SETUP
+// =============================================================================
+
+const sleepBehavior = new SleepBehavior(entityStore, jobProcessor);
+
+// =============================================================================
 // IDLE BEHAVIOR SETUP
 // =============================================================================
 
@@ -749,6 +756,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
 
   // Hungry colonists seek berry bushes
   forageBehavior.update();
+
+  // Tired colonists sleep on the ground
+  sleepBehavior.update();
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();

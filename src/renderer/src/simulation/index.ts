@@ -10,6 +10,7 @@ export {
   MENTAL_BREAK_TRIGGER_THRESHOLD,
   MentalBreakSystem,
 } from "./behaviors/mental-break-system";
+export { SleepBehavior } from "./behaviors/sleep-behavior";
 // Entity Store
 export { EntityStore, entityStore } from "./entity-store";
 // Jobs

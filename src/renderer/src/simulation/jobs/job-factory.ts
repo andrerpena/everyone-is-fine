@@ -116,6 +116,37 @@ export function createForageJob(
 }
 
 /**
+ * Create a "sleep on the ground" job.
+ * Steps: work 600 ticks (~10s at 60 TPS) → restore energy 0.5
+ * No movement — colonist sleeps where they stand.
+ */
+export function createSleepJob(characterId: EntityId, target: Position3D): Job {
+  return {
+    id: generateJobId(),
+    type: "sleep",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "work",
+        totalTicks: 600,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "restore_need",
+        needId: "energy",
+        amount: 0.5,
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/**
  * Create a simple "move" job.
  * Steps: move to destination
  */

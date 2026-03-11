@@ -11,6 +11,7 @@ export {
   createForageJob,
   createMineJob,
   createMoveJob,
+  createSleepJob,
 } from "./job-factory";
 // Job processor
 export { JobProcessor } from "./job-processor";
