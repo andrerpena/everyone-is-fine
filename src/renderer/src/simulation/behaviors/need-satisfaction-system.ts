@@ -9,6 +9,7 @@ import { getWorldTileAt } from "../../world/utils/tile-utils";
 import type { EntityStore } from "../entity-store";
 import type { JobProcessor } from "../jobs";
 import { createForageJob, createSleepJob } from "../jobs/job-factory";
+import { getNeedThreshold } from "../needs/needs-config";
 import type { Character } from "../types";
 
 // =============================================================================
@@ -37,7 +38,23 @@ export class NeedSatisfactionSystem {
       // Standard guards: skip characters that shouldn't auto-act
       if (character.control.mode === "drafted") continue;
       if (character.mentalBreak !== null) continue;
-      if (this.jobProcessor.getJob(character.id)) continue;
+
+      // If the character has an active job, check if a critical need should interrupt it
+      const activeJob = this.jobProcessor.getJob(character.id);
+      if (activeJob) {
+        // Never interrupt need-satisfying jobs (forage, sleep)
+        if (activeJob.type === "forage" || activeJob.type === "sleep") continue;
+
+        // Interrupt non-essential jobs only when a need is critical
+        const hasCriticalNeed =
+          getNeedThreshold(character.needs.hunger) === "critical" ||
+          getNeedThreshold(character.needs.energy) === "critical";
+        if (!hasCriticalNeed) continue;
+
+        // Cancel the current job so the colonist can address the critical need
+        this.jobProcessor.cancelJob(character.id);
+      }
+
       if (character.movement.isMoving) continue;
 
       // Find the most urgent unsatisfied need
