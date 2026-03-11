@@ -109,6 +109,18 @@ export const ambientLightingLayer: FeatureLayerDefinition = {
   customRender: true,
 };
 
+export const weatherEffectsLayer: FeatureLayerDefinition = {
+  id: "weather-effects",
+  name: "Weather Effects",
+  category: "feature",
+  type: "feature",
+  description: "Rain, snow, and storm particle effects",
+  defaultEnabled: true,
+  zIndex: 56, // Above ambient lighting (55), below hover/selection
+  filter: () => true,
+  customRender: true,
+};
+
 export const charactersLayer: FeatureLayerDefinition = {
   id: "characters",
   name: "Characters",
@@ -140,5 +152,6 @@ export function registerBuiltInLayers(): void {
   layerRegistry.register(structuresLayer);
   layerRegistry.register(itemsLayer);
   layerRegistry.register(ambientLightingLayer);
+  layerRegistry.register(weatherEffectsLayer);
   layerRegistry.register(charactersLayer);
 }

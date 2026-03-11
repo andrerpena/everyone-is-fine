@@ -38,6 +38,7 @@ import {
   HeatMapRenderer,
   JobProgressRenderer,
   PathRenderer,
+  WeatherRenderer,
 } from "./renderers";
 import { updateAmbientOverlay } from "./renderers/ambient-lighting";
 
@@ -255,6 +256,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
   const pathRendererRef = useRef<PathRenderer | null>(null);
   const heatMapRendererRef = useRef<HeatMapRenderer | null>(null);
   const jobProgressRendererRef = useRef<JobProgressRenderer | null>(null);
+  const weatherRendererRef = useRef<WeatherRenderer | null>(null);
 
   // Interaction container for click handling
   const [interactionContainer, setInteractionContainer] =
@@ -367,6 +369,23 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       );
     });
 
+    // Subscribe to weather type changes for particle effects
+    let lastWeatherType = "";
+    const unsubscribeWeather = useGameStore.subscribe((state) => {
+      const world = state.world;
+      if (!world || !weatherRendererRef.current) return;
+
+      const weatherType = world.weather.type;
+      if (weatherType === lastWeatherType) return;
+      lastWeatherType = weatherType;
+
+      const layerEnabled =
+        useLayerStore.getState().visibility.get("weather-effects") ?? true;
+      if (layerEnabled) {
+        weatherRendererRef.current.setWeatherType(weatherType);
+      }
+    });
+
     const unsubscribeLayers = useLayerStore.subscribe((state) => {
       // Update heat map renderer
       if (heatMapRendererRef.current && level) {
@@ -406,6 +425,21 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         }
       }
 
+      // Toggle weather effects layer
+      if (weatherRendererRef.current) {
+        const weatherEnabled = state.visibility.get("weather-effects") ?? true;
+        const displayObj = weatherRendererRef.current.getDisplayObject();
+        if (!weatherEnabled) {
+          displayObj.visible = false;
+        } else {
+          // Re-apply weather type when re-enabled
+          const world = useGameStore.getState().world;
+          if (world) {
+            weatherRendererRef.current.setWeatherType(world.weather.type);
+          }
+        }
+      }
+
       // Update characters and paths based on visibility
       const gameState = useGameStore.getState();
       const shouldRenderCharacters = state.visibility.get("characters") ?? true;
@@ -420,6 +454,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
     return () => {
       unsubscribeGame();
       unsubscribeAmbient();
+      unsubscribeWeather();
       unsubscribeLayers();
     };
   }, [zLevel, level]);
@@ -584,6 +619,28 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         ambientOverlay.visible = false;
       }
 
+      // Create weather particle renderer (above ambient, below hover)
+      const weatherRenderer = new WeatherRenderer(
+        level.width * CELL_SIZE,
+        level.height * CELL_SIZE,
+      );
+      viewport.addChild(weatherRenderer.getDisplayObject());
+      weatherRendererRef.current = weatherRenderer;
+      // Set initial weather type
+      if (initialWorld) {
+        weatherRenderer.setWeatherType(initialWorld.weather.type);
+      }
+      const weatherLayerEnabled =
+        initialLayerVisibility.get("weather-effects") ?? true;
+      if (!weatherLayerEnabled) {
+        weatherRenderer.getDisplayObject().visible = false;
+      }
+      // Animate weather particles each frame
+      const weatherTickerCallback = (ticker: { deltaTime: number }) => {
+        weatherRenderer.update(ticker.deltaTime);
+      };
+      app.ticker.add(weatherTickerCallback);
+
       // Create hover overlay (drawn first, below selection)
       const hoverGraphics = new Graphics();
       viewport.addChild(hoverGraphics);
@@ -709,12 +766,14 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         _fpsHandler?: () => void;
         _configUnsubscribe?: () => void;
         _colorsUnsubscribe?: () => void;
+        _weatherTickerCallback?: (ticker: { deltaTime: number }) => void;
       };
       appWithExtras._resizeObserver = resizeObserver;
       appWithExtras._resizeHandler = handleResize;
       appWithExtras._fpsHandler = fpsCallback;
       appWithExtras._configUnsubscribe = unsubscribeConfig;
       appWithExtras._colorsUnsubscribe = unsubscribeColors;
+      appWithExtras._weatherTickerCallback = weatherTickerCallback;
 
       // Subscribe to tile updates for reactive rendering (tree removal, item spawning)
       tileUpdateUnsubRef.current = commandRegistry.on(
@@ -800,6 +859,10 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         jobProgressRendererRef.current.destroy();
         jobProgressRendererRef.current = null;
       }
+      if (weatherRendererRef.current) {
+        weatherRendererRef.current.destroy();
+        weatherRendererRef.current = null;
+      }
       if (appRef.current) {
         const app = appRef.current as Application & {
           _resizeObserver?: ResizeObserver;
@@ -807,6 +870,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
           _fpsHandler?: () => void;
           _configUnsubscribe?: () => void;
           _colorsUnsubscribe?: () => void;
+          _weatherTickerCallback?: (ticker: { deltaTime: number }) => void;
         };
         app._resizeObserver?.disconnect();
         if (app._resizeHandler) {
@@ -814,6 +878,9 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         }
         if (app._fpsHandler) {
           app.ticker.remove(app._fpsHandler);
+        }
+        if (app._weatherTickerCallback) {
+          app.ticker.remove(app._weatherTickerCallback);
         }
         app._configUnsubscribe?.();
         app._colorsUnsubscribe?.();

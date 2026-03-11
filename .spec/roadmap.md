@@ -177,7 +177,7 @@
 - [x] 135. Create season system (spring, summer, fall, winter) with configurable year length <!-- Done: seasons cycle in time system (ticket 0014), displayed in status bar -->
 - [x] 136. Implement temperature simulation (outdoor temp varies by season and time) <!-- Ticket 0030 -->
 - [x] 137. Add weather system framework (clear, rain, fog, snow, thunderstorm) <!-- Ticket 0032 -->
-- [ ] 138. Implement rain weather with visual effects and ground moisture
+- [x] 138. Implement rain weather with visual effects and ground moisture <!-- Ticket 0033: visual effects only, ground moisture deferred -->
 - [ ] 139. Add snow weather with accumulation on tiles
 - [ ] 140. Create temperature-affected crop growth (growing season)
 - [ ] 141. Implement indoor temperature (affected by walls, roofs, heaters, coolers)
