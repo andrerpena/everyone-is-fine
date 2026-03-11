@@ -36,6 +36,10 @@ import {
   getConstructionCost,
   isBuildable,
 } from "./world/registries/construction-registry";
+import {
+  getFloorConstructionCost,
+  isFloorBuildable,
+} from "./world/registries/floor-registry";
 import type {
   BiomeType,
   CropType,
@@ -834,6 +838,45 @@ function createAgentApi(): GameAgentApi {
       if (!tile) throw new Error(`Tile (${x}, ${y}, ${zLevel}) out of bounds`);
 
       tile.blueprint = null;
+    },
+
+    buildFloor(x: number, y: number, floorType: string, z?: number) {
+      const state = useGameStore.getState();
+      const world = state.world;
+      if (!world) throw new Error("No world loaded");
+
+      const zLevel = z ?? 0;
+      const tile = getWorldTileAt(world, x, y, zLevel);
+      if (!tile) throw new Error(`Tile (${x}, ${y}, ${zLevel}) out of bounds`);
+
+      if (!isFloorBuildable(floorType as FloorType)) {
+        throw new Error(`Floor type "${floorType}" is not buildable`);
+      }
+
+      if (tile.floor !== null && tile.floor.type !== "none") {
+        throw new Error(
+          `Tile (${x}, ${y}) already has a floor: ${tile.floor.type}`,
+        );
+      }
+
+      // Check material availability
+      const cost = getFloorConstructionCost(floorType as FloorType);
+      if (cost) {
+        const check = hasSufficientMaterials(world, cost.materials, (type) =>
+          getConstructionCost(type as StructureType),
+        );
+        if (!check.sufficient) {
+          const details = check.missing
+            .map((m) => `${m.type}: need ${m.needed}, have ${m.available}`)
+            .join(", ");
+          throw new Error(
+            `Insufficient materials for ${floorType}: ${details}`,
+          );
+        }
+      }
+
+      // Directly place the floor (floor building is simpler than structure building)
+      tile.floor = { type: floorType as FloorType, condition: 1.0 };
     },
 
     getAvailableMaterials(): Record<string, number> {

@@ -3,6 +3,7 @@
 // =============================================================================
 
 import { logger } from "../../lib/logger";
+import { FLOOR_REGISTRY } from "../../world/registries/floor-registry";
 import { ITEM_REGISTRY } from "../../world/registries/item-registry";
 import { STRUCTURE_REGISTRY } from "../../world/registries/structure-registry";
 import type {
@@ -39,6 +40,7 @@ import type {
   JobProgressInfo,
   MoveStep,
   PickupItemStep,
+  PlaceFloorStep,
   PlaceStructureStep,
   PlantCropStep,
   RestoreNeedStep,
@@ -275,6 +277,10 @@ export class JobProcessor {
 
       case "place_structure":
         this.executePlaceStructure(characterId, job, step);
+        break;
+
+      case "place_floor":
+        this.executePlaceFloor(characterId, job, step);
         break;
     }
   }
@@ -678,6 +684,57 @@ export class JobProcessor {
         lastUpdated: Date.now(),
       };
     }
+
+    // Notify store so rendering updates
+    this.updateTile(
+      { x: step.position.x, y: step.position.y },
+      step.position.z,
+      {},
+    );
+
+    step.status = "completed";
+    this.advanceToNextStep(characterId, job);
+  }
+
+  // ===========================================================================
+  // PLACE FLOOR STEP
+  // ===========================================================================
+
+  private executePlaceFloor(
+    characterId: EntityId,
+    job: Job,
+    step: PlaceFloorStep,
+  ): void {
+    const world = this.getWorld();
+    if (!world) {
+      this.failJob(characterId, job, "World not initialized");
+      return;
+    }
+
+    const tile = getWorldTileAt(
+      world,
+      step.position.x,
+      step.position.y,
+      step.position.z,
+    );
+    if (!tile) {
+      this.failJob(characterId, job, "Tile not found");
+      return;
+    }
+
+    // Place the floor
+    const floorProps = FLOOR_REGISTRY[step.floorType];
+    tile.floor = {
+      type: step.floorType,
+      condition: 1.0,
+    };
+
+    // Update pathfinding with floor movement cost
+    tile.pathfinding = {
+      isPassable: tile.pathfinding.isPassable,
+      movementCost: floorProps.movementCost,
+      lastUpdated: Date.now(),
+    };
 
     // Notify store so rendering updates
     this.updateTile(

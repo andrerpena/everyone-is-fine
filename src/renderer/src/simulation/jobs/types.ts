@@ -4,6 +4,7 @@
 
 import type {
   CropType,
+  FloorType,
   ItemType,
   Position3D,
   StructureType,
@@ -148,6 +149,15 @@ export interface PlaceStructureStep {
   status: StepStatus;
 }
 
+export interface PlaceFloorStep {
+  type: "place_floor";
+  /** Tile to place the floor on */
+  position: Position3D;
+  /** Floor type to build */
+  floorType: FloorType;
+  status: StepStatus;
+}
+
 export type JobStep =
   | MoveStep
   | WorkStep
@@ -159,7 +169,8 @@ export type JobStep =
   | PlantCropStep
   | HarvestCropStep
   | ConsumeItemStep
-  | PlaceStructureStep;
+  | PlaceStructureStep
+  | PlaceFloorStep;
 
 // =============================================================================
 // ACTION RULES - Declarative matching for tile → actions

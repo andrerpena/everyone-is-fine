@@ -155,7 +155,7 @@
 - [x] 116. Implement construction job (colonists build from blueprints) <!-- Ticket 0044 -->
 - [x] 117. ~~Add wall building~~ (walls already defined with blocksMovement/blocksVision, buildable via construction system)
 - [ ] 118. Create door building (allows movement, can be locked) <!-- Partial: door types exist and are buildable, but no locking mechanism -->
-- [ ] 119. Implement floor/tile building (affects movement speed and beauty) <!-- Partial: floor types defined but not buildable, no movement/beauty effects -->
+- [x] 119. Implement floor/tile building (affects movement speed and beauty)
 - [x] 120. ~~Add furniture buildings~~ (bed, chair, table defined with construction costs)
 - [ ] 121. Create workstation buildings (crafting spot, stonecutter, tailoring bench) <!-- Partial: generic workbench exists but no specialized workstations -->
 - [x] 122. Implement room detection system (enclosed areas become rooms)

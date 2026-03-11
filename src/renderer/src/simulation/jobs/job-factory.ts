@@ -3,8 +3,10 @@
 // =============================================================================
 
 import { getConstructionCost } from "../../world/registries/construction-registry";
+import { getFloorConstructionCost } from "../../world/registries/floor-registry";
 import type {
   CropType,
+  FloorType,
   ItemType,
   Position3D,
   StructureType,
@@ -457,6 +459,49 @@ export function createHaulJob(
       {
         type: "drop_item",
         position: destPos,
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/**
+ * Create a "build floor" job.
+ * Steps: move to tile → work (based on floor type) → place floor
+ */
+export function createBuildFloorJob(
+  characterId: EntityId,
+  target: Position3D,
+  floorType: FloorType,
+): Job {
+  const cost = getFloorConstructionCost(floorType);
+  const workTicks = cost?.workTicks ?? 120;
+
+  return {
+    id: generateJobId(),
+    type: "build_floor",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: target,
+        adjacent: false,
+        status: "pending",
+      },
+      {
+        type: "work",
+        totalTicks: workTicks,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "place_floor",
+        position: target,
+        floorType,
         status: "pending",
       },
     ],

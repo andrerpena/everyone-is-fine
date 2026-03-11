@@ -13,6 +13,7 @@ export { HarvestingSystem } from "./harvesting-system";
 export { HaulingSystem } from "./hauling-system";
 // Job factories
 export {
+  createBuildFloorJob,
   createBuildJob,
   createChopJob,
   createDeconstructJob,
@@ -44,6 +45,7 @@ export type {
   JobStep,
   MoveStep,
   PickupItemStep,
+  PlaceFloorStep,
   PlaceStructureStep,
   PlantCropStep,
   RestoreNeedStep,

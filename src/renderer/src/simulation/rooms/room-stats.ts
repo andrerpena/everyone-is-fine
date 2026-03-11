@@ -3,6 +3,7 @@
 // =============================================================================
 // Computes size, beauty, wealth, and impressiveness for a room.
 
+import { FLOOR_REGISTRY } from "../../world/registries/floor-registry";
 import { ITEM_REGISTRY } from "../../world/registries/item-registry";
 import { STRUCTURE_REGISTRY } from "../../world/registries/structure-registry";
 import type { ZLevel } from "../../world/types";
@@ -31,6 +32,13 @@ export function calculateRoomStats(room: Room, level: ZLevel): RoomStats {
     const index = y * level.width + x;
     const tile = level.tiles[index];
     if (!tile) continue;
+
+    // Floor beauty and value
+    if (tile.floor && tile.floor.type !== "none") {
+      const floorProps = FLOOR_REGISTRY[tile.floor.type];
+      totalBeauty += floorProps.beauty;
+      totalWealth += floorProps.baseValue;
+    }
 
     // Structure beauty and value (scaled by build quality)
     if (tile.structure) {
