@@ -73,6 +73,11 @@ export const colonistInspectorSchema = nu
       renderer: "readonly",
       editable: false,
     }),
+    traits: nu.string().withMetadata({
+      label: "Traits",
+      renderer: "readonly",
+      editable: false,
+    }),
   })
   .withFormLayouts({
     default: {
@@ -113,6 +118,10 @@ export const colonistInspectorSchema = nu
           label: "Skills",
           fields: [{ name: "skills", fieldWidth: 12 }],
         },
+        {
+          label: "Traits",
+          fields: [{ name: "traits", fieldWidth: 12 }],
+        },
       ],
     },
   });
@@ -133,4 +142,5 @@ export interface ColonistInspectorData {
   energy: number;
   mood: number;
   skills: string;
+  traits: string;
 }

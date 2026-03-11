@@ -5,6 +5,7 @@ import {
   colonistInspectorSchema,
 } from "../../../schemas";
 import { formatSkillsSummary } from "../../../simulation/skills";
+import { formatTraitsSummary } from "../../../simulation/traits";
 import { InspectorForm } from "../../schema-form";
 import type { WidgetComponentProps, WidgetDefinition } from "../types";
 
@@ -23,7 +24,8 @@ function ColonistInfoWidget(_props: WidgetComponentProps) {
     );
   }
 
-  const { biography, position, movement, control, needs, skills } = character;
+  const { biography, position, movement, control, needs, skills, traits } =
+    character;
 
   const data: ColonistInspectorData = {
     name: character.name,
@@ -38,6 +40,7 @@ function ColonistInfoWidget(_props: WidgetComponentProps) {
     energy: needs.energy,
     mood: needs.mood,
     skills: formatSkillsSummary(skills),
+    traits: formatTraitsSummary(traits),
   };
 
   return (

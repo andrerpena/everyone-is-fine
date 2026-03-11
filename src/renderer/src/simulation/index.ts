@@ -96,6 +96,20 @@ export {
   xpForNextLevel,
 } from "./skills";
 
+// Traits
+export {
+  ALL_TRAIT_IDS,
+  type CharacterTraits,
+  formatTraitsSummary,
+  generateRandomTraits,
+  getTraitDefinition,
+  hasConflict,
+  TRAIT_DEFINITIONS,
+  type TraitCategory,
+  type TraitDefinition,
+  type TraitId,
+} from "./traits";
+
 // Types
 export {
   type BuildCommand,

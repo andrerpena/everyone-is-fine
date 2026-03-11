@@ -5,6 +5,7 @@
 import type { Position2D, Position3D } from "../world/types";
 import type { CharacterSkills } from "./skills";
 import { createDefaultSkills } from "./skills";
+import type { CharacterTraits } from "./traits";
 
 // =============================================================================
 // ENTITY TYPES
@@ -91,6 +92,8 @@ export interface Character extends Entity {
   needs: CharacterNeeds;
   /** Skill levels and experience */
   skills: CharacterSkills;
+  /** Personality traits */
+  traits: CharacterTraits;
 }
 
 // =============================================================================
@@ -279,6 +282,7 @@ export function createCharacter(
       mood: 1,
     },
     skills: createDefaultSkills(),
+    traits: [],
     ...options,
   };
 }

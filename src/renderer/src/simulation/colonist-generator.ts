@@ -7,6 +7,8 @@
 import type { SeededRandom } from "../world/factories/world-factory";
 import type { CharacterSkills } from "./skills";
 import { generateRandomSkills } from "./skills";
+import type { CharacterTraits } from "./traits";
+import { generateRandomTraits } from "./traits";
 import type { CharacterBiography, Gender } from "./types";
 
 // =============================================================================
@@ -162,6 +164,7 @@ export function generateColonistIdentity(rng: SeededRandom): {
   name: string;
   biography: CharacterBiography;
   skills: CharacterSkills;
+  traits: CharacterTraits;
 } {
   const gender: Gender = rng.chance(0.5) ? "male" : "female";
   const firstNames = gender === "male" ? MALE_FIRST_NAMES : FEMALE_FIRST_NAMES;
@@ -180,10 +183,12 @@ export function generateColonistIdentity(rng: SeededRandom): {
   };
 
   const skills = generateRandomSkills(rng);
+  const traits = generateRandomTraits(rng);
 
   return {
     name: formatColonistName(biography),
     biography,
     skills,
+    traits,
   };
 }

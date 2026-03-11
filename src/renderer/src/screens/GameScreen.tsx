@@ -133,6 +133,7 @@ export const GameScreen: React.FC = () => {
         name: identity.name,
         biography: identity.biography,
         skills: identity.skills,
+        traits: identity.traits,
         type: "colonist",
         position: { x: pos.x, y: pos.y, z: currentZLevel },
         color: colonistPalette[index] ?? colonistFallback,

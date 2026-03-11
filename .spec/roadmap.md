@@ -57,7 +57,7 @@
 - [x] 36. Add idle wandering behavior for colonists with no tasks <!-- Ticket 0005 -->
 - [x] 37. Create colonist name generator (first name + nickname + last name) <!-- Ticket 0001 -->
 - [ ] 38. Implement backstory system (childhood + adulthood backstories)
-- [ ] 39. Add trait system (personality traits that affect behavior and stats)
+- [x] 39. Add trait system (personality traits that affect behavior and stats) <!-- Ticket 0010 -->
 - [x] 40. Create skill system (shooting, melee, construction, mining, cooking, etc.) <!-- Ticket 0006 -->
 - [x] 41. Implement skill experience gain and leveling <!-- Ticket 0008 -->
 - [x] 42. Add passion system (no interest, minor passion, major passion per skill) <!-- Ticket 0009 -->
