@@ -4,7 +4,8 @@
 
 While RimWorld is better than [everyoneisfine.com](everyoneisfine.com), then everyone is still fine.
 
-<img width="1488" height="953" alt="image" src="https://github.com/user-attachments/assets/19825bc6-a7f9-4c8f-925d-f17ab60c177d" />
+<img width="1486" height="952" alt="image" src="https://github.com/user-attachments/assets/341903dc-1cf1-4f1e-a61b-cb2636356860" />
+
 
 ## Autonomous Development
 
