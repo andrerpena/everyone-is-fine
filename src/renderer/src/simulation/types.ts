@@ -78,6 +78,8 @@ export interface CharacterNeeds {
   energy: number;
   /** Mood level (0-1, 1 = happy) */
   mood: number;
+  /** Comfort level (0-1, 1 = comfortable) */
+  comfort: number;
 }
 
 /** Mental break types */
@@ -294,6 +296,7 @@ export function createCharacter(
       hunger: 1,
       energy: 1,
       mood: 1,
+      comfort: 1,
     },
     skills: createDefaultSkills(),
     traits: [],

@@ -27,6 +27,9 @@ const NEED_THRESHOLD = 0.3;
 /** Maximum distance (in tiles) to search for a bush */
 const FORAGE_SEARCH_RADIUS = 20;
 
+/** Maximum distance (in tiles) to search for a bed */
+const BED_SEARCH_RADIUS = 30;
+
 // =============================================================================
 // NEED SATISFACTION SYSTEM
 // =============================================================================
@@ -58,7 +61,8 @@ export class NeedSatisfactionSystem {
         // Interrupt non-essential jobs only when a need is critical
         const hasCriticalNeed =
           getNeedThreshold(character.needs.hunger) === "critical" ||
-          getNeedThreshold(character.needs.energy) === "critical";
+          getNeedThreshold(character.needs.energy) === "critical" ||
+          getNeedThreshold(character.needs.comfort) === "critical";
         if (!hasCriticalNeed) continue;
 
         // Cancel the current job so the colonist can address the critical need
@@ -88,19 +92,26 @@ export class NeedSatisfactionSystem {
   /**
    * Determine which need-satisfying action is most urgent.
    * Returns null if no needs are below threshold.
+   * Priority: hunger/energy (whichever is lower) > comfort
    */
   private getMostUrgentAction(character: Character): "forage" | "sleep" | null {
-    const { hunger, energy } = character.needs;
+    const { hunger, energy, comfort } = character.needs;
 
     const hungerLow = hunger < NEED_THRESHOLD;
     const energyLow = energy < NEED_THRESHOLD;
+    const comfortLow = comfort < NEED_THRESHOLD;
 
-    if (!hungerLow && !energyLow) return null;
-    if (hungerLow && !energyLow) return "forage";
-    if (!hungerLow && energyLow) return "sleep";
+    // Check hunger and energy first (vital needs)
+    if (hungerLow && energyLow) {
+      return hunger <= energy ? "forage" : "sleep";
+    }
+    if (hungerLow) return "forage";
+    if (energyLow) return "sleep";
 
-    // Both are low — address the more critical (lower value) first
-    return hunger <= energy ? "forage" : "sleep";
+    // Comfort is lower priority — satisfied by sleeping (preferably on a bed)
+    if (comfortLow) return "sleep";
+
+    return null;
   }
 
   /**
@@ -198,10 +209,57 @@ export class NeedSatisfactionSystem {
   }
 
   /**
-   * Sleep in place to restore energy.
+   * Sleep to restore energy and comfort.
+   * Searches for a nearby unoccupied bed first; falls back to sleeping on the ground.
    */
   private trySleep(character: Character): void {
-    const job = createSleepJob(character.id, character.position);
-    this.jobProcessor.assignJob(job);
+    const bedPos = this.findNearestBed(character);
+    if (bedPos) {
+      const job = createSleepJob(character.id, bedPos, true);
+      this.jobProcessor.assignJob(job);
+    } else {
+      const job = createSleepJob(character.id, character.position, false);
+      this.jobProcessor.assignJob(job);
+    }
+  }
+
+  /**
+   * Find the nearest unoccupied bed within search radius.
+   */
+  private findNearestBed(
+    character: Character,
+  ): { x: number; y: number; z: number } | null {
+    const world = this.getWorld();
+    if (!world) return null;
+
+    const { position } = character;
+    const level = world.levels.get(position.z);
+    if (!level) return null;
+
+    let bestDist = Number.POSITIVE_INFINITY;
+    let bestPos: { x: number; y: number; z: number } | null = null;
+
+    const minX = Math.max(0, position.x - BED_SEARCH_RADIUS);
+    const maxX = Math.min(level.width - 1, position.x + BED_SEARCH_RADIUS);
+    const minY = Math.max(0, position.y - BED_SEARCH_RADIUS);
+    const maxY = Math.min(level.height - 1, position.y + BED_SEARCH_RADIUS);
+
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        const tile = getWorldTileAt(world, x, y, position.z);
+        if (!tile || tile.structure?.type !== "bed") continue;
+
+        const candidate = { x, y, z: position.z };
+        if (this.jobProcessor.reservations.isReserved(candidate)) continue;
+
+        const dist = Math.abs(x - position.x) + Math.abs(y - position.y);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestPos = candidate;
+        }
+      }
+    }
+
+    return bestPos;
   }
 }

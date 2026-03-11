@@ -65,7 +65,7 @@ describe("computeMoodFromThoughts", () => {
 describe("evaluateConditionThoughts", () => {
   it("adds starving thought when hunger is critical", () => {
     const char = makeCharacter({
-      needs: { hunger: 0.1, energy: 0.5, mood: 0.5 },
+      needs: { hunger: 0.1, energy: 0.5, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("starving")).toBe(true);
@@ -74,7 +74,7 @@ describe("evaluateConditionThoughts", () => {
 
   it("adds hungry thought when hunger is major", () => {
     const char = makeCharacter({
-      needs: { hunger: 0.25, energy: 0.5, mood: 0.5 },
+      needs: { hunger: 0.25, energy: 0.5, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("hungry")).toBe(true);
@@ -83,7 +83,7 @@ describe("evaluateConditionThoughts", () => {
 
   it("adds ate_recently when hunger is satisfied", () => {
     const char = makeCharacter({
-      needs: { hunger: 0.9, energy: 0.5, mood: 0.5 },
+      needs: { hunger: 0.9, energy: 0.5, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("ate_recently")).toBe(true);
@@ -91,7 +91,7 @@ describe("evaluateConditionThoughts", () => {
 
   it("adds exhausted thought when energy is critical", () => {
     const char = makeCharacter({
-      needs: { hunger: 0.5, energy: 0.1, mood: 0.5 },
+      needs: { hunger: 0.5, energy: 0.1, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("exhausted")).toBe(true);
@@ -99,7 +99,7 @@ describe("evaluateConditionThoughts", () => {
 
   it("adds tired thought when energy is major", () => {
     const char = makeCharacter({
-      needs: { hunger: 0.5, energy: 0.25, mood: 0.5 },
+      needs: { hunger: 0.5, energy: 0.25, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("tired")).toBe(true);
@@ -107,7 +107,7 @@ describe("evaluateConditionThoughts", () => {
 
   it("adds well_rested when energy is satisfied", () => {
     const char = makeCharacter({
-      needs: { hunger: 0.5, energy: 0.9, mood: 0.5 },
+      needs: { hunger: 0.5, energy: 0.9, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("well_rested")).toBe(true);
@@ -115,7 +115,7 @@ describe("evaluateConditionThoughts", () => {
 
   it("adds content when both hunger and energy are satisfied", () => {
     const char = makeCharacter({
-      needs: { hunger: 0.9, energy: 0.9, mood: 0.5 },
+      needs: { hunger: 0.9, energy: 0.9, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("content")).toBe(true);
@@ -126,7 +126,7 @@ describe("evaluateConditionThoughts", () => {
   it("adds optimist thought for optimist trait", () => {
     const char = makeCharacter({
       traits: ["optimist"],
-      needs: { hunger: 0.5, energy: 0.5, mood: 0.5 },
+      needs: { hunger: 0.5, energy: 0.5, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("optimist_baseline")).toBe(true);
@@ -135,7 +135,7 @@ describe("evaluateConditionThoughts", () => {
   it("adds pessimist thought for pessimist trait", () => {
     const char = makeCharacter({
       traits: ["pessimist"],
-      needs: { hunger: 0.5, energy: 0.5, mood: 0.5 },
+      needs: { hunger: 0.5, energy: 0.5, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("pessimist_baseline")).toBe(true);
@@ -144,7 +144,7 @@ describe("evaluateConditionThoughts", () => {
   it("adds neurotic thought for neurotic trait", () => {
     const char = makeCharacter({
       traits: ["neurotic"],
-      needs: { hunger: 0.5, energy: 0.5, mood: 0.5 },
+      needs: { hunger: 0.5, energy: 0.5, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("neurotic_anxiety")).toBe(true);
@@ -153,7 +153,7 @@ describe("evaluateConditionThoughts", () => {
   it("adds brave thought for brave trait", () => {
     const char = makeCharacter({
       traits: ["brave"],
-      needs: { hunger: 0.5, energy: 0.5, mood: 0.5 },
+      needs: { hunger: 0.5, energy: 0.5, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("feeling_brave")).toBe(true);
@@ -161,7 +161,7 @@ describe("evaluateConditionThoughts", () => {
 
   it("returns no need thoughts at minor threshold", () => {
     const char = makeCharacter({
-      needs: { hunger: 0.5, energy: 0.5, mood: 0.5 },
+      needs: { hunger: 0.5, energy: 0.5, mood: 0.5, comfort: 0.5 },
     });
     const thoughts = evaluateConditionThoughts(char);
     expect(thoughts.has("hungry")).toBe(false);

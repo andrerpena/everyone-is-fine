@@ -124,11 +124,48 @@ export function createForageJob(
 }
 
 /**
- * Create a "sleep on the ground" job.
- * Steps: work 600 ticks (~10s at 60 TPS) → restore energy 0.5
- * No movement — colonist sleeps where they stand.
+ * Create a sleep job.
+ * If onBed is true, colonist moves to the bed and gets bonus comfort.
+ * Steps: [move to bed?] → work 600 ticks → restore energy → restore comfort
  */
-export function createSleepJob(characterId: EntityId, target: Position3D): Job {
+export function createSleepJob(
+  characterId: EntityId,
+  target: Position3D,
+  onBed = false,
+): Job {
+  const steps: Job["steps"] = [];
+
+  // If sleeping on a bed, move to the bed tile first
+  if (onBed) {
+    steps.push({
+      type: "move",
+      destination: target,
+      adjacent: false,
+      status: "pending",
+    });
+  }
+
+  steps.push(
+    {
+      type: "work",
+      totalTicks: 600,
+      ticksWorked: 0,
+      status: "pending",
+    },
+    {
+      type: "restore_need",
+      needId: "energy",
+      amount: 0.5,
+      status: "pending",
+    },
+    {
+      type: "restore_need",
+      needId: "comfort",
+      amount: onBed ? 0.4 : 0.15,
+      status: "pending",
+    },
+  );
+
   return {
     id: generateJobId(),
     type: "sleep",
@@ -137,20 +174,7 @@ export function createSleepJob(characterId: EntityId, target: Position3D): Job {
     currentStepIndex: 0,
     status: "pending",
     createdAt: Date.now(),
-    steps: [
-      {
-        type: "work",
-        totalTicks: 600,
-        ticksWorked: 0,
-        status: "pending",
-      },
-      {
-        type: "restore_need",
-        needId: "energy",
-        amount: 0.5,
-        status: "pending",
-      },
-    ],
+    steps,
   };
 }
 

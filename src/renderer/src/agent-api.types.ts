@@ -39,6 +39,7 @@ export interface AgentCharacterInfo {
     hunger: number;
     energy: number;
     mood: number;
+    comfort: number;
   };
   biography: AgentBiography;
   traits: string[];
@@ -173,7 +174,7 @@ export interface GameAgentApi {
       type?: string;
       z?: number;
       color?: number;
-      needs?: { hunger?: number; energy?: number; mood?: number };
+      needs?: { hunger?: number; energy?: number; mood?: number; comfort?: number };
     },
   ) => AgentCharacterInfo;
   removeCharacter: (name: string) => boolean;
