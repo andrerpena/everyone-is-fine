@@ -81,13 +81,17 @@ export {
   ALL_SKILL_IDS,
   type CharacterSkills,
   createDefaultSkills,
+  type ExperienceResult,
   formatSkillsSummary,
   generateRandomSkills,
+  getSkillProgress,
+  grantExperience,
   MAX_SKILL_LEVEL,
   SKILL_DEFINITIONS,
   type SkillData,
   type SkillDefinition,
   type SkillId,
+  xpForNextLevel,
 } from "./skills";
 
 // Types

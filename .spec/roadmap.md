@@ -59,18 +59,18 @@
 - [ ] 38. Implement backstory system (childhood + adulthood backstories)
 - [ ] 39. Add trait system (personality traits that affect behavior and stats)
 - [x] 40. Create skill system (shooting, melee, construction, mining, cooking, etc.) <!-- Ticket 0006 -->
-- [ ] 41. Implement skill experience gain and leveling
+- [x] 41. Implement skill experience gain and leveling <!-- Ticket 0008 -->
 - [ ] 42. Add passion system (no interest, minor passion, major passion per skill)
 - [ ] 43. Create colonist bio/character sheet panel
 
 ## Phase 4 — Needs System
 
 - [x] 44. Implement needs framework (need type, current value, decay rate, thresholds) <!-- Ticket 0007 -->
-- [ ] 45. Add hunger need with tick-based decay
-- [ ] 46. Add rest/energy need with tick-based decay
-- [ ] 47. Add mood/happiness composite need
-- [ ] 48. Implement need threshold levels (satisfied, minor, major, extreme, critical)
-- [ ] 49. Create needs bar UI showing all needs for selected colonist
+- [x] 45. Add hunger need with tick-based decay <!-- Done in Ticket 0007 -->
+- [x] 46. Add rest/energy need with tick-based decay <!-- Done in Ticket 0007 -->
+- [x] 47. Add mood/happiness composite need <!-- Done in Ticket 0007 -->
+- [x] 48. Implement need threshold levels (satisfied, minor, major, extreme, critical) <!-- Done in Ticket 0007: getNeedThreshold() -->
+- [x] 49. Create needs bar UI showing all needs for selected colonist <!-- Done: ColonistInfoWidget shows needs with percentage bars via InspectorForm -->
 - [ ] 50. Add mood thought system (positive and negative thoughts with expiry)
 - [ ] 51. Implement mood breakdowns at critically low mood (mental breaks)
 - [ ] 52. Create mental break types (berserk, sad wander, food binge, hide in room)

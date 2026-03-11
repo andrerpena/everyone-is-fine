@@ -155,6 +155,94 @@ export function generateRandomSkills(rng: SeededRandom): CharacterSkills {
   return skills;
 }
 
+// =============================================================================
+// EXPERIENCE & LEVELING
+// =============================================================================
+
+/**
+ * XP required to advance from `level` to `level + 1`.
+ * Uses a linear scaling formula: (level + 1) * 100.
+ * Level 0→1: 100 XP, Level 5→6: 600 XP, Level 19→20: 2000 XP.
+ */
+export function xpForNextLevel(level: number): number {
+  return (level + 1) * 100;
+}
+
+/** Result of granting experience to a skill */
+export interface ExperienceResult {
+  /** Updated skills record (new reference) */
+  skills: CharacterSkills;
+  /** Whether at least one level-up occurred */
+  leveledUp: boolean;
+  /** Number of levels gained */
+  levelsGained: number;
+}
+
+/**
+ * Grant experience points to a skill, handling level-ups.
+ * Returns a new skills record (does not mutate the input).
+ *
+ * @param skills - Current character skills
+ * @param skillId - Which skill to grant XP to
+ * @param amount - XP to add (must be positive)
+ * @returns Updated skills and level-up info
+ */
+export function grantExperience(
+  skills: CharacterSkills,
+  skillId: SkillId,
+  amount: number,
+): ExperienceResult {
+  const current = skills[skillId];
+
+  // Already at max level — no XP gain
+  if (current.level >= MAX_SKILL_LEVEL) {
+    return { skills, leveledUp: false, levelsGained: 0 };
+  }
+
+  let level = current.level;
+  let xp = current.experience + amount;
+  let levelsGained = 0;
+
+  // Process level-ups (handle multiple in one grant)
+  while (level < MAX_SKILL_LEVEL) {
+    const needed = xpForNextLevel(level);
+    if (xp < needed) break;
+    xp -= needed;
+    level++;
+    levelsGained++;
+  }
+
+  // Cap XP at 0 if max level reached
+  if (level >= MAX_SKILL_LEVEL) {
+    xp = 0;
+  }
+
+  const updatedSkills: CharacterSkills = {
+    ...skills,
+    [skillId]: { level, experience: xp },
+  };
+
+  return {
+    skills: updatedSkills,
+    leveledUp: levelsGained > 0,
+    levelsGained,
+  };
+}
+
+/**
+ * Get progress toward the next level as a 0-1 fraction.
+ * Returns 1 if at max level.
+ */
+export function getSkillProgress(skill: SkillData): number {
+  if (skill.level >= MAX_SKILL_LEVEL) return 1;
+  const needed = xpForNextLevel(skill.level);
+  return needed > 0 ? skill.experience / needed : 0;
+}
+
+// =============================================================================
+// DISPLAY HELPERS
+// =============================================================================
+
 /**
  * Format skills as a summary string for display.
  * Shows non-zero skills sorted by level descending.
