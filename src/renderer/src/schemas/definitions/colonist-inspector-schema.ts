@@ -40,6 +40,11 @@ export const colonistInspectorSchema = nu
       label: "Moving",
       editable: false,
     }),
+    activity: nu.string().withMetadata({
+      label: "Activity",
+      renderer: "readonly",
+      editable: false,
+    }),
     controlMode: nu.string().withMetadata({
       label: "Mode",
       renderer: "readonly",
@@ -107,6 +112,7 @@ export const colonistInspectorSchema = nu
         {
           label: "Status",
           fields: [
+            { name: "activity", fieldWidth: 12 },
             { name: "controlMode", fieldWidth: 6 },
             { name: "currentCommand", fieldWidth: 6 },
           ],
@@ -142,6 +148,7 @@ export interface ColonistInspectorData {
   position: string;
   speed: number;
   isMoving: boolean;
+  activity: string;
   controlMode: string;
   currentCommand: string;
   hunger: number;
