@@ -12,6 +12,7 @@ import {
   entityStore,
   findPath,
   IdleBehaviorSystem,
+  MentalBreakSystem,
   MoodThoughtSystem,
   MovementSystem,
   NeedsSystem,
@@ -632,6 +633,12 @@ const idleBehavior = new IdleBehaviorSystem(
 
 const needsSystem = new NeedsSystem(entityStore);
 const moodThoughtSystem = new MoodThoughtSystem(entityStore);
+const mentalBreakSystem = new MentalBreakSystem(
+  entityStore,
+  jobProcessor,
+  movementSystem,
+  () => useGameStore.getState().world,
+);
 
 // =============================================================================
 // SIMULATION LOOP SETUP
@@ -663,6 +670,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
 
   // Evaluate thoughts and compute mood from them
   moodThoughtSystem.update(tick);
+
+  // Check for mental break triggers/recovery
+  mentalBreakSystem.update(tick);
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();

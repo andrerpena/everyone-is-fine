@@ -80,6 +80,15 @@ export interface CharacterNeeds {
   mood: number;
 }
 
+/** Mental break types */
+export type MentalBreakType = "sad_wander";
+
+/** Active mental break state */
+export interface MentalBreakState {
+  type: MentalBreakType;
+  startedAtTick: number;
+}
+
 /** Character entity */
 export interface Character extends Entity {
   type: CharacterType;
@@ -97,6 +106,8 @@ export interface Character extends Entity {
   traits: CharacterTraits;
   /** Active mood thoughts */
   thoughts: ActiveThought[];
+  /** Active mental break, or null if not in a break */
+  mentalBreak: MentalBreakState | null;
 }
 
 // =============================================================================
@@ -287,6 +298,7 @@ export function createCharacter(
     skills: createDefaultSkills(),
     traits: [],
     thoughts: [],
+    mentalBreak: null,
     ...options,
   };
 }

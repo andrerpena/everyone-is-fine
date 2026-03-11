@@ -1,7 +1,8 @@
 // =============================================================================
-// IDLE BEHAVIOR SYSTEM
+// MENTAL BREAK SYSTEM
 // =============================================================================
-// Assigns idle colonists to wander to nearby tiles periodically
+// Monitors colonist mood and triggers/ends mental breaks.
+// Currently supports "sad_wander" — colonist ignores commands and wanders.
 
 import type { World } from "../../world/types";
 import { getWorldTileAt } from "../../world/utils/tile-utils";
@@ -9,6 +10,7 @@ import type { EntityStore } from "../entity-store";
 import type { JobProcessor } from "../jobs";
 import type { Job, MoveStep } from "../jobs/types";
 import { generateJobId } from "../jobs/types";
+import type { MovementSystem } from "../movement";
 import { findPath } from "../pathfinding";
 import { TICKS_PER_SECOND } from "../simulation-loop";
 import type { EntityId } from "../types";
@@ -17,14 +19,18 @@ import type { EntityId } from "../types";
 // CONSTANTS
 // =============================================================================
 
-/** Minimum cooldown between wanders in seconds */
-const MIN_WANDER_COOLDOWN = 3;
+/** Mood threshold to trigger a mental break */
+export const MENTAL_BREAK_TRIGGER_THRESHOLD = 0.2;
 
-/** Maximum cooldown between wanders in seconds */
-const MAX_WANDER_COOLDOWN = 8;
+/** Mood threshold to end a mental break (hysteresis) */
+export const MENTAL_BREAK_RECOVERY_THRESHOLD = 0.3;
 
-/** Maximum distance (in tiles) a colonist will wander from current position */
-const WANDER_RADIUS = 4;
+/** Wander cooldown during mental break (shorter than idle — more frantic) */
+const BREAK_WANDER_COOLDOWN_MIN = 1;
+const BREAK_WANDER_COOLDOWN_MAX = 3;
+
+/** Wander radius during mental break */
+const BREAK_WANDER_RADIUS = 6;
 
 // =============================================================================
 // SIMPLE LCG RNG (deterministic per-entity)
@@ -39,68 +45,114 @@ function lcgFloat(seed: number): number {
 }
 
 // =============================================================================
-// IDLE BEHAVIOR SYSTEM
+// MENTAL BREAK SYSTEM
 // =============================================================================
 
 /**
- * Checks idle characters each tick and assigns wander jobs
- * after a random cooldown period.
+ * Monitors mood each tick. Triggers mental breaks when mood drops to critical,
+ * ends them when mood recovers. During a break, assigns wander jobs.
  */
-export class IdleBehaviorSystem {
+export class MentalBreakSystem {
   private entityStore: EntityStore;
   private jobProcessor: JobProcessor;
+  private movementSystem: MovementSystem;
   private getWorld: () => World | null;
 
-  /** Remaining cooldown ticks per character before next wander */
+  /** Wander cooldown ticks per character during break */
   private cooldowns: Map<EntityId, number> = new Map();
 
-  /** RNG seed per character for deterministic wander directions */
+  /** RNG seeds per character */
   private seeds: Map<EntityId, number> = new Map();
 
   constructor(
     entityStore: EntityStore,
     jobProcessor: JobProcessor,
+    movementSystem: MovementSystem,
     getWorld: () => World | null,
   ) {
     this.entityStore = entityStore;
     this.jobProcessor = jobProcessor;
+    this.movementSystem = movementSystem;
     this.getWorld = getWorld;
   }
 
   /**
-   * Called every tick. Checks idle characters and assigns wander jobs.
+   * Called every tick. Check for break triggers and manage active breaks.
    */
-  update(): void {
+  update(currentTick: number): void {
     for (const character of this.entityStore.values()) {
-      // Skip characters in mental break (they have their own wander behavior)
-      if (character.mentalBreak !== null) continue;
-      // Only wander if truly idle (no job, no movement, idle mode)
-      if (character.control.mode !== "idle") continue;
-      if (character.movement.isMoving) continue;
-      if (this.jobProcessor.getJob(character.id)) continue;
+      const mood = character.needs.mood;
 
-      // Manage cooldown
-      const remaining = this.cooldowns.get(character.id);
-      if (remaining === undefined) {
-        // First time seeing this idle character — start a cooldown
-        this.cooldowns.set(character.id, this.randomCooldown(character.id));
-        continue;
+      if (character.mentalBreak === null) {
+        // Not in a break — check if we should trigger one
+        if (mood < MENTAL_BREAK_TRIGGER_THRESHOLD) {
+          this.triggerBreak(character.id, currentTick);
+        }
+      } else {
+        // In a break — check if we should end it
+        if (mood >= MENTAL_BREAK_RECOVERY_THRESHOLD) {
+          this.endBreak(character.id);
+        } else {
+          // Still in break — assign wander behavior
+          this.updateBreakBehavior(character.id);
+        }
       }
-
-      if (remaining > 0) {
-        this.cooldowns.set(character.id, remaining - 1);
-        continue;
-      }
-
-      // Cooldown expired — try to wander
-      this.tryWander(character.id);
     }
   }
 
   /**
-   * Pick a random nearby passable tile and create a move job.
+   * Trigger a mental break for a character.
    */
-  private tryWander(characterId: EntityId): void {
+  private triggerBreak(characterId: EntityId, currentTick: number): void {
+    // Cancel any active jobs and movement
+    this.jobProcessor.cancelJob(characterId);
+    this.movementSystem.cancelMove(characterId);
+
+    // Set mental break state
+    this.entityStore.update(characterId, {
+      mentalBreak: { type: "sad_wander", startedAtTick: currentTick },
+    });
+
+    // Reset wander cooldown (start wandering immediately)
+    this.cooldowns.set(characterId, 0);
+  }
+
+  /**
+   * End a mental break.
+   */
+  private endBreak(characterId: EntityId): void {
+    this.entityStore.update(characterId, {
+      mentalBreak: null,
+    });
+    this.cooldowns.delete(characterId);
+  }
+
+  /**
+   * During a break, assign wander jobs (similar to idle but more frequent/erratic).
+   */
+  private updateBreakBehavior(characterId: EntityId): void {
+    const character = this.entityStore.get(characterId);
+    if (!character) return;
+
+    // Don't assign new wander if already moving or has a job
+    if (character.movement.isMoving) return;
+    if (this.jobProcessor.getJob(characterId)) return;
+
+    // Manage cooldown
+    const remaining = this.cooldowns.get(characterId) ?? 0;
+    if (remaining > 0) {
+      this.cooldowns.set(characterId, remaining - 1);
+      return;
+    }
+
+    // Try to wander
+    this.tryBreakWander(characterId);
+  }
+
+  /**
+   * Pick a random nearby tile and create a wander job during break.
+   */
+  private tryBreakWander(characterId: EntityId): void {
     const character = this.entityStore.get(characterId);
     if (!character) return;
 
@@ -112,14 +164,11 @@ export class IdleBehaviorSystem {
     // Advance RNG
     let seed = this.seeds.get(characterId) ?? this.hashId(characterId);
     seed = lcgNext(seed);
-    this.seeds.set(characterId, seed);
-
-    // Pick a random offset within wander radius
     const seed2 = lcgNext(seed);
     this.seeds.set(characterId, seed2);
 
     const angle = lcgFloat(seed) * Math.PI * 2;
-    const dist = 1 + Math.floor(lcgFloat(seed2) * WANDER_RADIUS);
+    const dist = 1 + Math.floor(lcgFloat(seed2) * BREAK_WANDER_RADIUS);
     const targetX = position.x + Math.round(Math.cos(angle) * dist);
     const targetY = position.y + Math.round(Math.sin(angle) * dist);
     const target = { x: targetX, y: targetY, z: position.z };
@@ -127,7 +176,6 @@ export class IdleBehaviorSystem {
     // Check if target tile is passable
     const tile = getWorldTileAt(world, targetX, targetY, position.z);
     if (!tile || !tile.pathfinding.isPassable) {
-      // Pick a new cooldown and try again next time
       this.cooldowns.set(characterId, this.randomCooldown(characterId));
       return;
     }
@@ -142,7 +190,7 @@ export class IdleBehaviorSystem {
       return;
     }
 
-    // Create a simple wander job (single move step)
+    // Create wander job
     const moveStep: MoveStep = {
       type: "move",
       destination: target,
@@ -152,7 +200,7 @@ export class IdleBehaviorSystem {
 
     const job: Job = {
       id: generateJobId(),
-      type: "wander",
+      type: "sad_wander",
       characterId,
       targetPosition: target,
       steps: [moveStep],
@@ -162,27 +210,19 @@ export class IdleBehaviorSystem {
     };
 
     this.jobProcessor.assignJob(job);
-
-    // Reset cooldown for after wander completes
     this.cooldowns.set(characterId, this.randomCooldown(characterId));
   }
 
-  /**
-   * Generate a random cooldown in ticks using deterministic RNG.
-   */
   private randomCooldown(characterId: EntityId): number {
     let seed = this.seeds.get(characterId) ?? this.hashId(characterId);
     seed = lcgNext(seed);
     this.seeds.set(characterId, seed);
 
-    const range = MAX_WANDER_COOLDOWN - MIN_WANDER_COOLDOWN;
-    const seconds = MIN_WANDER_COOLDOWN + lcgFloat(seed) * range;
+    const range = BREAK_WANDER_COOLDOWN_MAX - BREAK_WANDER_COOLDOWN_MIN;
+    const seconds = BREAK_WANDER_COOLDOWN_MIN + lcgFloat(seed) * range;
     return Math.floor(seconds * TICKS_PER_SECOND);
   }
 
-  /**
-   * Simple hash of entity ID string to seed the RNG.
-   */
   private hashId(id: string): number {
     let hash = 0;
     for (let i = 0; i < id.length; i++) {

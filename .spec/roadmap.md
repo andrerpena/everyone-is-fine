@@ -72,8 +72,8 @@
 - [x] 48. Implement need threshold levels (satisfied, minor, major, extreme, critical) <!-- Done in Ticket 0007: getNeedThreshold() -->
 - [x] 49. Create needs bar UI showing all needs for selected colonist <!-- Done: ColonistInfoWidget shows needs with percentage bars via InspectorForm -->
 - [x] 50. Add mood thought system (positive and negative thoughts with expiry) <!-- Ticket 0011 -->
-- [ ] 51. Implement mood breakdowns at critically low mood (mental breaks)
-- [ ] 52. Create mental break types (berserk, sad wander, food binge, hide in room)
+- [x] 51. Implement mood breakdowns at critically low mood (mental breaks) <!-- Ticket 0016 -->
+- [ ] 52. Create mental break types (berserk, sad wander, food binge, hide in room) <!-- Partial: sad wander implemented in ticket 0016 -->
 - [ ] 53. Add comfort need (affected by furniture quality)
 - [ ] 54. Add recreation need (satisfied by joy activities)
 - [ ] 55. Add beauty/environment need (affected by surroundings cleanliness and aesthetics)

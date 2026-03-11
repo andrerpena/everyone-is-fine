@@ -19,7 +19,8 @@ export type ThoughtId =
   | "pessimist_baseline"
   | "neurotic_anxiety"
   | "feeling_brave"
-  | "content";
+  | "content"
+  | "mental_break_sad_wander";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -115,6 +116,14 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     label: "Feeling Brave",
     description: "Fearless and confident",
     moodEffect: 0.03,
+    durationSeconds: 0,
+  },
+  // Mental break thoughts (condition-based, duration = 0)
+  {
+    id: "mental_break_sad_wander",
+    label: "Mental Break: Sad Wander",
+    description: "Overwhelmed by sadness, wandering aimlessly",
+    moodEffect: -0.05,
     durationSeconds: 0,
   },
 ] as const;

@@ -4,6 +4,11 @@
 
 // Behaviors
 export { IdleBehaviorSystem } from "./behaviors/idle-behavior";
+export {
+  MENTAL_BREAK_RECOVERY_THRESHOLD,
+  MENTAL_BREAK_TRIGGER_THRESHOLD,
+  MentalBreakSystem,
+} from "./behaviors/mental-break-system";
 // Entity Store
 export { EntityStore, entityStore } from "./entity-store";
 // Jobs

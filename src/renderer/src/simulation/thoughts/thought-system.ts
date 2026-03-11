@@ -83,6 +83,11 @@ export function evaluateConditionThoughts(
     thoughts.add("content");
   }
 
+  // --- Mental break thoughts ---
+  if (character.mentalBreak?.type === "sad_wander") {
+    thoughts.add("mental_break_sad_wander");
+  }
+
   // --- Trait-based thoughts ---
   if (traits.includes("optimist")) {
     thoughts.add("optimist_baseline");

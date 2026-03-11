@@ -44,6 +44,7 @@ export interface AgentCharacterInfo {
   traits: string[];
   skills: Record<string, AgentSkillInfo>;
   thoughts: AgentThoughtInfo[];
+  mentalBreak: { type: string; startedAtTick: number } | null;
 }
 
 /** Tile info exposed to agents */

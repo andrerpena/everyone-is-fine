@@ -87,6 +87,12 @@ function toAgentCharacter(char: Character): AgentCharacterInfo {
         moodEffect: def?.moodEffect ?? 0,
       };
     }),
+    mentalBreak: char.mentalBreak
+      ? {
+          type: char.mentalBreak.type,
+          startedAtTick: char.mentalBreak.startedAtTick,
+        }
+      : null,
   };
 }
 

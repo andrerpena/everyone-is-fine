@@ -290,6 +290,10 @@ export class EntityStore {
         : base.skills,
       traits: changes.traits ?? base.traits,
       thoughts: changes.thoughts ?? base.thoughts,
+      mentalBreak:
+        changes.mentalBreak !== undefined
+          ? changes.mentalBreak
+          : base.mentalBreak,
       // Ensure position and visualOffset are fully replaced if provided
       position: changes.position ?? base.position,
       visualOffset: changes.visualOffset ?? base.visualOffset,
