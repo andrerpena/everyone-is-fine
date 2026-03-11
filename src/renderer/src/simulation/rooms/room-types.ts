@@ -2,6 +2,15 @@
 // ROOM TYPES
 // =============================================================================
 
+/** Functional role of a room based on its contents */
+export type RoomRole =
+  | "bedroom"
+  | "barracks"
+  | "dining_room"
+  | "workshop"
+  | "storage"
+  | "generic";
+
 /** Computed statistics for a room */
 export interface RoomStats {
   /** Number of tiles in the room */
@@ -26,6 +35,8 @@ export interface Room {
   isOutdoors: boolean;
   /** Computed stats, null until calculated */
   stats: RoomStats | null;
+  /** Functional role based on room contents */
+  role: RoomRole;
 }
 
 let roomCounter = 0;

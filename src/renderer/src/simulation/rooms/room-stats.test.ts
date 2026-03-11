@@ -35,6 +35,7 @@ function makeRoom(tileKeys: string[]): Room {
     tiles: new Set(tileKeys),
     isOutdoors: false,
     stats: null,
+    role: "generic",
   };
 }
 
@@ -87,6 +88,7 @@ describe("calculateRoomStats", () => {
       tiles: new Set(),
       isOutdoors: false,
       stats: null,
+      role: "generic",
     };
     const level = makeLevel([], 0, 0);
 
