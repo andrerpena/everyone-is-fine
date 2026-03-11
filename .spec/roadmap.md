@@ -175,7 +175,7 @@
 - [x] 133. Implement day/night cycle with configurable day length <!-- Done: time progression (ticket 0014) + ambient lighting (ticket 0017) -->
 - [x] 134. Add ambient lighting changes based on time of day <!-- Ticket 0017 -->
 - [x] 135. Create season system (spring, summer, fall, winter) with configurable year length <!-- Done: seasons cycle in time system (ticket 0014), displayed in status bar -->
-- [ ] 136. Implement temperature simulation (outdoor temp varies by season and time)
+- [x] 136. Implement temperature simulation (outdoor temp varies by season and time) <!-- Ticket 0030 -->
 - [ ] 137. Add weather system framework (clear, rain, fog, snow, thunderstorm)
 - [ ] 138. Implement rain weather with visual effects and ground moisture
 - [ ] 139. Add snow weather with accumulation on tiles

@@ -20,7 +20,8 @@ function GameTimeStatusBarComponent(_props: StatusBarItemProps) {
     // Reading currentTick ensures this selector re-evaluates when ticks advance.
     // Zustand only re-renders if the returned string actually changes.
     void state.simulation.currentTick;
-    return formatGameTime(state.world.time);
+    const temp = state.world.weather.temperature;
+    return `${formatGameTime(state.world.time)} | ${temp}°C`;
   });
 
   if (!timeText) {

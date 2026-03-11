@@ -12,6 +12,7 @@ import {
   entityStore,
   findPath,
   GameNotifications,
+  getOutdoorTemperature,
   IdleBehaviorSystem,
   MentalBreakSystem,
   MoodThoughtSystem,
@@ -740,6 +741,10 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
   const world = useGameStore.getState().world;
   if (world) {
     world.time = advanceTime(world.time);
+    world.weather.temperature = getOutdoorTemperature(
+      world.time.season,
+      world.time.hour,
+    );
   }
 
   // --- Profiled system updates ---

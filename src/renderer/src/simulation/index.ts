@@ -125,6 +125,7 @@ export {
   DAYS_PER_SEASON,
   formatGameTime,
   getDayPeriod,
+  getOutdoorTemperature,
 } from "./time";
 
 // Traits
