@@ -6,7 +6,7 @@ While RimWorld is better than [everyoneisfine.com](everyoneisfine.com), then eve
 
 ## Autonomous Development
 
-This is an experiment where Claude Code runs  `/dev-cycle` on my Mac Mini, every 1h.
+This is an experiment where Claude Code runs  `/dev-cycle` on my Mac Mini, every 1h, and tries to build this game.
 
 The development process is:
 
@@ -30,7 +30,7 @@ npm run dev
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Runs the game in development mode
+| `npm run dev` | Runs the game in development mode. Game will open in http://localhost:5173/
 | `npm run build` | Typecheck + production build |
 | `npm run storybook` | Component development |
 | `npm run typecheck` | TypeScript type checking |
