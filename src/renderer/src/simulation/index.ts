@@ -88,13 +88,16 @@ export {
 // Skills
 export {
   ALL_SKILL_IDS,
+  BASE_WORK_XP,
   type CharacterSkills,
   createDefaultSkills,
   type ExperienceResult,
   formatSkillsSummary,
   generateRandomSkills,
   getSkillProgress,
+  getWorkSpeedMultiplier,
   grantExperience,
+  JOB_SKILL_MAP,
   MAX_SKILL_LEVEL,
   PASSION_XP_MULTIPLIERS,
   type Passion,

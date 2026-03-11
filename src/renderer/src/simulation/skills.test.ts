@@ -4,6 +4,7 @@ import {
   createDefaultSkills,
   formatSkillsSummary,
   getSkillProgress,
+  getWorkSpeedMultiplier,
   grantExperience,
   MAX_SKILL_LEVEL,
   PASSION_XP_MULTIPLIERS,
@@ -148,6 +149,24 @@ describe("getSkillProgress", () => {
         passion: "none",
       }),
     ).toBe(1);
+  });
+});
+
+describe("getWorkSpeedMultiplier", () => {
+  it("returns 1.0 at level 0", () => {
+    expect(getWorkSpeedMultiplier(0)).toBe(1.0);
+  });
+
+  it("returns 1.5 at level 10", () => {
+    expect(getWorkSpeedMultiplier(10)).toBe(1.5);
+  });
+
+  it("returns 2.0 at level 20", () => {
+    expect(getWorkSpeedMultiplier(20)).toBe(2.0);
+  });
+
+  it("caps at MAX_SKILL_LEVEL", () => {
+    expect(getWorkSpeedMultiplier(25)).toBe(2.0);
   });
 });
 

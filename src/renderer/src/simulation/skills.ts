@@ -271,6 +271,32 @@ export function getSkillProgress(skill: SkillData): number {
 }
 
 // =============================================================================
+// WORK SPEED
+// =============================================================================
+
+/**
+ * Maps job types to the skill that affects their speed and grants XP.
+ * Jobs not listed here use base speed (1.0) and grant no XP.
+ */
+export const JOB_SKILL_MAP: Partial<Record<string, SkillId>> = {
+  chop: "plants",
+  mine: "mining",
+  forage: "plants",
+};
+
+/** Base XP granted per completed work step */
+export const BASE_WORK_XP = 20;
+
+/**
+ * Get the work speed multiplier for a given skill level.
+ * Linear scaling: 1.0 at level 0, 2.0 at level 20.
+ * Formula: 1 + level * 0.05
+ */
+export function getWorkSpeedMultiplier(level: number): number {
+  return 1 + Math.min(level, MAX_SKILL_LEVEL) * 0.05;
+}
+
+// =============================================================================
 // DISPLAY HELPERS
 // =============================================================================
 

@@ -14,6 +14,12 @@ import { addItemToTile, getWorldTileAt } from "../../world/utils/tile-utils";
 import type { EntityStore } from "../entity-store";
 import type { MovementSystem } from "../movement";
 import { findPath } from "../pathfinding";
+import {
+  BASE_WORK_XP,
+  getWorkSpeedMultiplier,
+  grantExperience,
+  JOB_SKILL_MAP,
+} from "../skills";
 import { createMoveCommand, type EntityId } from "../types";
 import { ReservationSystem } from "./reservation-system";
 import type {
@@ -184,9 +190,28 @@ export class JobProcessor {
           step.status = "active";
         }
         if (step.status === "active") {
-          step.ticksWorked++;
+          // Apply skill-based speed multiplier
+          const skillId = JOB_SKILL_MAP[job.type];
+          const character = this.entityStore.get(characterId);
+          const multiplier =
+            skillId && character
+              ? getWorkSpeedMultiplier(character.skills[skillId].level)
+              : 1;
+          step.ticksWorked += multiplier;
+
           if (step.ticksWorked >= step.totalTicks) {
             step.status = "completed";
+            // Grant XP to the relevant skill on work completion
+            if (skillId && character) {
+              const result = grantExperience(
+                character.skills,
+                skillId,
+                BASE_WORK_XP,
+              );
+              this.entityStore.update(characterId, {
+                skills: result.skills,
+              });
+            }
             this.advanceToNextStep(characterId, job);
           }
         }
