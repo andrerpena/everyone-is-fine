@@ -188,6 +188,45 @@ export interface GameAgentApi {
   saveSnapshot: () => string;
   loadSnapshot: (json: string) => void;
 
+  // Zone management
+  zones: {
+    create: (
+      type: string,
+      name: string,
+      tiles?: Array<{ x: number; y: number }>,
+      z?: number,
+    ) => {
+      id: string;
+      type: string;
+      name: string;
+      zLevel: number;
+      tileCount: number;
+    };
+    delete: (zoneId: string) => void;
+    addTiles: (zoneId: string, tiles: Array<{ x: number; y: number }>) => void;
+    removeTiles: (
+      zoneId: string,
+      tiles: Array<{ x: number; y: number }>,
+    ) => void;
+    list: () => Array<{
+      id: string;
+      type: string;
+      name: string;
+      zLevel: number;
+      tileCount: number;
+    }>;
+    get: (
+      zoneId: string,
+    ) => {
+      id: string;
+      type: string;
+      name: string;
+      zLevel: number;
+      tileCount: number;
+    } | null;
+    clearAll: () => void;
+  };
+
   // Low-level command access
   commands: {
     dispatch: (commandId: string, payload?: unknown) => Promise<void>;

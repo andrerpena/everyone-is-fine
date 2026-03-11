@@ -33,12 +33,14 @@ import {
   useGameColorStore,
 } from "@renderer/theming/game-color-store";
 import type { Position2D } from "@renderer/world/types";
+import { useZoneStore } from "@renderer/zones";
 import {
   CharacterRenderer,
   HeatMapRenderer,
   JobProgressRenderer,
   PathRenderer,
   WeatherRenderer,
+  ZoneRenderer,
 } from "./renderers";
 import { updateAmbientOverlay } from "./renderers/ambient-lighting";
 
@@ -257,6 +259,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
   const heatMapRendererRef = useRef<HeatMapRenderer | null>(null);
   const jobProgressRendererRef = useRef<JobProgressRenderer | null>(null);
   const weatherRendererRef = useRef<WeatherRenderer | null>(null);
+  const zoneRendererRef = useRef<ZoneRenderer | null>(null);
 
   // Interaction container for click handling
   const [interactionContainer, setInteractionContainer] =
@@ -386,6 +389,16 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       }
     });
 
+    // Subscribe to zone store changes for zone overlay rendering
+    const unsubscribeZones = useZoneStore.subscribe(() => {
+      if (!zoneRendererRef.current) return;
+      const layerEnabled =
+        useLayerStore.getState().visibility.get("zones") ?? true;
+      if (!layerEnabled) return;
+      const zones = useZoneStore.getState().getAllZones();
+      zoneRendererRef.current.update(zones, zLevel);
+    });
+
     const unsubscribeLayers = useLayerStore.subscribe((state) => {
       // Update heat map renderer
       if (heatMapRendererRef.current && level) {
@@ -440,6 +453,18 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         }
       }
 
+      // Toggle zones layer
+      if (zoneRendererRef.current) {
+        const zonesEnabled = state.visibility.get("zones") ?? true;
+        if (!zonesEnabled) {
+          zoneRendererRef.current.setVisible(false);
+        } else {
+          zoneRendererRef.current.setVisible(true);
+          const zones = useZoneStore.getState().getAllZones();
+          zoneRendererRef.current.update(zones, zLevel);
+        }
+      }
+
       // Update characters and paths based on visibility
       const gameState = useGameStore.getState();
       const shouldRenderCharacters = state.visibility.get("characters") ?? true;
@@ -455,6 +480,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       unsubscribeGame();
       unsubscribeAmbient();
       unsubscribeWeather();
+      unsubscribeZones();
       unsubscribeLayers();
     };
   }, [zLevel, level]);
@@ -587,6 +613,19 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       itemsGraphics.visible = initialLayerVisibility.get("items") ?? true;
 
       logger.info("Pixi.js viewport initialized", ["pixi"]);
+
+      // Create zone overlay container (above items, below heatmap)
+      const zoneContainer = new Container();
+      viewport.addChild(zoneContainer);
+      const zoneRenderer = new ZoneRenderer(zoneContainer, CELL_SIZE);
+      zoneRendererRef.current = zoneRenderer;
+      // Initial zone render
+      const initialZones = useZoneStore.getState().getAllZones();
+      zoneRenderer.update(initialZones, zLevel);
+      const zonesLayerEnabled = initialLayerVisibility.get("zones") ?? true;
+      if (!zonesLayerEnabled) {
+        zoneRenderer.setVisible(false);
+      }
 
       // Create heat map overlay container (between world and hover)
       const heatMapContainer = new Container();
@@ -862,6 +901,10 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       if (weatherRendererRef.current) {
         weatherRendererRef.current.destroy();
         weatherRendererRef.current = null;
+      }
+      if (zoneRendererRef.current) {
+        zoneRendererRef.current.destroy();
+        zoneRendererRef.current = null;
       }
       if (appRef.current) {
         const app = appRef.current as Application & {

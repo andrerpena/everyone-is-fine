@@ -109,6 +109,18 @@ export const ambientLightingLayer: FeatureLayerDefinition = {
   customRender: true,
 };
 
+export const zonesLayer: FeatureLayerDefinition = {
+  id: "zones",
+  name: "Zones",
+  category: "feature",
+  type: "feature",
+  description: "Zone designations (stockpile, growing, dumping)",
+  defaultEnabled: true,
+  zIndex: 49, // Below trees (50), above terrain
+  filter: () => true,
+  customRender: true,
+};
+
 export const weatherEffectsLayer: FeatureLayerDefinition = {
   id: "weather-effects",
   name: "Weather Effects",
@@ -151,6 +163,7 @@ export function registerBuiltInLayers(): void {
   layerRegistry.register(treesLayer);
   layerRegistry.register(structuresLayer);
   layerRegistry.register(itemsLayer);
+  layerRegistry.register(zonesLayer);
   layerRegistry.register(ambientLightingLayer);
   layerRegistry.register(weatherEffectsLayer);
   layerRegistry.register(charactersLayer);

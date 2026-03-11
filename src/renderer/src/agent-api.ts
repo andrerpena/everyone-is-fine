@@ -42,6 +42,8 @@ import type {
 } from "./world/types";
 import { deserializeWorld, serializeWorld } from "./world/utils/serialization";
 import { getWorldTileAt } from "./world/utils/tile-utils";
+import { useZoneStore } from "./zones";
+import type { AgentZoneInfo, ZoneType } from "./zones/types";
 
 // =============================================================================
 // HELPERS
@@ -629,6 +631,81 @@ function createAgentApi(): GameAgentApi {
 
       // Restore simulation state
       state.setSpeed(snapshot.simulation.speed);
+    },
+
+    // =========================================================================
+    // ZONE MANAGEMENT
+    // =========================================================================
+
+    zones: {
+      create(
+        type: string,
+        name: string,
+        tiles?: Array<{ x: number; y: number }>,
+        z?: number,
+      ): AgentZoneInfo {
+        const zoneStore = useZoneStore.getState();
+        const zLevel = z ?? 0;
+        const id = zoneStore.createZone(type as ZoneType, name, zLevel);
+        if (tiles && tiles.length > 0) {
+          zoneStore.addTiles(
+            id,
+            tiles.map((t) => `${t.x},${t.y}`),
+          );
+        }
+        const zone = useZoneStore.getState().zones.get(id)!;
+        return {
+          id: zone.id,
+          type: zone.type,
+          name: zone.name,
+          zLevel: zone.zLevel,
+          tileCount: zone.tiles.size,
+        };
+      },
+      delete(zoneId: string): void {
+        useZoneStore.getState().deleteZone(zoneId);
+      },
+      addTiles(zoneId: string, tiles: Array<{ x: number; y: number }>): void {
+        useZoneStore.getState().addTiles(
+          zoneId,
+          tiles.map((t) => `${t.x},${t.y}`),
+        );
+      },
+      removeTiles(
+        zoneId: string,
+        tiles: Array<{ x: number; y: number }>,
+      ): void {
+        useZoneStore.getState().removeTiles(
+          zoneId,
+          tiles.map((t) => `${t.x},${t.y}`),
+        );
+      },
+      list(): AgentZoneInfo[] {
+        return useZoneStore
+          .getState()
+          .getAllZones()
+          .map((zone) => ({
+            id: zone.id,
+            type: zone.type,
+            name: zone.name,
+            zLevel: zone.zLevel,
+            tileCount: zone.tiles.size,
+          }));
+      },
+      get(zoneId: string): AgentZoneInfo | null {
+        const zone = useZoneStore.getState().zones.get(zoneId);
+        if (!zone) return null;
+        return {
+          id: zone.id,
+          type: zone.type,
+          name: zone.name,
+          zLevel: zone.zLevel,
+          tileCount: zone.tiles.size,
+        };
+      },
+      clearAll(): void {
+        useZoneStore.getState().clearAll();
+      },
     },
 
     // =========================================================================
