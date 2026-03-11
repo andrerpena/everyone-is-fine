@@ -39,6 +39,7 @@ import {
   JobProgressRenderer,
   PathRenderer,
 } from "./renderers";
+import { updateAmbientOverlay } from "./renderers/ambient-lighting";
 
 // =============================================================================
 // CONFIGURATION
@@ -246,6 +247,9 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
   const itemDisplaysRef = useRef<Map<string, Sprite>>(new Map());
   const tileUpdateUnsubRef = useRef<(() => void) | null>(null);
 
+  // Ambient lighting overlay
+  const ambientOverlayRef = useRef<Graphics | null>(null);
+
   // Character, path, heat map, and job progress renderers
   const characterRendererRef = useRef<CharacterRenderer | null>(null);
   const pathRendererRef = useRef<PathRenderer | null>(null);
@@ -338,6 +342,31 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       );
     });
 
+    // Subscribe to time changes for ambient lighting (only redraws when hour changes)
+    let lastAmbientHour = -1;
+    const unsubscribeAmbient = useGameStore.subscribe((state) => {
+      const world = state.world;
+      if (!world || !ambientOverlayRef.current || !level) return;
+
+      const hour = world.time.hour;
+      if (hour === lastAmbientHour) return;
+      lastAmbientHour = hour;
+
+      const layerEnabled =
+        useLayerStore.getState().visibility.get("ambient-lighting") ?? true;
+      if (!layerEnabled) {
+        ambientOverlayRef.current.visible = false;
+        return;
+      }
+
+      updateAmbientOverlay(
+        ambientOverlayRef.current,
+        level.width * CELL_SIZE,
+        level.height * CELL_SIZE,
+        hour,
+      );
+    });
+
     const unsubscribeLayers = useLayerStore.subscribe((state) => {
       // Update heat map renderer
       if (heatMapRendererRef.current && level) {
@@ -358,6 +387,25 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
           state.visibility.get("items") ?? true;
       }
 
+      // Toggle ambient lighting layer
+      if (ambientOverlayRef.current) {
+        const ambientEnabled = state.visibility.get("ambient-lighting") ?? true;
+        if (!ambientEnabled) {
+          ambientOverlayRef.current.visible = false;
+        } else {
+          // Re-apply current lighting when layer is re-enabled
+          const world = useGameStore.getState().world;
+          if (world && level) {
+            updateAmbientOverlay(
+              ambientOverlayRef.current,
+              level.width * CELL_SIZE,
+              level.height * CELL_SIZE,
+              world.time.hour,
+            );
+          }
+        }
+      }
+
       // Update characters and paths based on visibility
       const gameState = useGameStore.getState();
       const shouldRenderCharacters = state.visibility.get("characters") ?? true;
@@ -371,6 +419,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
 
     return () => {
       unsubscribeGame();
+      unsubscribeAmbient();
       unsubscribeLayers();
     };
   }, [zLevel, level]);
@@ -512,6 +561,28 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
 
       // Initial heat map render
       heatMapRenderer.update(level, initialLayerVisibility);
+
+      // Create ambient lighting overlay (day/night tint)
+      const ambientOverlay = new Graphics();
+      viewport.addChild(ambientOverlay);
+      ambientOverlayRef.current = ambientOverlay;
+
+      // Initial ambient lighting render
+      const initialWorld = useGameStore.getState().world;
+      if (initialWorld) {
+        updateAmbientOverlay(
+          ambientOverlay,
+          level.width * CELL_SIZE,
+          level.height * CELL_SIZE,
+          initialWorld.time.hour,
+        );
+      }
+      // Apply initial layer visibility
+      const ambientLayerEnabled =
+        initialLayerVisibility.get("ambient-lighting") ?? true;
+      if (!ambientLayerEnabled) {
+        ambientOverlay.visible = false;
+      }
 
       // Create hover overlay (drawn first, below selection)
       const hoverGraphics = new Graphics();

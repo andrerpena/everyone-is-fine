@@ -97,6 +97,18 @@ export const itemsLayer: FeatureLayerDefinition = {
   filter: (tile) => tile.items.length > 0,
 };
 
+export const ambientLightingLayer: FeatureLayerDefinition = {
+  id: "ambient-lighting",
+  name: "Ambient Lighting",
+  category: "feature",
+  type: "feature",
+  description: "Day/night lighting overlay based on in-game time",
+  defaultEnabled: true,
+  zIndex: 55, // Above items, below hover/selection/characters
+  filter: () => true,
+  customRender: true,
+};
+
 export const charactersLayer: FeatureLayerDefinition = {
   id: "characters",
   name: "Characters",
@@ -127,5 +139,6 @@ export function registerBuiltInLayers(): void {
   layerRegistry.register(treesLayer);
   layerRegistry.register(structuresLayer);
   layerRegistry.register(itemsLayer);
+  layerRegistry.register(ambientLightingLayer);
   layerRegistry.register(charactersLayer);
 }

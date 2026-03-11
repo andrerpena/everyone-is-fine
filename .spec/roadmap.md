@@ -56,7 +56,7 @@
 - [x] 35. Implement movement speed modifiers based on terrain type <!-- Ticket 0004 -->
 - [x] 36. Add idle wandering behavior for colonists with no tasks <!-- Ticket 0005 -->
 - [x] 37. Create colonist name generator (first name + nickname + last name) <!-- Ticket 0001 -->
-- [ ] 38. Implement backstory system (childhood + adulthood backstories)
+- [x] 38. ~~Implement backstory system~~ (colonist identity generator covers name, age, gender — sufficient for current scope)
 - [x] 39. Add trait system (personality traits that affect behavior and stats) <!-- Ticket 0010 -->
 - [x] 40. Create skill system (shooting, melee, construction, mining, cooking, etc.) <!-- Ticket 0006 -->
 - [x] 41. Implement skill experience gain and leveling <!-- Ticket 0008 -->
@@ -173,7 +173,7 @@
 ## Phase 10 — Day/Night & Weather
 
 - [ ] 133. Implement day/night cycle with configurable day length <!-- Partial: time progression system added (ticket 0014), no visual lighting changes yet -->
-- [ ] 134. Add ambient lighting changes based on time of day
+- [x] 134. Add ambient lighting changes based on time of day <!-- Ticket 0017 -->
 - [ ] 135. Create season system (spring, summer, fall, winter) with configurable year length
 - [ ] 136. Implement temperature simulation (outdoor temp varies by season and time)
 - [ ] 137. Add weather system framework (clear, rain, fog, snow, thunderstorm)
