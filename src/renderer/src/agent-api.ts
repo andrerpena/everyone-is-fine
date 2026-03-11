@@ -34,6 +34,7 @@ import {
 import { createWorld as createWorldFactory } from "./world/factories/world-factory";
 import type {
   BiomeType,
+  CropType,
   FloorType,
   ItemCategory,
   ItemType,
@@ -742,6 +743,27 @@ function createAgentApi(): GameAgentApi {
       clearAll(): void {
         useZoneStore.getState().clearAll();
       },
+    },
+
+    // =========================================================================
+    // PLANT MANAGEMENT
+    // =========================================================================
+
+    plantCrop(x: number, y: number, cropType: string, z?: number) {
+      const state = useGameStore.getState();
+      const world = state.world;
+      if (!world) throw new Error("No world loaded");
+
+      const zLevel = z ?? 0;
+      const tile = getWorldTileAt(world, x, y, zLevel);
+      if (!tile) throw new Error(`Tile (${x}, ${y}, ${zLevel}) out of bounds`);
+
+      tile.crop = {
+        type: cropType as CropType,
+        growthProgress: 0,
+        stage: "seedling",
+        plantedDay: world.time.day,
+      };
     },
 
     // =========================================================================

@@ -132,9 +132,9 @@
 
 ## Phase 8 — Food Production Chain
 
-- [ ] 99. Implement plant growth system (growth stages over ticks)
-- [ ] 100. Create crop types (rice, potatoes, corn, strawberries, healroot)
-- [ ] 101. Add soil fertility affecting crop growth speed
+- [x] 99. Implement plant growth system (growth stages over ticks) <!-- Ticket 0038 -->
+- [x] 100. Create crop types (rice, potatoes, corn, strawberries, healroot) <!-- Ticket 0038: included in plant growth system -->
+- [x] 101. Add soil fertility affecting crop growth speed <!-- Ticket 0038: terrain moisture affects growth rate -->
 - [ ] 102. Implement sowing job (colonists plant seeds in growing zones)
 - [ ] 103. Implement harvesting job (colonists gather mature crops)
 - [ ] 104. Create cooking workstation (campfire, fueled stove, electric stove)

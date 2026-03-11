@@ -236,6 +236,9 @@ export interface GameAgentApi {
     clearAll: () => void;
   };
 
+  // Plant management
+  plantCrop: (x: number, y: number, cropType: string, z?: number) => void;
+
   // Low-level command access
   commands: {
     dispatch: (commandId: string, payload?: unknown) => Promise<void>;

@@ -82,6 +82,9 @@ export {
   positionKey,
   positionsEqual,
 } from "./pathfinding";
+// Plants
+export { CROP_REGISTRY } from "./plants/crop-registry";
+export { PlantGrowthSystem } from "./plants/plant-growth-system";
 // Simulation Loop
 export {
   MS_PER_TICK,
@@ -131,7 +134,6 @@ export {
   getDayPeriod,
   getOutdoorTemperature,
 } from "./time";
-
 // Traits
 export {
   ALL_TRAIT_IDS,

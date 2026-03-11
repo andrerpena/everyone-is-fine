@@ -21,6 +21,7 @@ import {
   MovementSystem,
   NeedSatisfactionSystem,
   NeedsSystem,
+  PlantGrowthSystem,
   SnowAccumulationSystem,
   simulationLoop,
   WEATHER_TEMP_MODIFIERS,
@@ -725,6 +726,7 @@ const gameNotifications = new GameNotifications(entityStore, jobProcessor);
 
 const itemDeterioration = new ItemDeteriorationSystem();
 const snowAccumulation = new SnowAccumulationSystem();
+const plantGrowth = new PlantGrowthSystem();
 const weatherSystem = new WeatherSystem();
 const needsSystem = new NeedsSystem(entityStore);
 const moodThoughtSystem = new MoodThoughtSystem(entityStore);
@@ -763,6 +765,8 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
       WEATHER_TEMP_MODIFIERS[world.weather.type];
     // Accumulate/melt snow on tiles based on weather
     snowAccumulation.update(() => world);
+    // Advance plant growth on tiles
+    plantGrowth.update(() => world);
     // Degrade items on ground tiles
     itemDeterioration.update(() => world);
   }

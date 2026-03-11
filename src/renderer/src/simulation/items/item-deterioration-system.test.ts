@@ -12,6 +12,7 @@ function makeWorld(items: ItemData[]): World {
     pathfinding: { isPassable: true, movementCost: 1, lastUpdated: 0 },
     visibility: { explored: false, visible: false, lightLevel: 0 },
     snowDepth: 0,
+    crop: null,
   };
 
   const level: ZLevel = {

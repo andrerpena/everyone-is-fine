@@ -231,6 +231,33 @@ export interface ItemData {
 }
 
 // =============================================================================
+// CROP / PLANT TYPES
+// =============================================================================
+
+/** Available crop types that can be planted */
+export type CropType = "rice" | "potato" | "corn" | "strawberry" | "healroot";
+
+/** Growth stages for planted crops */
+export type GrowthStage = "seedling" | "growing" | "mature" | "wilted";
+
+/** Instance data for a crop planted on a tile */
+export interface CropData {
+  type: CropType;
+  growthProgress: number; // 0-1
+  stage: GrowthStage;
+  plantedDay: number;
+}
+
+/** Static properties defining crop behavior */
+export interface CropProperties {
+  readonly growthTicks: number; // Total ticks to reach maturity
+  readonly minTemp: number; // Celsius — below this, crop wilts
+  readonly maxTemp: number; // Celsius — above this, crop wilts
+  readonly yieldType: ItemType;
+  readonly yieldQuantity: number;
+}
+
+// =============================================================================
 // TILE - Complete tile combining all layers
 // =============================================================================
 
@@ -256,6 +283,9 @@ export interface Tile {
 
   /** Snow depth on this tile (0 = none, 1 = fully covered) */
   snowDepth: number;
+
+  /** Crop planted on this tile (null = no crop) */
+  crop: CropData | null;
 }
 
 /** Cached pathfinding information */
@@ -415,6 +445,7 @@ export const DEFAULT_TILE: Tile = {
     lightLevel: 0,
   },
   snowDepth: 0,
+  crop: null,
 };
 
 /** Chunk size for future chunk-based loading */
