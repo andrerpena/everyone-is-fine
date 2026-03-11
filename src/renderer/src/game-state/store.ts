@@ -8,6 +8,7 @@ import { logger } from "../lib/logger";
 import type { SystemTimings } from "../lib/performance-store";
 import { usePerformanceStore } from "../lib/performance-store";
 import {
+  advanceTime,
   entityStore,
   findPath,
   IdleBehaviorSystem,
@@ -648,6 +649,12 @@ let lastTpsTimestamp = performance.now();
 
 // Set up tick callback to update jobs and movement
 simulationLoop.setTickCallback((deltaTime, tick) => {
+  // --- Advance world time ---
+  const world = useGameStore.getState().world;
+  if (world) {
+    world.time = advanceTime(world.time);
+  }
+
   // --- Profiled system updates ---
   const t0 = performance.now();
 

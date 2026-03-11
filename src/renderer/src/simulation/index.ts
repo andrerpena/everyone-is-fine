@@ -95,7 +95,6 @@ export {
   type SkillId,
   xpForNextLevel,
 } from "./skills";
-
 // Thoughts
 export {
   type ActiveThought,
@@ -108,6 +107,13 @@ export {
   type ThoughtDefinition,
   type ThoughtId,
 } from "./thoughts";
+// Time
+export {
+  advanceTime,
+  DAYS_PER_SEASON,
+  formatGameTime,
+  getDayPeriod,
+} from "./time";
 
 // Traits
 export {

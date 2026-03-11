@@ -172,7 +172,7 @@
 
 ## Phase 10 — Day/Night & Weather
 
-- [ ] 133. Implement day/night cycle with configurable day length
+- [ ] 133. Implement day/night cycle with configurable day length <!-- Partial: time progression system added (ticket 0014), no visual lighting changes yet -->
 - [ ] 134. Add ambient lighting changes based on time of day
 - [ ] 135. Create season system (spring, summer, fall, winter) with configurable year length
 - [ ] 136. Implement temperature simulation (outdoor temp varies by season and time)
