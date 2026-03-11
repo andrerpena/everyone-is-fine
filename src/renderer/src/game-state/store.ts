@@ -10,14 +10,13 @@ import { usePerformanceStore } from "../lib/performance-store";
 import {
   advanceTime,
   entityStore,
-  ForageBehavior,
   findPath,
   IdleBehaviorSystem,
   MentalBreakSystem,
   MoodThoughtSystem,
   MovementSystem,
+  NeedSatisfactionSystem,
   NeedsSystem,
-  SleepBehavior,
   simulationLoop,
 } from "../simulation";
 import { JobProcessor } from "../simulation/jobs";
@@ -682,20 +681,14 @@ const jobProcessor = new JobProcessor(
 );
 
 // =============================================================================
-// FORAGE BEHAVIOR SETUP
+// NEED SATISFACTION SETUP
 // =============================================================================
 
-const forageBehavior = new ForageBehavior(
+const needSatisfaction = new NeedSatisfactionSystem(
   entityStore,
   jobProcessor,
   () => useGameStore.getState().world,
 );
-
-// =============================================================================
-// SLEEP BEHAVIOR SETUP
-// =============================================================================
-
-const sleepBehavior = new SleepBehavior(entityStore, jobProcessor);
 
 // =============================================================================
 // IDLE BEHAVIOR SETUP
@@ -754,11 +747,8 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
   // Check for mental break triggers/recovery
   mentalBreakSystem.update(tick);
 
-  // Hungry colonists seek berry bushes
-  forageBehavior.update();
-
-  // Tired colonists sleep on the ground
-  sleepBehavior.update();
+  // Satisfy most critical need (hunger → forage, energy → sleep)
+  needSatisfaction.update();
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();

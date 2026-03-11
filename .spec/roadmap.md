@@ -78,7 +78,7 @@
 - [ ] 54. Add recreation need (satisfied by joy activities)
 - [ ] 55. Add beauty/environment need (affected by surroundings cleanliness and aesthetics)
 - [ ] 56. Add social need (satisfied by conversations with other colonists)
-- [ ] 57. Implement need urgency priority system (colonists prioritize critical needs)
+- [x] 57. Implement need urgency priority system (colonists prioritize critical needs) <!-- Ticket 0022 -->
 - [x] 58. Add colonist mood indicator icons on world sprites <!-- Ticket 0012 -->
 
 ## Phase 5 — Items & Inventory
