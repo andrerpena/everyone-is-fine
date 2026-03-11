@@ -11,6 +11,7 @@ import {
   entityStore,
   findPath,
   IdleBehaviorSystem,
+  MoodThoughtSystem,
   MovementSystem,
   NeedsSystem,
   simulationLoop,
@@ -629,6 +630,7 @@ const idleBehavior = new IdleBehaviorSystem(
 // =============================================================================
 
 const needsSystem = new NeedsSystem(entityStore);
+const moodThoughtSystem = new MoodThoughtSystem(entityStore);
 
 // =============================================================================
 // SIMULATION LOOP SETUP
@@ -649,8 +651,11 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
   // --- Profiled system updates ---
   const t0 = performance.now();
 
-  // Decay colonist needs (hunger, energy, mood)
+  // Decay colonist needs (hunger, energy)
   needsSystem.update(deltaTime);
+
+  // Evaluate thoughts and compute mood from them
+  moodThoughtSystem.update(tick);
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();

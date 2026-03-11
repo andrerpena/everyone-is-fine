@@ -27,16 +27,15 @@ export interface NeedConfig {
 
 /**
  * Need configurations with decay rates.
+ * Mood is no longer decayed here — it's computed by the MoodThoughtSystem.
  *
  * Approximate time to empty from full (1.0 → 0.0):
  * - Hunger:  ~17 minutes (0.001/s)
  * - Energy:  ~21 minutes (0.0008/s)
- * - Mood:    ~33 minutes (0.0005/s)
  */
 export const NEED_CONFIGS: readonly NeedConfig[] = [
   { id: "hunger", label: "Hunger", decayPerSecond: 0.001 },
   { id: "energy", label: "Energy", decayPerSecond: 0.0008 },
-  { id: "mood", label: "Mood", decayPerSecond: 0.0005 },
 ] as const;
 
 // =============================================================================

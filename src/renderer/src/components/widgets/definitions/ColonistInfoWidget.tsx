@@ -5,6 +5,7 @@ import {
   colonistInspectorSchema,
 } from "../../../schemas";
 import { formatSkillsSummary } from "../../../simulation/skills";
+import { getThoughtDefinition } from "../../../simulation/thoughts";
 import { formatTraitsSummary } from "../../../simulation/traits";
 import { InspectorForm } from "../../schema-form";
 import type { WidgetComponentProps, WidgetDefinition } from "../types";
@@ -24,8 +25,16 @@ function ColonistInfoWidget(_props: WidgetComponentProps) {
     );
   }
 
-  const { biography, position, movement, control, needs, skills, traits } =
-    character;
+  const {
+    biography,
+    position,
+    movement,
+    control,
+    needs,
+    skills,
+    traits,
+    thoughts,
+  } = character;
 
   const data: ColonistInspectorData = {
     name: character.name,
@@ -41,6 +50,12 @@ function ColonistInfoWidget(_props: WidgetComponentProps) {
     mood: needs.mood,
     skills: formatSkillsSummary(skills),
     traits: formatTraitsSummary(traits),
+    thoughts:
+      thoughts.length > 0
+        ? thoughts
+            .map((t) => getThoughtDefinition(t.thoughtId)?.label ?? t.thoughtId)
+            .join(", ")
+        : "None",
   };
 
   return (

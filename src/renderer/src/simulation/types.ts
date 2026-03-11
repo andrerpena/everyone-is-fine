@@ -5,6 +5,7 @@
 import type { Position2D, Position3D } from "../world/types";
 import type { CharacterSkills } from "./skills";
 import { createDefaultSkills } from "./skills";
+import type { ActiveThought } from "./thoughts";
 import type { CharacterTraits } from "./traits";
 
 // =============================================================================
@@ -94,6 +95,8 @@ export interface Character extends Entity {
   skills: CharacterSkills;
   /** Personality traits */
   traits: CharacterTraits;
+  /** Active mood thoughts */
+  thoughts: ActiveThought[];
 }
 
 // =============================================================================
@@ -283,6 +286,7 @@ export function createCharacter(
     },
     skills: createDefaultSkills(),
     traits: [],
+    thoughts: [],
     ...options,
   };
 }

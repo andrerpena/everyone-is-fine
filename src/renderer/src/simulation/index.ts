@@ -96,6 +96,19 @@ export {
   xpForNextLevel,
 } from "./skills";
 
+// Thoughts
+export {
+  type ActiveThought,
+  computeMoodFromThoughts,
+  evaluateConditionThoughts,
+  getThoughtDefinition,
+  MoodThoughtSystem,
+  THOUGHT_DEFINITIONS,
+  THOUGHT_MAP,
+  type ThoughtDefinition,
+  type ThoughtId,
+} from "./thoughts";
+
 // Traits
 export {
   ALL_TRAIT_IDS,
