@@ -205,6 +205,8 @@ export type ItemType =
   | "vegetable"
   | "meal_simple"
   | "meal_fine"
+  | "meal_lavish"
+  | "nutrient_paste"
   // Medicine
   | "medicine_herbal"
   | "medicine_industrial"

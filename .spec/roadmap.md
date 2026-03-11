@@ -139,7 +139,7 @@
 - [x] 103. Implement harvesting job (colonists gather mature crops) <!-- Ticket 0040 -->
 - [x] 104. Create cooking workstation (campfire, fueled stove, electric stove)
 - [x] 105. Implement cooking job (convert raw food into meals)
-- [ ] 106. Create meal types (simple meal, fine meal, lavish meal, nutrient paste)
+- [x] 106. Create meal types (simple meal, fine meal, lavish meal, nutrient paste)
 - [x] 107. Implement eating action (colonist picks up food, sits, eats, restores hunger) <!-- Ticket 0042 -->
 - [ ] 108. Add food poisoning chance based on cooking skill
 - [x] 109. Implement food spoilage system (food rots over time without refrigeration) <!-- Ticket 0041 -->

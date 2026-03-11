@@ -147,6 +147,28 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     nutrition: 1.0,
     spoilageRate: 0.003, // Cooked meals spoil slower
   },
+  meal_lavish: {
+    type: "meal_lavish",
+    category: "food",
+    label: "Lavish Meal",
+    stackSize: 10,
+    baseValue: 20,
+    weight: 0.5,
+    flammability: 0,
+    nutrition: 1.0,
+    spoilageRate: 0.003, // Cooked meals spoil slower
+  },
+  nutrient_paste: {
+    type: "nutrient_paste",
+    category: "food",
+    label: "Nutrient Paste",
+    stackSize: 10,
+    baseValue: 1,
+    weight: 0.3,
+    flammability: 0,
+    nutrition: 0.8,
+    spoilageRate: 0, // Processed paste doesn't spoil
+  },
 
   // Medicine
   medicine_herbal: {
