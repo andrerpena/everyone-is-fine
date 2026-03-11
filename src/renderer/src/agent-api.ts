@@ -19,6 +19,7 @@ import {
   createMoveJob,
 } from "./simulation/jobs/job-factory";
 import type { Job } from "./simulation/jobs/types";
+import { isValidScheduleActivity, type Schedule } from "./simulation/schedule";
 import { getThoughtDefinition } from "./simulation/thoughts";
 import {
   type Character,
@@ -121,6 +122,7 @@ function toAgentCharacter(char: Character): AgentCharacterInfo {
       : null,
     isDrafted: char.control.mode === "drafted",
     workPriorities: { ...char.workPriorities },
+    schedule: [...char.schedule],
   };
 }
 
@@ -400,6 +402,34 @@ function createAgentApi(): GameAgentApi {
       const char = findCharacterByName(name);
       if (!char) return null;
       return { ...char.workPriorities };
+    },
+
+    setSchedule(name: string, schedule: string[]) {
+      const char = findCharacterByName(name);
+      if (!char) throw new Error(`Character "${name}" not found`);
+
+      if (!Array.isArray(schedule) || schedule.length !== 24) {
+        throw new Error(
+          "Schedule must be an array of exactly 24 activity strings",
+        );
+      }
+      for (let i = 0; i < 24; i++) {
+        if (!isValidScheduleActivity(schedule[i])) {
+          throw new Error(
+            `Invalid schedule activity "${schedule[i]}" at hour ${i}. Valid: work, sleep, recreation, anything`,
+          );
+        }
+      }
+
+      useGameStore.getState().updateCharacter(char.id, {
+        schedule: schedule as unknown as Schedule,
+      });
+    },
+
+    getSchedule(name: string) {
+      const char = findCharacterByName(name);
+      if (!char) return null;
+      return [...char.schedule];
     },
 
     // =========================================================================

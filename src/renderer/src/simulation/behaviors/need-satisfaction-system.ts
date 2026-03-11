@@ -17,6 +17,7 @@ import {
   createSocializeJob,
 } from "../jobs/job-factory";
 import { getNeedThreshold } from "../needs/needs-config";
+import { getScheduledActivity } from "../schedule";
 import type { Character } from "../types";
 
 // =============================================================================
@@ -34,6 +35,9 @@ const BED_SEARCH_RADIUS = 30;
 
 /** Maximum distance (in tiles) to search for another colonist to socialize with */
 const SOCIALIZE_SEARCH_RADIUS = 25;
+
+/** Threshold for proactive need satisfaction during scheduled activity hours (higher than critical) */
+const SCHEDULE_PROACTIVE_THRESHOLD = 0.8;
 
 // =============================================================================
 // NEED SATISFACTION SYSTEM
@@ -78,8 +82,16 @@ export class NeedSatisfactionSystem {
 
       if (character.movement.isMoving) continue;
 
-      // Find the most urgent unsatisfied need
-      const action = this.getMostUrgentAction(character);
+      // Check the schedule to determine behavior
+      const world = this.getWorld();
+      const currentHour = world?.time.hour ?? 12;
+      const scheduledActivity = getScheduledActivity(
+        character.schedule,
+        currentHour,
+      );
+
+      // Determine action based on schedule and needs
+      const action = this.getActionForSchedule(character, scheduledActivity);
       if (!action) continue;
 
       switch (action) {
@@ -135,6 +147,65 @@ export class NeedSatisfactionSystem {
     if (socialLow) return "socialize";
 
     return null;
+  }
+
+  /**
+   * Determine the action based on the character's schedule and needs.
+   *
+   * - "work": Only satisfy critical needs; otherwise let auto-assignment systems handle work
+   * - "sleep": Proactively sleep if energy < 0.8; also satisfy critical hunger
+   * - "recreation": Proactively relax/socialize if recreation/social < 0.8; also satisfy critical needs
+   * - "anything": Use standard need-based behavior (getMostUrgentAction)
+   */
+  private getActionForSchedule(
+    character: Character,
+    activity: string,
+  ): "forage" | "sleep" | "relax" | "socialize" | null {
+    const { hunger, energy, recreation, social } = character.needs;
+
+    // Critical needs always take priority regardless of schedule
+    const hungerCritical = hunger < NEED_THRESHOLD;
+    const energyCritical = energy < NEED_THRESHOLD;
+
+    switch (activity) {
+      case "work":
+        // During work hours, only satisfy critical needs
+        if (hungerCritical && energyCritical) {
+          return hunger <= energy ? "forage" : "sleep";
+        }
+        if (hungerCritical) return "forage";
+        if (energyCritical) return "sleep";
+        return null;
+
+      case "sleep":
+        // Critical hunger still takes priority over scheduled sleep
+        if (hungerCritical) return "forage";
+        // Proactively sleep when energy is below 0.8 (not just critical)
+        if (energy < SCHEDULE_PROACTIVE_THRESHOLD) return "sleep";
+        return null;
+
+      case "recreation":
+        // Critical needs still take priority
+        if (hungerCritical && energyCritical) {
+          return hunger <= energy ? "forage" : "sleep";
+        }
+        if (hungerCritical) return "forage";
+        if (energyCritical) return "sleep";
+        // Proactively relax/socialize when below threshold
+        if (
+          recreation < SCHEDULE_PROACTIVE_THRESHOLD &&
+          social < SCHEDULE_PROACTIVE_THRESHOLD
+        ) {
+          return recreation <= social ? "relax" : "socialize";
+        }
+        if (recreation < SCHEDULE_PROACTIVE_THRESHOLD) return "relax";
+        if (social < SCHEDULE_PROACTIVE_THRESHOLD) return "socialize";
+        return null;
+
+      default:
+        // "anything" — use standard need-based behavior
+        return this.getMostUrgentAction(character);
+    }
   }
 
   /**

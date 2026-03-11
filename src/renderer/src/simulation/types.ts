@@ -3,6 +3,8 @@
 // =============================================================================
 
 import type { Position2D, Position3D } from "../world/types";
+import type { Schedule } from "./schedule";
+import { createDefaultSchedule } from "./schedule";
 import type { CharacterSkills } from "./skills";
 import { createDefaultSkills } from "./skills";
 import type { ActiveThought } from "./thoughts";
@@ -118,6 +120,8 @@ export interface Character extends Entity {
   mentalBreak: MentalBreakState | null;
   /** Per-work-type priority (0 = disabled, 1 = highest, 4 = lowest) */
   workPriorities: WorkPriorities;
+  /** 24-hour activity schedule */
+  schedule: Schedule;
 }
 
 // =============================================================================
@@ -313,6 +317,7 @@ export function createCharacter(
     thoughts: [],
     mentalBreak: null,
     workPriorities: createDefaultWorkPriorities(),
+    schedule: createDefaultSchedule(),
     ...options,
   };
 }

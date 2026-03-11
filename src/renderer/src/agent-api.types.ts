@@ -50,6 +50,7 @@ export interface AgentCharacterInfo {
   mentalBreak: { type: string; startedAtTick: number } | null;
   isDrafted: boolean;
   workPriorities: Record<string, number>;
+  schedule: string[];
 }
 
 /** Tile info exposed to agents */
@@ -121,6 +122,8 @@ export interface GameAgentApi {
   cancelAction: (name: string) => void;
   setWorkPriority: (name: string, workType: string, priority: number) => void;
   getWorkPriorities: (name: string) => Record<string, number> | null;
+  setSchedule: (name: string, schedule: string[]) => void;
+  getSchedule: (name: string) => string[] | null;
   draftCharacter: (name: string) => AgentCharacterInfo | null;
   undraftCharacter: (name: string) => AgentCharacterInfo | null;
 

@@ -105,7 +105,7 @@
 - [x] 75. Create job type definitions (haul, construct, mine, grow, cook, hunt, etc.) <!-- Done: ActionRule pattern in action-rules.ts with chop/mine/move; extensible by adding new rules -->
 - [x] 76. Add job priority system (1-4 priority per colonist per job type)
 - [x] 77. Implement job assignment algorithm (match colonists to jobs by priority and skill)
-- [ ] 78. Create work schedule system (assign work/sleep/recreation/anything time blocks)
+- [x] 78. Create work schedule system (assign work/sleep/recreation/anything time blocks)
 - [x] 79. Add job reservation system (prevent multiple colonists claiming same job) <!-- Ticket 0025 -->
 - [x] 80. Implement job interruption and resumption <!-- Ticket 0026: critical need interruption; resumption deferred -->
 - [x] 81. Create hauling job type (move items from ground to stockpile) <!-- Ticket 0036 -->
