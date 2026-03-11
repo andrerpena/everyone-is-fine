@@ -2,6 +2,8 @@
 // SIMULATION MODULE EXPORTS
 // =============================================================================
 
+// Behaviors
+export { IdleBehaviorSystem } from "./behaviors/idle-behavior";
 // Entity Store
 export { EntityStore, entityStore } from "./entity-store";
 // Jobs

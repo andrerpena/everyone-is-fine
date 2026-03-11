@@ -10,6 +10,7 @@ import { usePerformanceStore } from "../lib/performance-store";
 import {
   entityStore,
   findPath,
+  IdleBehaviorSystem,
   MovementSystem,
   simulationLoop,
 } from "../simulation";
@@ -613,6 +614,16 @@ const jobProcessor = new JobProcessor(
 );
 
 // =============================================================================
+// IDLE BEHAVIOR SETUP
+// =============================================================================
+
+const idleBehavior = new IdleBehaviorSystem(
+  entityStore,
+  jobProcessor,
+  () => useGameStore.getState().world,
+);
+
+// =============================================================================
 // SIMULATION LOOP SETUP
 // =============================================================================
 
@@ -630,6 +641,9 @@ let lastTpsTimestamp = performance.now();
 simulationLoop.setTickCallback((deltaTime, tick) => {
   // --- Profiled system updates ---
   const t0 = performance.now();
+
+  // Assign idle behaviors (wander) before job processing
+  idleBehavior.update();
 
   // Update job processor (advances work steps, initiates moves)
   jobProcessor.update(deltaTime);

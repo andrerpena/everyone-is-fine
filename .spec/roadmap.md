@@ -54,7 +54,7 @@
 - [x] 33. Add colonist info panel showing basic stats <!-- Ticket 0003 -->
 - [x] 34. Create colonist list/roster panel widget
 - [x] 35. Implement movement speed modifiers based on terrain type <!-- Ticket 0004 -->
-- [ ] 36. Add idle wandering behavior for colonists with no tasks
+- [x] 36. Add idle wandering behavior for colonists with no tasks <!-- Ticket 0005 -->
 - [x] 37. Create colonist name generator (first name + nickname + last name) <!-- Ticket 0001 -->
 - [ ] 38. Implement backstory system (childhood + adulthood backstories)
 - [ ] 39. Add trait system (personality traits that affect behavior and stats)
