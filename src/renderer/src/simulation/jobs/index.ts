@@ -15,6 +15,7 @@ export { HaulingSystem } from "./hauling-system";
 export {
   createBuildJob,
   createChopJob,
+  createDeconstructJob,
   createForageJob,
   createHarvestJob,
   createHaulJob,

@@ -3,7 +3,12 @@
 // =============================================================================
 
 import { getConstructionCost } from "../../world/registries/construction-registry";
-import type { CropType, Position3D, StructureType } from "../../world/types";
+import type {
+  CropType,
+  ItemType,
+  Position3D,
+  StructureType,
+} from "../../world/types";
 import type { EntityId } from "../types";
 import { generateJobId, type Job } from "./types";
 
@@ -335,6 +340,79 @@ export function createEatJob(
         needId: "hunger",
         status: "pending",
       },
+    ],
+  };
+}
+
+/** Material recovery rate for deconstruction (75%) */
+const DECONSTRUCT_RECOVERY_RATE = 0.75;
+
+/** Deconstruction takes half the time of construction */
+const DECONSTRUCT_TIME_MULTIPLIER = 0.5;
+
+/**
+ * Create a "deconstruct structure" job.
+ * Steps: move adjacent → work (50% of build time) → spawn recovered materials → remove structure
+ */
+export function createDeconstructJob(
+  characterId: EntityId,
+  target: Position3D,
+  structureType: StructureType,
+): Job {
+  const cost = getConstructionCost(structureType);
+  const workTicks = Math.max(
+    60,
+    Math.floor((cost?.workTicks ?? 300) * DECONSTRUCT_TIME_MULTIPLIER),
+  );
+
+  // Recover 75% of original materials
+  const recoveredItems: Array<{ type: ItemType; quantity: number }> = [];
+  if (cost) {
+    for (const mat of cost.materials) {
+      const qty = Math.floor(mat.quantity * DECONSTRUCT_RECOVERY_RATE);
+      if (qty > 0) {
+        recoveredItems.push({ type: mat.type, quantity: qty });
+      }
+    }
+  }
+
+  return {
+    id: generateJobId(),
+    type: "deconstruct",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: target,
+        adjacent: true,
+        status: "pending",
+      },
+      {
+        type: "work",
+        totalTicks: workTicks,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "transform_tile",
+        position: target,
+        removeStructure: true,
+        status: "pending",
+      },
+      ...(recoveredItems.length > 0
+        ? [
+            {
+              type: "spawn_items" as const,
+              position: target,
+              items: recoveredItems,
+              status: "pending" as const,
+            },
+          ]
+        : []),
     ],
   };
 }
