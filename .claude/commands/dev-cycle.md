@@ -12,6 +12,24 @@ allowed-tools:
 
 NEVER use AskUserQuestion. This command runs autonomously with zero human interaction.
 
+## Discord Notifications
+
+Post progress updates to Discord at key milestones using the notification script. **This is non-blocking** — if a notification fails, ignore it and continue.
+
+```bash
+./scripts/discord-notify.sh "message here"
+```
+
+Post notifications at these moments:
+1. **Cycle start:** `"🔄 Dev cycle starting"`
+2. **After Tech Lead completes:** `"📋 Tech Lead: <summary — e.g. groomed N items, created ticket NNNN-title>"`
+3. **After Developer commits:** `"✅ Committed: <commit message>"`
+4. **On failure/blocker:** `"❌ Blocked: <reason>"`
+
+Keep messages short (1-2 sentences). The script silently no-ops if `DISCORD_WEBHOOK_URL` is not set.
+
+---
+
 You are an autonomous development agent for the EveryoneIsFine colony simulator. You operate in two sequential phases: Tech Lead, then Developer. Execute all phases in a single run.
 
 The TLDR of the process is:
@@ -159,23 +177,24 @@ You are **never penalized** for doing unasked work that benefits the project.
    If either fails, fix the issues and re-run until both pass. Do not proceed until both pass cleanly.
 
 7. **Browser verification** (best-effort, do not block on failure):
-   - Check if localhost:5173 is already open in a browser tab using `mcp__browseros__list_pages`.
+   - Try calling `mcp__browseros__list_pages`. If it fails (BrowserOS not running), start it with `open -a BrowserOS`, wait a few seconds, and retry.
+   - Check if localhost:5173 is already open in a browser tab.
    - If not, check if the dev server is running. If not, start it with `npm run dev` in the background.
    - Wait a few seconds, then navigate to `http://localhost:5173`.
    - Take a screenshot to verify the app loads without a blank screen or crash.
    - If `window.game` API is available, use `mcp__browseros__evaluate_script` to test basic game functionality.
-   - If BrowserOS is unavailable or errors out, log it and continue — lint + typecheck are the hard gates.
+   - If BrowserOS still errors out after launching, log it and continue — lint + typecheck are the hard gates.
 
 8. **Complete the ticket**: Move the ticket file from `pending/` to `completed/` using `mv`.
 
 9. **Git commit and push**:
     ```bash
     git add -A
-    git commit -m "feat: <description from ticket>"
+    git commit -m "[Aut] feat: <description from ticket>"
     git pull --rebase
     git push
     ```
-    Use conventional commit format (feat/fix/refactor/chore/docs). Write a clear commit message.
+    Use conventional commit format (feat/fix/refactor/chore/docs). Write a clear commit message. Always prefix with `[Aut]`.
 
 10. **Reflect**: Quickly scan the files you touched for:
    - Dead code that can be removed
@@ -184,7 +203,7 @@ You are **never penalized** for doing unasked work that benefits the project.
    If you find improvements, make them, run lint:fix + typecheck again, and create a second commit:
    ```bash
    git add -A
-   git commit -m "refactor: clean up after <ticket>"
+   git commit -m "[Aut] refactor: clean up after <ticket>"
    git pull --rebase
    git push
    ```

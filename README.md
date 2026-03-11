@@ -15,6 +15,10 @@ The development process is:
 
 Human steering happens by editing [`.spec/human-requests/todo.md`](.spec/human-requests/todo.md). The [roadmap](.spec/roadmap.md), [tickets](.spec/tickets/), and [project vision](.spec/north-star.md) live in [`.spec/`](.spec/).
 
+## The initial commit was vibe-coded but not autonomous
+
+The original infrastructure of the game (UI, base game loop...) was vibe-coded using Claude Code but I actively intervened to steer it in the right direction.
+
 ## License
 
 [MIT](LICENSE)
