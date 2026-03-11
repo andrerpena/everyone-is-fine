@@ -90,6 +90,8 @@ export interface SpawnItemsStep {
   type: "spawn_items";
   position: Position3D;
   items: Array<{ type: ItemType; quantity: number }>;
+  /** When set, item quality is calculated from the character's skill level */
+  skillId?: string;
   status: StepStatus;
 }
 

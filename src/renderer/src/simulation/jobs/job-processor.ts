@@ -245,7 +245,7 @@ export class JobProcessor {
         break;
 
       case "spawn_items":
-        this.executeSpawnItems(step);
+        this.executeSpawnItems(step, characterId);
         step.status = "completed";
         this.advanceToNextStep(characterId, job);
         break;
@@ -406,7 +406,7 @@ export class JobProcessor {
   // SPAWN ITEMS STEP
   // ===========================================================================
 
-  private executeSpawnItems(step: SpawnItemsStep): void {
+  private executeSpawnItems(step: SpawnItemsStep, characterId: EntityId): void {
     const world = this.getWorld();
     if (!world) return;
 
@@ -418,12 +418,22 @@ export class JobProcessor {
     );
     if (!tile) return;
 
+    // Calculate quality from character skill if skillId is specified
+    let quality = 1;
+    if (step.skillId) {
+      const character = this.entityStore.get(characterId);
+      const skillLevel =
+        character?.skills[step.skillId as keyof typeof character.skills]
+          ?.level ?? 0;
+      quality = calculateQualityFromSkill(skillLevel);
+    }
+
     for (const itemDef of step.items) {
       addItemToTile(tile, {
         id: `item_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
         type: itemDef.type as ItemType,
         quantity: itemDef.quantity,
-        quality: 1,
+        quality,
         condition: 1,
       });
     }
@@ -632,12 +642,17 @@ export class JobProcessor {
     // Remove the crop
     tile.crop = null;
 
+    // Calculate quality from character's plants skill
+    const character = this.entityStore.get(characterId);
+    const plantsLevel = character?.skills.plants?.level ?? 0;
+    const quality = calculateQualityFromSkill(plantsLevel);
+
     // Spawn yield items
     addItemToTile(tile, {
       id: `item_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
       type: props.yieldType,
       quantity: props.yieldQuantity,
-      quality: 1,
+      quality,
       condition: 1,
     });
 

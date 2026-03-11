@@ -356,6 +356,7 @@ export function createCookJob(
         type: "spawn_items",
         position: campfirePos,
         items: [{ type: "meal_simple", quantity: 1 }],
+        skillId: "cooking",
         status: "pending",
       },
     ],

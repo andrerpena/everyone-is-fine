@@ -89,7 +89,7 @@
 - [x] 62. Add item rendering on the world map (small sprites on tiles) <!-- Done: itemsGraphics layer in World.tsx -->
 - [x] 63. Create item stack merging and splitting logic <!-- Done: addItemToTile merges matching stacks in tile-utils.ts -->
 - [x] 64. Implement item deterioration over time when left outside <!-- Ticket 0031 -->
-- [ ] 65. Add quality levels for crafted items (awful → legendary)
+- [x] 65. Add quality levels for crafted items (awful → legendary)
 - [x] 66. Create material system (wood, stone, steel, gold, etc.) <!-- Done: MaterialType union + MaterialProperties in world/types.ts -->
 - [x] 67. Implement material properties affecting item stats <!-- Done: MaterialProperties with durability, flammability, beauty, value in world/types.ts -->
 - [x] 68. Add item info tooltip/panel showing details on hover <!-- Ticket 0027: item details in tile inspector -->
