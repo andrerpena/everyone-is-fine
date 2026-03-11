@@ -14,6 +14,7 @@
 export const WIDGET_IDS = [
   "world",
   "characters",
+  "colonist-info",
   "layers",
   "logs",
   "performance",

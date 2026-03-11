@@ -8,6 +8,11 @@ export * from "./core";
 // Schema definitions
 export { characterSchema } from "./definitions/character-schema";
 
+export {
+  type ColonistInspectorData,
+  colonistInspectorSchema,
+} from "./definitions/colonist-inspector-schema";
+
 export { layerSchema } from "./definitions/layer-schema";
 
 export { pathfindingDataSchema } from "./definitions/pathfinding-schema";

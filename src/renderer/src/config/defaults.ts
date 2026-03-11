@@ -19,7 +19,7 @@ export const CONFIG_SCHEMA: ConfigSchema = {
       "left-bottom": [],
       center: ["world", "settings"],
       "center-bottom": ["logs"],
-      "right-top": ["mini-map", "tile-inspector"],
+      "right-top": ["mini-map", "tile-inspector", "colonist-info"],
       "right-bottom": ["layers", "characters", "performance"],
     },
     description: "Widget slot assignments",

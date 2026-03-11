@@ -22,7 +22,7 @@
 - [x] 7. Create game speed controls (pause, 1x, 2x, 3x, fast-forward)
 - [x] 8. Implement deterministic random number generator with seed support
 - [x] 9. Add performance profiling hooks to the game loop <!-- Partial: FPS tracking exists but no per-system timing breakdown -->
-- [ ] 10. Create debug overlay showing tick rate, entity count, and system timings <!-- Partial: FPS chart exists but no entity count or system timings -->
+- [x] 10. Create debug overlay showing tick rate, entity count, and system timings <!-- Done: PerformanceWidget shows FPS chart, TPS, entity count, and per-system timing bars -->
 
 ## Phase 2 — World & Map Basics
 
@@ -51,7 +51,7 @@
 - [x] 30. Add pathfinding cache for frequently traveled routes
 - [ ] 31. Create colonist sprite rendering and animation system <!-- Partial: static sprite rendering exists, no animation -->
 - [x] 32. Implement colonist selection (click to select, box select multiple)
-- [ ] 33. Add colonist info panel showing basic stats
+- [x] 33. Add colonist info panel showing basic stats <!-- Ticket 0003 -->
 - [x] 34. Create colonist list/roster panel widget
 - [ ] 35. Implement movement speed modifiers based on terrain type <!-- Partial: movementCost exists on terrain, integration unclear -->
 - [ ] 36. Add idle wandering behavior for colonists with no tasks
