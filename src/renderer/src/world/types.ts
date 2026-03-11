@@ -217,6 +217,14 @@ export type ItemType =
   // Weapons — Ranged
   | "bow"
   | "pistol"
+  // Apparel
+  | "shirt"
+  | "pants"
+  | "jacket"
+  | "hat"
+  | "boots"
+  | "armor_leather"
+  | "armor_metal"
   // Tools
   | "pickaxe"
   | "axe"
