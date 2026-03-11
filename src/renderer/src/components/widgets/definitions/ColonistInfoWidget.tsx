@@ -4,6 +4,7 @@ import {
   type ColonistInspectorData,
   colonistInspectorSchema,
 } from "../../../schemas";
+import { formatSkillsSummary } from "../../../simulation/skills";
 import { InspectorForm } from "../../schema-form";
 import type { WidgetComponentProps, WidgetDefinition } from "../types";
 
@@ -22,7 +23,7 @@ function ColonistInfoWidget(_props: WidgetComponentProps) {
     );
   }
 
-  const { biography, position, movement, control, needs } = character;
+  const { biography, position, movement, control, needs, skills } = character;
 
   const data: ColonistInspectorData = {
     name: character.name,
@@ -36,6 +37,7 @@ function ColonistInfoWidget(_props: WidgetComponentProps) {
     hunger: needs.hunger,
     energy: needs.energy,
     mood: needs.mood,
+    skills: formatSkillsSummary(skills),
   };
 
   return (

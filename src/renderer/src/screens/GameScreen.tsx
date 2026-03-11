@@ -132,6 +132,7 @@ export const GameScreen: React.FC = () => {
       const character = createCharacter({
         name: identity.name,
         biography: identity.biography,
+        skills: identity.skills,
         type: "colonist",
         position: { x: pos.x, y: pos.y, z: currentZLevel },
         color: colonistPalette[index] ?? colonistFallback,

@@ -67,6 +67,19 @@ export {
   simulationLoop,
   TICKS_PER_SECOND,
 } from "./simulation-loop";
+// Skills
+export {
+  ALL_SKILL_IDS,
+  type CharacterSkills,
+  createDefaultSkills,
+  formatSkillsSummary,
+  generateRandomSkills,
+  MAX_SKILL_LEVEL,
+  SKILL_DEFINITIONS,
+  type SkillData,
+  type SkillDefinition,
+  type SkillId,
+} from "./skills";
 
 // Types
 export {
