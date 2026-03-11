@@ -148,6 +148,41 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     spoilageRate: 0.003, // Cooked meals spoil slower
   },
 
+  // Medicine
+  medicine_herbal: {
+    type: "medicine_herbal",
+    category: "medicine",
+    label: "Herbal Medicine",
+    stackSize: 25,
+    baseValue: 5,
+    weight: 0.3,
+    flammability: 0.5,
+    nutrition: 0,
+    spoilageRate: 0.002,
+  },
+  medicine_industrial: {
+    type: "medicine_industrial",
+    category: "medicine",
+    label: "Medicine",
+    stackSize: 25,
+    baseValue: 15,
+    weight: 0.3,
+    flammability: 0.2,
+    nutrition: 0,
+    spoilageRate: 0,
+  },
+  medicine_glitterworld: {
+    type: "medicine_glitterworld",
+    category: "medicine",
+    label: "Glitterworld Medicine",
+    stackSize: 10,
+    baseValue: 50,
+    weight: 0.2,
+    flammability: 0.1,
+    nutrition: 0,
+    spoilageRate: 0,
+  },
+
   // Tools
   pickaxe: {
     type: "pickaxe",

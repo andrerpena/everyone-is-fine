@@ -205,6 +205,10 @@ export type ItemType =
   | "vegetable"
   | "meal_simple"
   | "meal_fine"
+  // Medicine
+  | "medicine_herbal"
+  | "medicine_industrial"
+  | "medicine_glitterworld"
   // Tools
   | "pickaxe"
   | "axe"
