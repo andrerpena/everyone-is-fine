@@ -21,6 +21,8 @@ import {
   NeedSatisfactionSystem,
   NeedsSystem,
   simulationLoop,
+  WEATHER_TEMP_MODIFIERS,
+  WeatherSystem,
 } from "../simulation";
 import { JobProcessor } from "../simulation/jobs";
 import type { Job } from "../simulation/jobs/types";
@@ -714,6 +716,7 @@ const gameNotifications = new GameNotifications(entityStore, jobProcessor);
 // =============================================================================
 
 const itemDeterioration = new ItemDeteriorationSystem();
+const weatherSystem = new WeatherSystem();
 const needsSystem = new NeedsSystem(entityStore);
 const moodThoughtSystem = new MoodThoughtSystem(entityStore);
 const mentalBreakSystem = new MentalBreakSystem(
@@ -743,10 +746,12 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
   const world = useGameStore.getState().world;
   if (world) {
     world.time = advanceTime(world.time);
-    world.weather.temperature = getOutdoorTemperature(
-      world.time.season,
-      world.time.hour,
-    );
+    // Evaluate weather transitions based on season
+    weatherSystem.update(world.weather, world.time.season);
+    // Compute temperature from season + hour + weather modifier
+    world.weather.temperature =
+      getOutdoorTemperature(world.time.season, world.time.hour) +
+      WEATHER_TEMP_MODIFIERS[world.weather.type];
     // Degrade items on ground tiles
     itemDeterioration.update(() => world);
   }

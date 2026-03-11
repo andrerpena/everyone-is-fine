@@ -93,8 +93,8 @@
 - [x] 66. Create material system (wood, stone, steel, gold, etc.) <!-- Done: MaterialType union + MaterialProperties in world/types.ts -->
 - [x] 67. Implement material properties affecting item stats <!-- Done: MaterialProperties with durability, flammability, beauty, value in world/types.ts -->
 - [x] 68. Add item info tooltip/panel showing details on hover <!-- Ticket 0027: item details in tile inspector -->
-- [ ] 69. Create raw resource types (wood, stone chunks, steel slag, components)
-- [ ] 70. Implement food item types (raw food, meals, berries, meat)
+- [x] 69. ~~Create raw resource types~~ (done: wood, stone, iron, gold, silver, coal, cloth, leather in ItemType + ITEM_REGISTRY)
+- [x] 70. ~~Implement food item types~~ (done: meat, berries, vegetable, meal_simple, meal_fine in ItemType + ITEM_REGISTRY)
 - [ ] 71. Add medicine item types (herbal medicine, industrial medicine, glitterworld medicine)
 - [ ] 72. Create weapon item types (melee and ranged)
 - [ ] 73. Create apparel/clothing item types with body part slots
@@ -176,7 +176,7 @@
 - [x] 134. Add ambient lighting changes based on time of day <!-- Ticket 0017 -->
 - [x] 135. Create season system (spring, summer, fall, winter) with configurable year length <!-- Done: seasons cycle in time system (ticket 0014), displayed in status bar -->
 - [x] 136. Implement temperature simulation (outdoor temp varies by season and time) <!-- Ticket 0030 -->
-- [ ] 137. Add weather system framework (clear, rain, fog, snow, thunderstorm)
+- [x] 137. Add weather system framework (clear, rain, fog, snow, thunderstorm) <!-- Ticket 0032 -->
 - [ ] 138. Implement rain weather with visual effects and ground moisture
 - [ ] 139. Add snow weather with accumulation on tiles
 - [ ] 140. Create temperature-affected crop growth (growing season)

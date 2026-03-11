@@ -3,7 +3,7 @@
 // =============================================================================
 
 import { useGameStore } from "@renderer/game-state";
-import { formatGameTime } from "@renderer/simulation";
+import { formatGameTime, WEATHER_LABELS } from "@renderer/simulation";
 import { Clock } from "lucide-react";
 import { StatusBarButton } from "../StatusBarButton";
 import type { StatusBarItemDefinition, StatusBarItemProps } from "../types";
@@ -21,7 +21,8 @@ function GameTimeStatusBarComponent(_props: StatusBarItemProps) {
     // Zustand only re-renders if the returned string actually changes.
     void state.simulation.currentTick;
     const temp = state.world.weather.temperature;
-    return `${formatGameTime(state.world.time)} | ${temp}°C`;
+    const weatherLabel = WEATHER_LABELS[state.world.weather.type];
+    return `${formatGameTime(state.world.time)} | ${weatherLabel} ${temp}°C`;
   });
 
   if (!timeText) {

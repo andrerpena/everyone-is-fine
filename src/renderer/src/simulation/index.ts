@@ -143,7 +143,6 @@ export {
   type TraitDefinition,
   type TraitId,
 } from "./traits";
-
 // Types
 export {
   type BuildCommand,
@@ -174,3 +173,9 @@ export {
   type SimulationSpeed,
   type SimulationState,
 } from "./types";
+// Weather
+export {
+  WEATHER_LABELS,
+  WEATHER_TEMP_MODIFIERS,
+  WeatherSystem,
+} from "./weather/weather-system";
