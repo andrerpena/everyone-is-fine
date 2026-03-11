@@ -28,6 +28,7 @@ export const STATUS_BAR_IDS = [
   "theme",
   "run-command",
   "fps",
+  "game-time",
 ] as const;
 
 export const CONTROL_BAR_IDS = ["time-control", "zoom-control"] as const;

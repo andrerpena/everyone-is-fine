@@ -4,6 +4,7 @@
 
 import {
   fpsStatusBar,
+  gameTimeStatusBar,
   runCommandStatusBar,
   themeStatusBar,
   versionStatusBar,
@@ -15,6 +16,7 @@ import { statusBarRegistry } from "./status-bar-registry";
  * Call this during app initialization.
  */
 export function registerBuiltInStatusBars(): void {
+  statusBarRegistry.register(gameTimeStatusBar);
   statusBarRegistry.register(versionStatusBar);
   statusBarRegistry.register(themeStatusBar);
   statusBarRegistry.register(runCommandStatusBar);

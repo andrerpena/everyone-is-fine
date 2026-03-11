@@ -27,7 +27,7 @@ export const CONFIG_SCHEMA: ConfigSchema = {
   "layout.statusBars": {
     type: "object",
     default: {
-      left: ["version", "run-command", "theme"],
+      left: ["game-time", "version", "run-command", "theme"],
       right: ["fps"],
     },
     description: "Status bar alignment assignments",
