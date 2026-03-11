@@ -4,6 +4,7 @@
 
 import type {
   AgentCharacterInfo,
+  AgentSkillInfo,
   AgentTileInfo,
   AgentTileSpec,
   GameAgentApi,
@@ -17,6 +18,7 @@ import {
   createMoveJob,
 } from "./simulation/jobs/job-factory";
 import type { Job } from "./simulation/jobs/types";
+import { getThoughtDefinition } from "./simulation/thoughts";
 import {
   type Character,
   type CharacterType,
@@ -50,6 +52,16 @@ const POLL_INTERVAL = 100;
 
 /** Convert internal Character to agent-friendly plain object */
 function toAgentCharacter(char: Character): AgentCharacterInfo {
+  // Convert skills to plain agent format
+  const skills: Record<string, AgentSkillInfo> = {};
+  for (const [id, data] of Object.entries(char.skills)) {
+    skills[id] = {
+      level: data.level,
+      experience: data.experience,
+      passion: data.passion,
+    };
+  }
+
   return {
     id: char.id,
     name: char.name,
@@ -58,6 +70,23 @@ function toAgentCharacter(char: Character): AgentCharacterInfo {
     isMoving: char.movement.isMoving,
     currentCommand: char.control.currentCommand?.type ?? null,
     needs: { ...char.needs },
+    biography: {
+      age: char.biography.age,
+      gender: char.biography.gender,
+      firstName: char.biography.firstName,
+      lastName: char.biography.lastName,
+      nickname: char.biography.nickname,
+    },
+    traits: [...char.traits],
+    skills,
+    thoughts: char.thoughts.map((t) => {
+      const def = getThoughtDefinition(t.thoughtId);
+      return {
+        id: t.thoughtId,
+        label: def?.label ?? t.thoughtId,
+        moodEffect: def?.moodEffect ?? 0,
+      };
+    }),
   };
 }
 

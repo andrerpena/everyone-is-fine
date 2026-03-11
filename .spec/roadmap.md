@@ -102,7 +102,7 @@
 ## Phase 6 — Jobs & Work System
 
 - [x] 74. Implement job queue system (global list of available jobs) <!-- Done: JobQueue class in simulation/jobs/job-queue.ts -->
-- [ ] 75. Create job type definitions (haul, construct, mine, grow, cook, hunt, etc.)
+- [x] 75. Create job type definitions (haul, construct, mine, grow, cook, hunt, etc.) <!-- Done: ActionRule pattern in action-rules.ts with chop/mine/move; extensible by adding new rules -->
 - [ ] 76. Add job priority system (1-4 priority per colonist per job type)
 - [ ] 77. Implement job assignment algorithm (match colonists to jobs by priority and skill)
 - [ ] 78. Create work schedule system (assign work/sleep/recreation/anything time blocks)
@@ -113,7 +113,7 @@
 - [ ] 83. Add bill/order system for crafting and cooking workstations
 - [ ] 84. Create work tab UI for managing colonist job priorities
 - [ ] 85. Implement "draft" mode (direct colonist control, overriding job AI)
-- [ ] 86. Add job progress indicators (progress bars on in-world tasks)
+- [x] 86. Add job progress indicators (progress bars on in-world tasks) <!-- Done: JobProgressRenderer in pixi/renderers/ -->
 - [ ] 87. Create idle alert when colonists have no available work
 
 ## Phase 7 — Zone System

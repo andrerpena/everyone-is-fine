@@ -4,6 +4,29 @@
 
 import type { Position3D } from "./world/types";
 
+/** Character biography exposed to agents */
+export interface AgentBiography {
+  age: number;
+  gender: string;
+  firstName: string;
+  lastName: string;
+  nickname: string | null;
+}
+
+/** Skill data exposed to agents */
+export interface AgentSkillInfo {
+  level: number;
+  experience: number;
+  passion: string;
+}
+
+/** Active thought exposed to agents */
+export interface AgentThoughtInfo {
+  id: string;
+  label: string;
+  moodEffect: number;
+}
+
 /** Character info exposed to agents */
 export interface AgentCharacterInfo {
   id: string;
@@ -17,6 +40,10 @@ export interface AgentCharacterInfo {
     energy: number;
     mood: number;
   };
+  biography: AgentBiography;
+  traits: string[];
+  skills: Record<string, AgentSkillInfo>;
+  thoughts: AgentThoughtInfo[];
 }
 
 /** Tile info exposed to agents */
