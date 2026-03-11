@@ -10,6 +10,7 @@ import { usePerformanceStore } from "../lib/performance-store";
 import {
   advanceTime,
   entityStore,
+  ForageBehavior,
   findPath,
   IdleBehaviorSystem,
   MentalBreakSystem,
@@ -680,6 +681,16 @@ const jobProcessor = new JobProcessor(
 );
 
 // =============================================================================
+// FORAGE BEHAVIOR SETUP
+// =============================================================================
+
+const forageBehavior = new ForageBehavior(
+  entityStore,
+  jobProcessor,
+  () => useGameStore.getState().world,
+);
+
+// =============================================================================
 // IDLE BEHAVIOR SETUP
 // =============================================================================
 
@@ -735,6 +746,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
 
   // Check for mental break triggers/recovery
   mentalBreakSystem.update(tick);
+
+  // Hungry colonists seek berry bushes
+  forageBehavior.update();
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();

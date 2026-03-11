@@ -6,7 +6,12 @@
 export { resolveActions } from "./action-resolver";
 export { ACTION_RULES } from "./action-rules";
 // Job factories
-export { createChopJob, createMineJob, createMoveJob } from "./job-factory";
+export {
+  createChopJob,
+  createForageJob,
+  createMineJob,
+  createMoveJob,
+} from "./job-factory";
 // Job processor
 export { JobProcessor } from "./job-processor";
 // Job queue (scheduler stub)
@@ -20,6 +25,7 @@ export type {
   JobStatus,
   JobStep,
   MoveStep,
+  RestoreNeedStep,
   SpawnItemsStep,
   StepStatus,
   TransformTileStep,

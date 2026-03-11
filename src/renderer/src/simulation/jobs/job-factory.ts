@@ -81,6 +81,41 @@ export function createMineJob(characterId: EntityId, target: Position3D): Job {
 }
 
 /**
+ * Create a "forage berry bush" job.
+ * Steps: move adjacent → work 120 ticks (~2s at 60 TPS) → restore hunger 0.3
+ * Bush is NOT destroyed (renewable resource).
+ */
+export function createForageJob(
+  characterId: EntityId,
+  target: Position3D,
+): Job {
+  return {
+    id: generateJobId(),
+    type: "forage",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      { type: "move", destination: target, adjacent: true, status: "pending" },
+      {
+        type: "work",
+        totalTicks: 120,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "restore_need",
+        needId: "hunger",
+        amount: 0.3,
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/**
  * Create a simple "move" job.
  * Steps: move to destination
  */

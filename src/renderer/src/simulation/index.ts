@@ -3,6 +3,7 @@
 // =============================================================================
 
 // Behaviors
+export { ForageBehavior } from "./behaviors/forage-behavior";
 export { IdleBehaviorSystem } from "./behaviors/idle-behavior";
 export {
   MENTAL_BREAK_RECOVERY_THRESHOLD,

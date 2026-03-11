@@ -19,6 +19,7 @@ import type {
   Job,
   JobProgressInfo,
   MoveStep,
+  RestoreNeedStep,
   SpawnItemsStep,
   TransformTileStep,
 } from "./types";
@@ -198,6 +199,12 @@ export class JobProcessor {
         step.status = "completed";
         this.advanceToNextStep(characterId, job);
         break;
+
+      case "restore_need":
+        this.executeRestoreNeed(characterId, step);
+        step.status = "completed";
+        this.advanceToNextStep(characterId, job);
+        break;
     }
   }
 
@@ -330,6 +337,28 @@ export class JobProcessor {
       step.position.z,
       {},
     );
+  }
+
+  // ===========================================================================
+  // RESTORE NEED STEP
+  // ===========================================================================
+
+  private executeRestoreNeed(
+    characterId: EntityId,
+    step: RestoreNeedStep,
+  ): void {
+    const character = this.entityStore.get(characterId);
+    if (!character) return;
+
+    const needs = character.needs;
+    const currentValue =
+      step.needId in needs
+        ? (needs[step.needId as keyof typeof needs] as number)
+        : 0;
+    const newValue = Math.min(1, currentValue + step.amount);
+    this.entityStore.update(characterId, {
+      needs: { ...needs, [step.needId]: newValue },
+    });
   }
 
   // ===========================================================================

@@ -84,7 +84,21 @@ export interface SpawnItemsStep {
   status: StepStatus;
 }
 
-export type JobStep = MoveStep | WorkStep | TransformTileStep | SpawnItemsStep;
+export interface RestoreNeedStep {
+  type: "restore_need";
+  /** Which need to restore (e.g. "hunger") */
+  needId: string;
+  /** Amount to add (clamped to 0-1) */
+  amount: number;
+  status: StepStatus;
+}
+
+export type JobStep =
+  | MoveStep
+  | WorkStep
+  | TransformTileStep
+  | SpawnItemsStep
+  | RestoreNeedStep;
 
 // =============================================================================
 // ACTION RULES - Declarative matching for tile → actions

@@ -3,7 +3,12 @@
 // =============================================================================
 // To add a new action, append a rule to ACTION_RULES. No other code changes needed.
 
-import { createChopJob, createMineJob, createMoveJob } from "./job-factory";
+import {
+  createChopJob,
+  createForageJob,
+  createMineJob,
+  createMoveJob,
+} from "./job-factory";
 import type { ActionRule } from "./types";
 
 export const ACTION_RULES: ActionRule[] = [
@@ -15,6 +20,13 @@ export const ACTION_RULES: ActionRule[] = [
       tile.structure?.type === "tree_oak" ||
       tile.structure?.type === "tree_pine",
     createJob: (characterId, target) => createChopJob(characterId, target),
+  },
+  {
+    id: "forage",
+    label: "Forage",
+    priority: 10,
+    matches: (tile) => tile.structure?.type === "bush",
+    createJob: (characterId, target) => createForageJob(characterId, target),
   },
   {
     id: "mine",
