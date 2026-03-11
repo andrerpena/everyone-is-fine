@@ -45,6 +45,7 @@ export interface AgentCharacterInfo {
   skills: Record<string, AgentSkillInfo>;
   thoughts: AgentThoughtInfo[];
   mentalBreak: { type: string; startedAtTick: number } | null;
+  isDrafted: boolean;
 }
 
 /** Tile info exposed to agents */
@@ -106,6 +107,8 @@ export interface GameAgentApi {
     target: { x: number; y: number },
   ) => Promise<{ success: boolean }>;
   cancelAction: (name: string) => void;
+  draftCharacter: (name: string) => AgentCharacterInfo | null;
+  undraftCharacter: (name: string) => AgentCharacterInfo | null;
 
   // State queries
   characters: AgentCharacterInfo[];

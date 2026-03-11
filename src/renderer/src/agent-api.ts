@@ -93,6 +93,7 @@ function toAgentCharacter(char: Character): AgentCharacterInfo {
           startedAtTick: char.mentalBreak.startedAtTick,
         }
       : null,
+    isDrafted: char.control.mode === "drafted",
   };
 }
 
@@ -275,6 +276,24 @@ function createAgentApi(): GameAgentApi {
       const state = useGameStore.getState();
       state.cancelJob(char.id);
       state.cancelCommand(char.id);
+    },
+
+    draftCharacter(name) {
+      const char = findCharacterByName(name);
+      if (!char) return null;
+
+      useGameStore.getState().draftCharacter(char.id);
+      const updated = entityStore.get(char.id);
+      return updated ? toAgentCharacter(updated) : null;
+    },
+
+    undraftCharacter(name) {
+      const char = findCharacterByName(name);
+      if (!char) return null;
+
+      useGameStore.getState().undraftCharacter(char.id);
+      const updated = entityStore.get(char.id);
+      return updated ? toAgentCharacter(updated) : null;
     },
 
     // =========================================================================

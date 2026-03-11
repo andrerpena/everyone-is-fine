@@ -240,4 +240,8 @@ export interface SimulationStateActions {
   // Jobs
   assignJob: (job: Job) => void;
   cancelJob: (characterId: EntityId) => void;
+
+  // Draft mode
+  draftCharacter: (characterId: EntityId) => void;
+  undraftCharacter: (characterId: EntityId) => void;
 }

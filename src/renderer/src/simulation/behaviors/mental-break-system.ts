@@ -81,6 +81,9 @@ export class MentalBreakSystem {
    */
   update(currentTick: number): void {
     for (const character of this.entityStore.values()) {
+      // Skip drafted characters — they are under direct player control
+      if (character.control.mode === "drafted") continue;
+
       const mood = character.needs.mood;
 
       if (character.mentalBreak === null) {

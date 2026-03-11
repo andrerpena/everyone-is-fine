@@ -34,6 +34,11 @@ const MOOD_INDICATOR_RADIUS = 3;
 const MOOD_INDICATOR_X_OFFSET = -12;
 const MOOD_INDICATOR_Y_OFFSET = -18;
 
+const DRAFT_INDICATOR_COLOR = 0xffc107;
+const DRAFT_INDICATOR_RADIUS = 3;
+const DRAFT_INDICATOR_X_OFFSET = 12;
+const DRAFT_INDICATOR_Y_OFFSET = -18;
+
 // =============================================================================
 // CHARACTER GRAPHICS
 // =============================================================================
@@ -45,6 +50,7 @@ interface CharacterGraphics {
   selectionRing: Graphics;
   jobIndicator: Graphics;
   moodIndicator: Graphics;
+  draftIndicator: Graphics;
 }
 
 /** Character sprite size (32x32 pixels, fits one cell) */
@@ -217,6 +223,11 @@ export class CharacterRenderer {
     moodIndicator.visible = false;
     container.addChild(moodIndicator);
 
+    // Draft indicator (hidden by default)
+    const draftIndicator = new Graphics();
+    draftIndicator.visible = false;
+    container.addChild(draftIndicator);
+
     return {
       container,
       body,
@@ -224,6 +235,7 @@ export class CharacterRenderer {
       selectionRing,
       jobIndicator,
       moodIndicator,
+      draftIndicator,
     };
   }
 
@@ -376,6 +388,33 @@ export class CharacterRenderer {
   }
 
   /**
+   * Draw the draft indicator dot to the upper-right of the character.
+   * Only visible when character is in drafted mode.
+   */
+  private drawDraftIndicator(graphics: Graphics, isDrafted: boolean): void {
+    graphics.clear();
+
+    if (!isDrafted) {
+      graphics.visible = false;
+      return;
+    }
+
+    graphics.visible = true;
+    graphics.circle(
+      DRAFT_INDICATOR_X_OFFSET,
+      DRAFT_INDICATOR_Y_OFFSET,
+      DRAFT_INDICATOR_RADIUS,
+    );
+    graphics.fill(DRAFT_INDICATOR_COLOR);
+    graphics.circle(
+      DRAFT_INDICATOR_X_OFFSET,
+      DRAFT_INDICATOR_Y_OFFSET,
+      DRAFT_INDICATOR_RADIUS,
+    );
+    graphics.stroke({ width: 1, color: 0x000000, alpha: 0.4 });
+  }
+
+  /**
    * Update a character's graphics with current state.
    */
   private updateCharacterGraphics(
@@ -405,6 +444,12 @@ export class CharacterRenderer {
 
     // Update mood indicator
     this.drawMoodIndicator(charGraphics.moodIndicator, character.needs.mood);
+
+    // Update draft indicator
+    this.drawDraftIndicator(
+      charGraphics.draftIndicator,
+      character.control.mode === "drafted",
+    );
   }
 
   /**

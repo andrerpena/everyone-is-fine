@@ -112,7 +112,7 @@
 - [ ] 82. Implement cleaning job type (remove filth from floors)
 - [ ] 83. Add bill/order system for crafting and cooking workstations
 - [ ] 84. Create work tab UI for managing colonist job priorities
-- [ ] 85. Implement "draft" mode (direct colonist control, overriding job AI)
+- [x] 85. Implement "draft" mode (direct colonist control, overriding job AI) <!-- Ticket 0018 -->
 - [x] 86. Add job progress indicators (progress bars on in-world tasks) <!-- Done: JobProgressRenderer in pixi/renderers/ -->
 - [ ] 87. Create idle alert when colonists have no available work
 
@@ -172,9 +172,9 @@
 
 ## Phase 10 — Day/Night & Weather
 
-- [ ] 133. Implement day/night cycle with configurable day length <!-- Partial: time progression system added (ticket 0014), no visual lighting changes yet -->
+- [x] 133. Implement day/night cycle with configurable day length <!-- Done: time progression (ticket 0014) + ambient lighting (ticket 0017) -->
 - [x] 134. Add ambient lighting changes based on time of day <!-- Ticket 0017 -->
-- [ ] 135. Create season system (spring, summer, fall, winter) with configurable year length
+- [x] 135. Create season system (spring, summer, fall, winter) with configurable year length <!-- Done: seasons cycle in time system (ticket 0014), displayed in status bar -->
 - [ ] 136. Implement temperature simulation (outdoor temp varies by season and time)
 - [ ] 137. Add weather system framework (clear, rain, fog, snow, thunderstorm)
 - [ ] 138. Implement rain weather with visual effects and ground moisture

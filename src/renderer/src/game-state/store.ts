@@ -603,6 +603,68 @@ export const useGameStore = create<GameStore>((set, get) => ({
   cancelJob: (characterId: EntityId) => {
     jobProcessor.cancelJob(characterId);
   },
+
+  // ===========================================================================
+  // DRAFT MODE
+  // ===========================================================================
+
+  draftCharacter: (characterId: EntityId) => {
+    const character = entityStore.get(characterId);
+    if (!character) return;
+
+    // Cancel any active jobs and movement
+    jobProcessor.cancelJob(characterId);
+    movementSystem.cancelMove(characterId);
+
+    // End any active mental break
+    if (character.mentalBreak !== null) {
+      entityStore.update(characterId, { mentalBreak: null });
+    }
+
+    // Set control mode to drafted
+    entityStore.update(characterId, {
+      control: {
+        ...character.control,
+        mode: "drafted",
+        currentCommand: null,
+        commandQueue: [],
+      },
+    });
+
+    // Sync to store
+    const updated = entityStore.get(characterId);
+    if (updated) {
+      set((state) => {
+        const newCharacters = new Map(state.simulation.characters);
+        newCharacters.set(characterId, updated);
+        return {
+          simulation: { ...state.simulation, characters: newCharacters },
+        };
+      });
+    }
+  },
+
+  undraftCharacter: (characterId: EntityId) => {
+    const character = entityStore.get(characterId);
+    if (!character || character.control.mode !== "drafted") return;
+
+    // Return to idle mode
+    entityStore.update(characterId, {
+      control: { ...character.control, mode: "idle" },
+    });
+
+    // Sync to store
+    const updated = entityStore.get(characterId);
+    if (updated) {
+      set((state) => {
+        const newCharacters = new Map(state.simulation.characters);
+        newCharacters.set(characterId, updated);
+        return {
+          simulation: { ...state.simulation, characters: newCharacters },
+        };
+      });
+    }
+  },
 }));
 
 // =============================================================================

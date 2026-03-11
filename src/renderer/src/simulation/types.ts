@@ -58,7 +58,7 @@ export interface CharacterMovement {
 }
 
 /** Character control mode */
-export type ControlMode = "idle" | "imperative" | "scheduled";
+export type ControlMode = "idle" | "imperative" | "scheduled" | "drafted";
 
 /** Character control state */
 export interface CharacterControl {
