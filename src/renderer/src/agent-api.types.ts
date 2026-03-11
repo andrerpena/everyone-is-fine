@@ -56,6 +56,7 @@ export interface AgentTileInfo {
   structure: string | null;
   isPassable: boolean;
   items: Array<{ type: string; quantity: number }>;
+  door?: { isOpen: boolean; isLocked: boolean };
 }
 
 /** World metadata exposed to agents */
@@ -112,6 +113,8 @@ export interface GameAgentApi {
     target: { x: number; y: number },
     z?: number,
   ) => Promise<{ success: boolean }>;
+  lockDoor: (x: number, y: number, z?: number) => void;
+  unlockDoor: (x: number, y: number, z?: number) => void;
   cancelAction: (name: string) => void;
   draftCharacter: (name: string) => AgentCharacterInfo | null;
   undraftCharacter: (name: string) => AgentCharacterInfo | null;

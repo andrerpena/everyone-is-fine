@@ -41,6 +41,7 @@ import {
   getFloorConstructionCost,
   isFloorBuildable,
 } from "./world/registries/floor-registry";
+import { STRUCTURE_REGISTRY } from "./world/registries/structure-registry";
 import { TERRAIN_REGISTRY } from "./world/registries/terrain-registry";
 import type {
   BiomeType,
@@ -289,6 +290,58 @@ function createAgentApi(): GameAgentApi {
       return { success: true };
     },
 
+    lockDoor(x: number, y: number, z?: number) {
+      const state = useGameStore.getState();
+      const world = state.world;
+      if (!world) throw new Error("No world loaded");
+
+      const zLevel = z ?? state.currentZLevel;
+      const tile = getWorldTileAt(world, x, y, zLevel);
+      if (!tile) throw new Error(`Tile (${x}, ${y}, ${zLevel}) out of bounds`);
+
+      if (
+        !tile.structure ||
+        STRUCTURE_REGISTRY[tile.structure.type].category !== "door"
+      ) {
+        throw new Error(`No door at (${x}, ${y}, ${zLevel})`);
+      }
+
+      tile.structure.isLocked = true;
+      state.updateTile({ x, y }, zLevel, {
+        pathfinding: {
+          isPassable: false,
+          movementCost: tile.pathfinding.movementCost,
+          lastUpdated: Date.now(),
+        },
+      });
+    },
+
+    unlockDoor(x: number, y: number, z?: number) {
+      const state = useGameStore.getState();
+      const world = state.world;
+      if (!world) throw new Error("No world loaded");
+
+      const zLevel = z ?? state.currentZLevel;
+      const tile = getWorldTileAt(world, x, y, zLevel);
+      if (!tile) throw new Error(`Tile (${x}, ${y}, ${zLevel}) out of bounds`);
+
+      if (
+        !tile.structure ||
+        STRUCTURE_REGISTRY[tile.structure.type].category !== "door"
+      ) {
+        throw new Error(`No door at (${x}, ${y}, ${zLevel})`);
+      }
+
+      tile.structure.isLocked = false;
+      state.updateTile({ x, y }, zLevel, {
+        pathfinding: {
+          isPassable: true,
+          movementCost: tile.pathfinding.movementCost,
+          lastUpdated: Date.now(),
+        },
+      });
+    },
+
     cancelAction(name) {
       const char = findCharacterByName(name);
       if (!char) return;
@@ -349,6 +402,18 @@ function createAgentApi(): GameAgentApi {
           quantity: item.quantity,
         })),
       };
+
+      // Expose door state if structure is a door
+      if (
+        tile.structure &&
+        STRUCTURE_REGISTRY[tile.structure.type].category === "door"
+      ) {
+        info.door = {
+          isOpen: tile.structure.isOpen ?? false,
+          isLocked: tile.structure.isLocked ?? false,
+        };
+      }
+
       return info;
     },
 

@@ -143,6 +143,7 @@ export interface StructureData {
   quality?: number; // 0-1 build quality (from builder skill), affects beauty/value
   ownerId?: EntityId; // For furniture ownership
   isOpen?: boolean; // For doors
+  isLocked?: boolean; // For doors — locked doors block movement
   rotation: 0 | 90 | 180 | 270; // Degrees
 }
 
