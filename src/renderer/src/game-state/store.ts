@@ -5,6 +5,8 @@
 import { create } from "zustand";
 import { commandRegistry } from "../commands";
 import { logger } from "../lib/logger";
+import type { SystemTimings } from "../lib/performance-store";
+import { usePerformanceStore } from "../lib/performance-store";
 import {
   entityStore,
   findPath,
@@ -603,13 +605,28 @@ const jobProcessor = new JobProcessor(
 // SIMULATION LOOP SETUP
 // =============================================================================
 
+// =============================================================================
+// TICK PROFILING STATE
+// =============================================================================
+
+/** Throttle interval for pushing metrics to the performance store */
+const METRICS_UPDATE_INTERVAL = 500;
+let lastMetricsUpdate = 0;
+let tickCountSinceLastUpdate = 0;
+let lastTpsTimestamp = performance.now();
+
 // Set up tick callback to update jobs and movement
 simulationLoop.setTickCallback((deltaTime, tick) => {
+  // --- Profiled system updates ---
+  const t0 = performance.now();
+
   // Update job processor (advances work steps, initiates moves)
   jobProcessor.update(deltaTime);
+  const t1 = performance.now();
 
   // Update movement system (advances characters along paths)
   movementSystem.update(deltaTime);
+  const t2 = performance.now();
 
   // Sync entity store and job progress to game state
   const characters = new Map<EntityId, Character>();
@@ -626,4 +643,31 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
       jobProgress,
     },
   }));
+  const t3 = performance.now();
+
+  // --- Push metrics (throttled) ---
+  tickCountSinceLastUpdate++;
+  const now = t3;
+
+  if (now - lastMetricsUpdate >= METRICS_UPDATE_INTERVAL) {
+    const elapsed = (now - lastTpsTimestamp) / 1000; // seconds
+    const tps =
+      elapsed > 0 ? Math.round(tickCountSinceLastUpdate / elapsed) : 0;
+
+    const systemTimings: SystemTimings = {
+      jobProcessor: Number.parseFloat((t1 - t0).toFixed(3)),
+      movementSystem: Number.parseFloat((t2 - t1).toFixed(3)),
+      stateSync: Number.parseFloat((t3 - t2).toFixed(3)),
+    };
+
+    usePerformanceStore.getState().pushTickMetrics({
+      systemTimings,
+      entityCount: entityStore.size,
+      tps,
+    });
+
+    lastMetricsUpdate = now;
+    tickCountSinceLastUpdate = 0;
+    lastTpsTimestamp = now;
+  }
 });
