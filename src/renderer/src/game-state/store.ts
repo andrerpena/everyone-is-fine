@@ -14,6 +14,7 @@ import {
   GameNotifications,
   getOutdoorTemperature,
   IdleBehaviorSystem,
+  ItemDeteriorationSystem,
   MentalBreakSystem,
   MoodThoughtSystem,
   MovementSystem,
@@ -712,6 +713,7 @@ const gameNotifications = new GameNotifications(entityStore, jobProcessor);
 // NEEDS SYSTEM SETUP
 // =============================================================================
 
+const itemDeterioration = new ItemDeteriorationSystem();
 const needsSystem = new NeedsSystem(entityStore);
 const moodThoughtSystem = new MoodThoughtSystem(entityStore);
 const mentalBreakSystem = new MentalBreakSystem(
@@ -745,6 +747,8 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
       world.time.season,
       world.time.hour,
     );
+    // Degrade items on ground tiles
+    itemDeterioration.update(() => world);
   }
 
   // --- Profiled system updates ---

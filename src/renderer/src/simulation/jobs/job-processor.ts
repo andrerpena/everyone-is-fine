@@ -357,6 +357,7 @@ export class JobProcessor {
         type: itemDef.type as ItemType,
         quantity: itemDef.quantity,
         quality: 1,
+        condition: 1,
       });
     }
 

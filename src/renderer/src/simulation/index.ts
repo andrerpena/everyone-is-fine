@@ -14,6 +14,8 @@ export { NeedSatisfactionSystem } from "./behaviors/need-satisfaction-system";
 export { EntityStore, entityStore } from "./entity-store";
 // Game Notifications
 export { GameNotifications } from "./game-notifications";
+// Items
+export { ItemDeteriorationSystem } from "./items/item-deterioration-system";
 // Jobs
 export {
   ACTION_RULES,

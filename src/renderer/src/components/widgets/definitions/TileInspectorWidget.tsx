@@ -8,7 +8,15 @@ import type { WidgetComponentProps, WidgetDefinition } from "../types";
 /** Format an items array into a human-readable summary string */
 function formatItemsSummary(items: ItemData[]): string {
   if (items.length === 0) return "None";
-  return items.map((item) => `${item.type} x${item.quantity}`).join(", ");
+  return items
+    .map((item) => {
+      const condition =
+        item.condition !== undefined
+          ? ` (${Math.round(item.condition * 100)}%)`
+          : "";
+      return `${item.type} x${item.quantity}${condition}`;
+    })
+    .join(", ");
 }
 
 /**
