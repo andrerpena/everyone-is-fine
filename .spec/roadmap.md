@@ -34,7 +34,7 @@
 - [x] 16. Create fertility map generation (affects plant growth)
 - [x] 17. Implement tile rendering with Pixi.js sprite tiles
 - [x] 18. Add camera controls (pan, zoom) for map navigation
-- [ ] 19. Implement fog of war / unexplored area rendering <!-- Partial: visibility flags defined but no fog rendering effect -->
+- [x] 19. Implement fog of war / unexplored area rendering <!-- Ticket 0043 -->
 - [x] 20. Create minimap widget showing overview of the full map
 - [x] 21. Add tile selection and hover highlighting
 - [x] 22. Implement coordinate system with world-to-screen conversion

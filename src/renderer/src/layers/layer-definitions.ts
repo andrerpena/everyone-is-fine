@@ -97,6 +97,19 @@ export const itemsLayer: FeatureLayerDefinition = {
   filter: (tile) => tile.items.length > 0,
 };
 
+export const fogOfWarLayer: FeatureLayerDefinition = {
+  id: "fog-of-war",
+  name: "Fog of War",
+  category: "feature",
+  type: "feature",
+  description:
+    "Darkens unexplored tiles and dims explored-but-not-visible tiles",
+  defaultEnabled: true,
+  zIndex: 54, // Above items (52), below ambient lighting (55)
+  filter: () => true,
+  customRender: true,
+};
+
 export const ambientLightingLayer: FeatureLayerDefinition = {
   id: "ambient-lighting",
   name: "Ambient Lighting",
@@ -164,6 +177,7 @@ export function registerBuiltInLayers(): void {
   layerRegistry.register(structuresLayer);
   layerRegistry.register(itemsLayer);
   layerRegistry.register(zonesLayer);
+  layerRegistry.register(fogOfWarLayer);
   layerRegistry.register(ambientLightingLayer);
   layerRegistry.register(weatherEffectsLayer);
   layerRegistry.register(charactersLayer);

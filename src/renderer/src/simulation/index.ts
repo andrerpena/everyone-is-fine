@@ -179,6 +179,8 @@ export {
   type SimulationSpeed,
   type SimulationState,
 } from "./types";
+// Vision
+export { VisionSystem } from "./vision/vision-system";
 // Weather
 export { SnowAccumulationSystem } from "./weather/snow-accumulation-system";
 export {

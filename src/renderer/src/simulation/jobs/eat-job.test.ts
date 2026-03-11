@@ -25,7 +25,8 @@ describe("createEatJob", () => {
   it("sets consume_item step with hunger need", () => {
     const job = createEatJob("char_1", { x: 0, y: 0, z: 0 }, "item_1");
     const consumeStep = job.steps[3];
-    if (consumeStep.type !== "consume_item") throw new Error("Expected consume");
+    if (consumeStep.type !== "consume_item")
+      throw new Error("Expected consume");
     expect(consumeStep.needId).toBe("hunger");
   });
 });

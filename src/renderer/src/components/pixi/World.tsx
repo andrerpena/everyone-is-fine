@@ -36,6 +36,7 @@ import type { Position2D } from "@renderer/world/types";
 import { useZoneStore } from "@renderer/zones";
 import {
   CharacterRenderer,
+  FogOfWarRenderer,
   HeatMapRenderer,
   JobProgressRenderer,
   PathRenderer,
@@ -260,6 +261,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
   const jobProgressRendererRef = useRef<JobProgressRenderer | null>(null);
   const weatherRendererRef = useRef<WeatherRenderer | null>(null);
   const zoneRendererRef = useRef<ZoneRenderer | null>(null);
+  const fogOfWarRendererRef = useRef<FogOfWarRenderer | null>(null);
   const snowOverlayRef = useRef<Graphics | null>(null);
 
   // Interaction container for click handling
@@ -427,6 +429,21 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       }
     });
 
+    // Subscribe to tick changes for fog of war overlay (throttled to every ~30 ticks)
+    let lastFogTick = 0;
+    const unsubscribeFog = useGameStore.subscribe((state) => {
+      if (!fogOfWarRendererRef.current || !level) return;
+      const tick = state.simulation.currentTick;
+      if (tick - lastFogTick < 30) return;
+      lastFogTick = tick;
+
+      const fogEnabled =
+        useLayerStore.getState().visibility.get("fog-of-war") ?? true;
+      if (!fogEnabled) return;
+
+      fogOfWarRendererRef.current.update(level);
+    });
+
     const unsubscribeLayers = useLayerStore.subscribe((state) => {
       // Update heat map renderer
       if (heatMapRendererRef.current && level) {
@@ -445,6 +462,19 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       if (itemsGraphicsRef.current) {
         itemsGraphicsRef.current.visible =
           state.visibility.get("items") ?? true;
+      }
+
+      // Toggle fog of war layer
+      if (fogOfWarRendererRef.current) {
+        const fogEnabled = state.visibility.get("fog-of-war") ?? true;
+        if (!fogEnabled) {
+          fogOfWarRendererRef.current.setVisible(false);
+        } else {
+          fogOfWarRendererRef.current.setVisible(true);
+          if (level) {
+            fogOfWarRendererRef.current.update(level);
+          }
+        }
       }
 
       // Toggle ambient lighting layer
@@ -510,6 +540,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       unsubscribeWeather();
       unsubscribeZones();
       unsubscribeSnow();
+      unsubscribeFog();
       unsubscribeLayers();
     };
   }, [zLevel, level]);
@@ -690,6 +721,21 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         initialLayerVisibility.get("ambient-lighting") ?? true;
       if (!ambientLayerEnabled) {
         ambientOverlay.visible = false;
+      }
+
+      // Create fog of war renderer (above ambient, below weather)
+      const fogOfWarContainer = new Container();
+      viewport.addChild(fogOfWarContainer);
+      const fogOfWarRenderer = new FogOfWarRenderer(
+        fogOfWarContainer,
+        CELL_SIZE,
+      );
+      fogOfWarRendererRef.current = fogOfWarRenderer;
+      // Initial fog render
+      fogOfWarRenderer.update(level);
+      const fogLayerEnabled = initialLayerVisibility.get("fog-of-war") ?? true;
+      if (!fogLayerEnabled) {
+        fogOfWarRenderer.setVisible(false);
       }
 
       // Create weather particle renderer (above ambient, below hover)
@@ -939,6 +985,10 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       if (zoneRendererRef.current) {
         zoneRendererRef.current.destroy();
         zoneRendererRef.current = null;
+      }
+      if (fogOfWarRendererRef.current) {
+        fogOfWarRendererRef.current.destroy();
+        fogOfWarRendererRef.current = null;
       }
       if (snowOverlayRef.current) {
         snowOverlayRef.current.destroy();

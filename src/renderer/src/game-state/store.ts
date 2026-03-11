@@ -26,6 +26,7 @@ import {
   SnowAccumulationSystem,
   SowingSystem,
   simulationLoop,
+  VisionSystem,
   WEATHER_TEMP_MODIFIERS,
   WeatherSystem,
 } from "../simulation";
@@ -736,6 +737,7 @@ const gameNotifications = new GameNotifications(entityStore, jobProcessor);
 // NEEDS SYSTEM SETUP
 // =============================================================================
 
+const visionSystem = new VisionSystem(entityStore);
 const itemDeterioration = new ItemDeteriorationSystem();
 const snowAccumulation = new SnowAccumulationSystem();
 const plantGrowth = new PlantGrowthSystem();
@@ -781,6 +783,8 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
     plantGrowth.update(() => world);
     // Degrade items on ground tiles
     itemDeterioration.update(() => world);
+    // Update tile visibility based on colonist positions
+    visionSystem.update(() => world);
   }
 
   // --- Profiled system updates ---
