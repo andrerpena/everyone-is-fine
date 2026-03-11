@@ -6,7 +6,8 @@
 
 import type { World } from "../../world/types";
 import type { EntityStore } from "../entity-store";
-import type { Character } from "../types";
+import type { EntityId } from "../types";
+import { pickBestCharacter } from "../work-priorities";
 import { createBuildJob } from "./job-factory";
 import type { JobProcessor } from "./job-processor";
 
@@ -33,28 +34,15 @@ export class ConstructionSystem {
     const world = this.getWorld();
     if (!world) return;
 
-    // Find idle colonists
-    const idleColonists: Character[] = [];
-    for (const character of this.entityStore.values()) {
-      if (character.control.mode === "drafted") continue;
-      if (character.mentalBreak !== null) continue;
-      if (this.jobProcessor.getJob(character.id)) continue;
-      if (character.movement.isMoving) continue;
-      idleColonists.push(character);
-    }
-
-    if (idleColonists.length === 0) return;
-
     let jobsAssigned = 0;
+    const assignedCharacters = new Set<EntityId>();
 
     for (const level of world.levels.values()) {
       if (jobsAssigned >= MAX_JOBS_PER_SCAN) break;
-      if (idleColonists.length === 0) break;
 
       for (let y = 0; y < level.height; y++) {
         for (let x = 0; x < level.width; x++) {
           if (jobsAssigned >= MAX_JOBS_PER_SCAN) break;
-          if (idleColonists.length === 0) break;
 
           const tile = level.tiles[y * level.width + x];
           if (!tile.blueprint) continue;
@@ -63,26 +51,19 @@ export class ConstructionSystem {
           const pos = { x, y, z: level.z };
           if (this.jobProcessor.reservations.isReserved(pos)) continue;
 
-          // Find closest idle colonist
-          let bestIdx = -1;
-          let bestDist = Number.POSITIVE_INFINITY;
-          for (let i = 0; i < idleColonists.length; i++) {
-            const c = idleColonists[i];
-            if (c.position.z !== level.z) continue;
-            const dist =
-              Math.abs(c.position.x - x) + Math.abs(c.position.y - y);
-            if (dist < bestDist) {
-              bestDist = dist;
-              bestIdx = i;
-            }
-          }
+          const charId = pickBestCharacter(
+            this.entityStore.values(),
+            "construction",
+            pos,
+            (id) =>
+              assignedCharacters.has(id) ||
+              this.jobProcessor.getJob(id) !== undefined,
+          );
+          if (!charId) continue;
 
-          if (bestIdx === -1) continue;
-
-          const colonist = idleColonists[bestIdx];
-          const job = createBuildJob(colonist.id, pos, tile.blueprint.type);
+          const job = createBuildJob(charId, pos, tile.blueprint.type);
           this.jobProcessor.assignJob(job);
-          idleColonists.splice(bestIdx, 1);
+          assignedCharacters.add(charId);
           jobsAssigned++;
         }
       }

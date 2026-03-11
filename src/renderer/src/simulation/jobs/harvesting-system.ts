@@ -7,6 +7,7 @@
 import type { Position3D, World } from "../../world/types";
 import type { EntityStore } from "../entity-store";
 import type { EntityId } from "../types";
+import { pickBestCharacter } from "../work-priorities";
 import { createHarvestJob } from "./job-factory";
 import type { JobProcessor } from "./job-processor";
 
@@ -41,22 +42,17 @@ export class HarvestingSystem {
     const world = this.getWorld();
     if (!world) return;
 
-    const idleCharacters = this.getIdleCharacters();
-    if (idleCharacters.length === 0) return;
-
     let jobsAssigned = 0;
+    const assignedCharacters = new Set<EntityId>();
 
     for (const [zLevel, level] of world.levels) {
       if (jobsAssigned >= MAX_JOBS_PER_SCAN) break;
-      if (idleCharacters.length === 0) break;
 
       for (let y = 0; y < level.height; y++) {
         if (jobsAssigned >= MAX_JOBS_PER_SCAN) break;
-        if (idleCharacters.length === 0) break;
 
         for (let x = 0; x < level.width; x++) {
           if (jobsAssigned >= MAX_JOBS_PER_SCAN) break;
-          if (idleCharacters.length === 0) break;
 
           const tile = level.tiles[y * level.width + x];
           if (!tile.crop || tile.crop.stage !== "mature") continue;
@@ -66,54 +62,22 @@ export class HarvestingSystem {
           // Skip reserved tiles
           if (this.jobProcessor.reservations.isReserved(pos)) continue;
 
-          // Pick closest idle colonist
-          const charId = this.pickClosestCharacter(idleCharacters, pos);
+          const charId = pickBestCharacter(
+            this.entityStore.values(),
+            "growing",
+            pos,
+            (id) =>
+              assignedCharacters.has(id) ||
+              this.jobProcessor.getJob(id) !== undefined,
+          );
           if (!charId) continue;
 
           const job = createHarvestJob(charId, pos, tile.crop.type);
           this.jobProcessor.assignJob(job);
+          assignedCharacters.add(charId);
           jobsAssigned++;
-
-          // Remove from idle pool
-          const idx = idleCharacters.indexOf(charId);
-          if (idx !== -1) idleCharacters.splice(idx, 1);
         }
       }
     }
-  }
-
-  private getIdleCharacters(): EntityId[] {
-    const idle: EntityId[] = [];
-    for (const character of this.entityStore.values()) {
-      if (character.mentalBreak !== null) continue;
-      if (character.control.mode !== "idle") continue;
-      if (character.movement.isMoving) continue;
-      if (this.jobProcessor.getJob(character.id)) continue;
-      idle.push(character.id);
-    }
-    return idle;
-  }
-
-  private pickClosestCharacter(
-    idleCharacters: EntityId[],
-    target: Position3D,
-  ): EntityId | null {
-    let best: EntityId | null = null;
-    let bestDist = Number.POSITIVE_INFINITY;
-
-    for (const id of idleCharacters) {
-      const char = this.entityStore.get(id);
-      if (!char) continue;
-
-      const dist =
-        Math.abs(char.position.x - target.x) +
-        Math.abs(char.position.y - target.y);
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = id;
-      }
-    }
-
-    return best;
   }
 }

@@ -26,6 +26,11 @@ import {
   createCharacter,
   type SimulationSpeed,
 } from "./simulation/types";
+import {
+  ALL_WORK_TYPES,
+  type WorkPriorityLevel,
+  type WorkType,
+} from "./simulation/work-priorities";
 import { generateWorld as generateWorldFactory } from "./world/factories/procedural-generator";
 import {
   createFloorData,
@@ -115,6 +120,7 @@ function toAgentCharacter(char: Character): AgentCharacterInfo {
         }
       : null,
     isDrafted: char.control.mode === "drafted",
+    workPriorities: { ...char.workPriorities },
   };
 }
 
@@ -367,6 +373,33 @@ function createAgentApi(): GameAgentApi {
       useGameStore.getState().undraftCharacter(char.id);
       const updated = entityStore.get(char.id);
       return updated ? toAgentCharacter(updated) : null;
+    },
+
+    setWorkPriority(name: string, workType: string, priority: number) {
+      const char = findCharacterByName(name);
+      if (!char) throw new Error(`Character "${name}" not found`);
+
+      if (!ALL_WORK_TYPES.includes(workType as WorkType)) {
+        throw new Error(
+          `Invalid work type "${workType}". Valid types: ${ALL_WORK_TYPES.join(", ")}`,
+        );
+      }
+      if (priority < 0 || priority > 4 || !Number.isInteger(priority)) {
+        throw new Error("Priority must be an integer 0-4");
+      }
+
+      useGameStore.getState().updateCharacter(char.id, {
+        workPriorities: {
+          ...char.workPriorities,
+          [workType]: priority as WorkPriorityLevel,
+        },
+      });
+    },
+
+    getWorkPriorities(name: string) {
+      const char = findCharacterByName(name);
+      if (!char) return null;
+      return { ...char.workPriorities };
     },
 
     // =========================================================================

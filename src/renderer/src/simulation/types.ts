@@ -7,6 +7,8 @@ import type { CharacterSkills } from "./skills";
 import { createDefaultSkills } from "./skills";
 import type { ActiveThought } from "./thoughts";
 import type { CharacterTraits } from "./traits";
+import type { WorkPriorities } from "./work-priorities";
+import { createDefaultWorkPriorities } from "./work-priorities";
 
 // =============================================================================
 // ENTITY TYPES
@@ -114,6 +116,8 @@ export interface Character extends Entity {
   thoughts: ActiveThought[];
   /** Active mental break, or null if not in a break */
   mentalBreak: MentalBreakState | null;
+  /** Per-work-type priority (0 = disabled, 1 = highest, 4 = lowest) */
+  workPriorities: WorkPriorities;
 }
 
 // =============================================================================
@@ -308,6 +312,7 @@ export function createCharacter(
     traits: [],
     thoughts: [],
     mentalBreak: null,
+    workPriorities: createDefaultWorkPriorities(),
     ...options,
   };
 }

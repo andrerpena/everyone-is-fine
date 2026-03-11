@@ -49,6 +49,7 @@ export interface AgentCharacterInfo {
   thoughts: AgentThoughtInfo[];
   mentalBreak: { type: string; startedAtTick: number } | null;
   isDrafted: boolean;
+  workPriorities: Record<string, number>;
 }
 
 /** Tile info exposed to agents */
@@ -118,6 +119,8 @@ export interface GameAgentApi {
   lockDoor: (x: number, y: number, z?: number) => void;
   unlockDoor: (x: number, y: number, z?: number) => void;
   cancelAction: (name: string) => void;
+  setWorkPriority: (name: string, workType: string, priority: number) => void;
+  getWorkPriorities: (name: string) => Record<string, number> | null;
   draftCharacter: (name: string) => AgentCharacterInfo | null;
   undraftCharacter: (name: string) => AgentCharacterInfo | null;
 

@@ -11,6 +11,7 @@ import type { ZoneData } from "../../zones/types";
 import { useZoneStore } from "../../zones/zone-store";
 import type { EntityStore } from "../entity-store";
 import type { EntityId } from "../types";
+import { pickBestCharacter } from "../work-priorities";
 import { createHaulJob } from "./job-factory";
 import type { JobProcessor } from "./job-processor";
 
@@ -48,23 +49,18 @@ export class HaulingSystem {
     const stockpiles = this.getStockpileZones();
     if (stockpiles.length === 0) return;
 
-    const idleCharacters = this.getIdleCharacters();
-    if (idleCharacters.length === 0) return;
-
     let jobsAssigned = 0;
+    const assignedCharacters = new Set<EntityId>();
 
     // Scan each level for items on the ground
     for (const [zLevel, level] of world.levels) {
       if (jobsAssigned >= MAX_JOBS_PER_SCAN) break;
-      if (idleCharacters.length === 0) break;
 
       for (let y = 0; y < level.height; y++) {
         if (jobsAssigned >= MAX_JOBS_PER_SCAN) break;
-        if (idleCharacters.length === 0) break;
 
         for (let x = 0; x < level.width; x++) {
           if (jobsAssigned >= MAX_JOBS_PER_SCAN) break;
-          if (idleCharacters.length === 0) break;
 
           const tile = level.tiles[y * level.width + x];
           if (tile.items.length === 0) continue;
@@ -77,7 +73,6 @@ export class HaulingSystem {
           // Try to haul each item on this tile
           for (const item of tile.items) {
             if (jobsAssigned >= MAX_JOBS_PER_SCAN) break;
-            if (idleCharacters.length === 0) break;
 
             // Skip items already reserved for hauling
             const sourcePos: Position3D = { x, y, z: zLevel };
@@ -87,17 +82,21 @@ export class HaulingSystem {
             const dest = this.findStockpileDestination(item, stockpiles, world);
             if (!dest) continue;
 
-            // Pick the closest idle character
-            const charId = this.pickClosestCharacter(idleCharacters, sourcePos);
+            // Pick the best eligible character by priority, then distance
+            const charId = pickBestCharacter(
+              this.entityStore.values(),
+              "hauling",
+              sourcePos,
+              (id) =>
+                assignedCharacters.has(id) ||
+                this.jobProcessor.getJob(id) !== undefined,
+            );
             if (!charId) continue;
 
             const job = createHaulJob(charId, sourcePos, dest, item.id);
             this.jobProcessor.assignJob(job);
+            assignedCharacters.add(charId);
             jobsAssigned++;
-
-            // Remove this character from idle pool
-            const idx = idleCharacters.indexOf(charId);
-            if (idx !== -1) idleCharacters.splice(idx, 1);
           }
         }
       }
@@ -109,18 +108,6 @@ export class HaulingSystem {
       .getState()
       .getAllZones()
       .filter((z) => z.type === "stockpile");
-  }
-
-  private getIdleCharacters(): EntityId[] {
-    const idle: EntityId[] = [];
-    for (const character of this.entityStore.values()) {
-      if (character.mentalBreak !== null) continue;
-      if (character.control.mode !== "idle") continue;
-      if (character.movement.isMoving) continue;
-      if (this.jobProcessor.getJob(character.id)) continue;
-      idle.push(character.id);
-    }
-    return idle;
   }
 
   private findStockpileDestination(
@@ -152,28 +139,5 @@ export class HaulingSystem {
       }
     }
     return null;
-  }
-
-  private pickClosestCharacter(
-    idleCharacters: EntityId[],
-    target: Position3D,
-  ): EntityId | null {
-    let best: EntityId | null = null;
-    let bestDist = Number.POSITIVE_INFINITY;
-
-    for (const id of idleCharacters) {
-      const char = this.entityStore.get(id);
-      if (!char) continue;
-
-      const dist =
-        Math.abs(char.position.x - target.x) +
-        Math.abs(char.position.y - target.y);
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = id;
-      }
-    }
-
-    return best;
   }
 }

@@ -103,7 +103,7 @@
 
 - [x] 74. Implement job queue system (global list of available jobs) <!-- Done: JobQueue class in simulation/jobs/job-queue.ts -->
 - [x] 75. Create job type definitions (haul, construct, mine, grow, cook, hunt, etc.) <!-- Done: ActionRule pattern in action-rules.ts with chop/mine/move; extensible by adding new rules -->
-- [ ] 76. Add job priority system (1-4 priority per colonist per job type)
+- [x] 76. Add job priority system (1-4 priority per colonist per job type)
 - [ ] 77. Implement job assignment algorithm (match colonists to jobs by priority and skill)
 - [ ] 78. Create work schedule system (assign work/sleep/recreation/anything time blocks)
 - [x] 79. Add job reservation system (prevent multiple colonists claiming same job) <!-- Ticket 0025 -->
