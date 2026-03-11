@@ -127,6 +127,13 @@ export interface HarvestCropStep {
   status: StepStatus;
 }
 
+export interface ConsumeItemStep {
+  type: "consume_item";
+  /** Which need to restore (e.g. "hunger") */
+  needId: string;
+  status: StepStatus;
+}
+
 export type JobStep =
   | MoveStep
   | WorkStep
@@ -136,7 +143,8 @@ export type JobStep =
   | PickupItemStep
   | DropItemStep
   | PlantCropStep
-  | HarvestCropStep;
+  | HarvestCropStep
+  | ConsumeItemStep;
 
 // =============================================================================
 // ACTION RULES - Declarative matching for tile → actions

@@ -3,6 +3,7 @@
 // =============================================================================
 
 import { logger } from "../../lib/logger";
+import { ITEM_REGISTRY } from "../../world/registries/item-registry";
 import type {
   ItemData,
   ItemType,
@@ -29,6 +30,7 @@ import {
 import { createMoveCommand, type EntityId } from "../types";
 import { ReservationSystem } from "./reservation-system";
 import type {
+  ConsumeItemStep,
   DropItemStep,
   HarvestCropStep,
   Job,
@@ -262,6 +264,10 @@ export class JobProcessor {
 
       case "harvest_crop":
         this.executeHarvestCrop(characterId, job, step);
+        break;
+
+      case "consume_item":
+        this.executeConsumeItem(characterId, job, step);
         break;
     }
   }
@@ -609,6 +615,49 @@ export class JobProcessor {
       step.position.z,
       {},
     );
+
+    step.status = "completed";
+    this.advanceToNextStep(characterId, job);
+  }
+
+  // ===========================================================================
+  // CONSUME ITEM STEP
+  // ===========================================================================
+
+  private executeConsumeItem(
+    characterId: EntityId,
+    job: Job,
+    step: ConsumeItemStep,
+  ): void {
+    const carried = this.carriedItems.get(characterId);
+    if (!carried) {
+      this.failJob(characterId, job, "No item being carried to consume");
+      return;
+    }
+
+    const character = this.entityStore.get(characterId);
+    if (!character) {
+      this.failJob(characterId, job, "Character not found");
+      return;
+    }
+
+    // Look up nutrition from item registry
+    const props = ITEM_REGISTRY[carried.type];
+    const amount = props.nutrition;
+
+    // Restore the need
+    const needs = character.needs;
+    const currentValue =
+      step.needId in needs
+        ? (needs[step.needId as keyof typeof needs] as number)
+        : 0;
+    const newValue = Math.min(1, currentValue + amount);
+    this.entityStore.update(characterId, {
+      needs: { ...needs, [step.needId]: newValue },
+    });
+
+    // Item is consumed — remove from carried items
+    this.carriedItems.delete(characterId);
 
     step.status = "completed";
     this.advanceToNextStep(characterId, job);

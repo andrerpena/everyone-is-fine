@@ -4,11 +4,16 @@
 // Unified system that checks all colonist needs and addresses the most
 // critical one first. Replaces separate ForageBehavior and SleepBehavior.
 
+import { ITEM_REGISTRY } from "../../world/registries/item-registry";
 import type { World } from "../../world/types";
 import { getWorldTileAt } from "../../world/utils/tile-utils";
 import type { EntityStore } from "../entity-store";
 import type { JobProcessor } from "../jobs";
-import { createForageJob, createSleepJob } from "../jobs/job-factory";
+import {
+  createEatJob,
+  createForageJob,
+  createSleepJob,
+} from "../jobs/job-factory";
 import { getNeedThreshold } from "../needs/needs-config";
 import type { Character } from "../types";
 
@@ -42,8 +47,13 @@ export class NeedSatisfactionSystem {
       // If the character has an active job, check if a critical need should interrupt it
       const activeJob = this.jobProcessor.getJob(character.id);
       if (activeJob) {
-        // Never interrupt need-satisfying jobs (forage, sleep)
-        if (activeJob.type === "forage" || activeJob.type === "sleep") continue;
+        // Never interrupt need-satisfying jobs (forage, eat, sleep)
+        if (
+          activeJob.type === "forage" ||
+          activeJob.type === "eat" ||
+          activeJob.type === "sleep"
+        )
+          continue;
 
         // Interrupt non-essential jobs only when a need is critical
         const hasCriticalNeed =
@@ -63,7 +73,10 @@ export class NeedSatisfactionSystem {
 
       switch (action) {
         case "forage":
-          this.tryForage(character);
+          // Prefer eating food items over foraging bushes
+          if (!this.tryEat(character)) {
+            this.tryForage(character);
+          }
           break;
         case "sleep":
           this.trySleep(character);
@@ -88,6 +101,58 @@ export class NeedSatisfactionSystem {
 
     // Both are low — address the more critical (lower value) first
     return hunger <= energy ? "forage" : "sleep";
+  }
+
+  /**
+   * Find nearest food item on the ground and assign an eat job.
+   * Returns true if a food item was found and a job assigned.
+   */
+  private tryEat(character: Character): boolean {
+    const world = this.getWorld();
+    if (!world) return false;
+
+    const { position } = character;
+    const level = world.levels.get(position.z);
+    if (!level) return false;
+
+    let bestDist = Number.POSITIVE_INFINITY;
+    let bestPos: { x: number; y: number; z: number } | null = null;
+    let bestItemId: string | null = null;
+
+    const minX = Math.max(0, position.x - FORAGE_SEARCH_RADIUS);
+    const maxX = Math.min(level.width - 1, position.x + FORAGE_SEARCH_RADIUS);
+    const minY = Math.max(0, position.y - FORAGE_SEARCH_RADIUS);
+    const maxY = Math.min(level.height - 1, position.y + FORAGE_SEARCH_RADIUS);
+
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        const tile = getWorldTileAt(world, x, y, position.z);
+        if (!tile || tile.items.length === 0) continue;
+
+        const candidate = { x, y, z: position.z };
+        if (this.jobProcessor.reservations.isReserved(candidate)) continue;
+
+        // Find a food item on this tile
+        for (const item of tile.items) {
+          const props = ITEM_REGISTRY[item.type];
+          if (props.nutrition <= 0) continue;
+
+          const dist = Math.abs(x - position.x) + Math.abs(y - position.y);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestPos = candidate;
+            bestItemId = item.id;
+          }
+          break; // Only consider first food item per tile
+        }
+      }
+    }
+
+    if (!bestPos || !bestItemId) return false;
+
+    const job = createEatJob(character.id, bestPos, bestItemId);
+    this.jobProcessor.assignJob(job);
+    return true;
   }
 
   /**

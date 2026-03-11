@@ -251,6 +251,51 @@ export function createHarvestJob(
 }
 
 /**
+ * Create an "eat food" job.
+ * Steps: move to food tile → pick up item → work 60 ticks (~1s eating) → consume item (restores hunger)
+ */
+export function createEatJob(
+  characterId: EntityId,
+  target: Position3D,
+  itemId: string,
+): Job {
+  return {
+    id: generateJobId(),
+    type: "eat",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: target,
+        adjacent: false,
+        status: "pending",
+      },
+      {
+        type: "pickup_item",
+        position: target,
+        itemId,
+        status: "pending",
+      },
+      {
+        type: "work",
+        totalTicks: 60,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "consume_item",
+        needId: "hunger",
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/**
  * Create a "haul item" job.
  * Steps: move to source → pick up item → move to destination → drop item
  */

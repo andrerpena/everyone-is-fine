@@ -120,7 +120,7 @@
 
 - [x] 88. Implement zone designation framework (paint tiles to create zones) <!-- Ticket 0034 -->
 - [x] 89. Create stockpile zone type with item filter configuration <!-- Ticket 0035 -->
-- [ ] 90. Add growing zone type (designate crop planting areas)
+- [x] 90. Add growing zone type (designate crop planting areas) <!-- Done: growing zones with cropType in zone-store, sowing system auto-plants -->
 - [ ] 91. Create dumping zone type (for unwanted items)
 - [ ] 92. Implement allowed area zones (restrict colonist movement)
 - [x] 93. Add zone rendering overlay with color-coding <!-- Ticket 0034: basic overlay -->
@@ -140,7 +140,7 @@
 - [ ] 104. Create cooking workstation (campfire, fueled stove, electric stove)
 - [ ] 105. Implement cooking job (convert raw food into meals)
 - [ ] 106. Create meal types (simple meal, fine meal, lavish meal, nutrient paste)
-- [ ] 107. Implement eating action (colonist picks up food, sits, eats, restores hunger)
+- [x] 107. Implement eating action (colonist picks up food, sits, eats, restores hunger) <!-- Ticket 0042 -->
 - [ ] 108. Add food poisoning chance based on cooking skill
 - [x] 109. Implement food spoilage system (food rots over time without refrigeration) <!-- Ticket 0041 -->
 - [ ] 110. Create nutrient paste dispenser building (efficient but mood-negative meals)
@@ -179,7 +179,7 @@
 - [x] 137. Add weather system framework (clear, rain, fog, snow, thunderstorm) <!-- Ticket 0032 -->
 - [x] 138. Implement rain weather with visual effects and ground moisture <!-- Ticket 0033: visual effects only, ground moisture deferred -->
 - [x] 139. Add snow weather with accumulation on tiles <!-- Ticket 0037 -->
-- [ ] 140. Create temperature-affected crop growth (growing season)
+- [x] 140. Create temperature-affected crop growth (growing season) <!-- Done: PlantGrowthSystem uses temperature factor, crops wilt outside viable range -->
 - [ ] 141. Implement indoor temperature (affected by walls, roofs, heaters, coolers)
 - [ ] 142. Add heatstroke and hypothermia health conditions
 - [ ] 143. Create weather forecast system (predict upcoming weather)
