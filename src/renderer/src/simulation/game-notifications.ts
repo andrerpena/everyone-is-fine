@@ -6,6 +6,7 @@
 
 import { showToast } from "../components/floating/toast/toastUtils";
 import type { EntityStore } from "./entity-store";
+import type { JobProcessor } from "./jobs";
 import { getNeedThreshold, type NeedThreshold } from "./needs/needs-config";
 import type { EntityId, MentalBreakType } from "./types";
 
@@ -29,6 +30,7 @@ const MENTAL_BREAK_LABELS: Record<MentalBreakType, string> = {
 
 export class GameNotifications {
   private entityStore: EntityStore;
+  private jobProcessor: JobProcessor;
 
   /** Previous mental break state per character */
   private prevMentalBreak: Map<EntityId, MentalBreakType | null> = new Map();
@@ -36,11 +38,15 @@ export class GameNotifications {
   /** Previous hunger threshold per character */
   private prevHungerThreshold: Map<EntityId, NeedThreshold> = new Map();
 
+  /** Whether all colonists were idle on the last check */
+  private prevAllIdle = false;
+
   /** Tick counter for throttling */
   private tickCounter = 0;
 
-  constructor(entityStore: EntityStore) {
+  constructor(entityStore: EntityStore, jobProcessor: JobProcessor) {
     this.entityStore = entityStore;
+    this.jobProcessor = jobProcessor;
   }
 
   update(): void {
@@ -85,5 +91,39 @@ export class GameNotifications {
         this.prevHungerThreshold.set(id, currentHunger);
       }
     }
+
+    // --- Colony-wide idle detection ---
+    this.checkAllIdle();
+  }
+
+  /**
+   * Check if all colonists are idle and fire a one-time notification
+   * on the transition from busy → all idle.
+   */
+  private checkAllIdle(): void {
+    let totalColonists = 0;
+    let idleCount = 0;
+
+    for (const character of this.entityStore.values()) {
+      // Skip drafted colonists — they're under player control
+      if (character.control.mode === "drafted") continue;
+      totalColonists++;
+
+      const hasJob = this.jobProcessor.getJob(character.id) !== undefined;
+      const isMoving = character.movement.isMoving;
+      const inMentalBreak = character.mentalBreak !== null;
+
+      if (!hasJob && !isMoving && !inMentalBreak) {
+        idleCount++;
+      }
+    }
+
+    const allIdle = totalColonists > 0 && idleCount === totalColonists;
+
+    if (allIdle && !this.prevAllIdle) {
+      showToast("All colonists are idle.", "default", { duration: 4000 });
+    }
+
+    this.prevAllIdle = allIdle;
   }
 }

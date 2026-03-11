@@ -705,7 +705,7 @@ const idleBehavior = new IdleBehaviorSystem(
 // GAME NOTIFICATIONS SETUP
 // =============================================================================
 
-const gameNotifications = new GameNotifications(entityStore);
+const gameNotifications = new GameNotifications(entityStore, jobProcessor);
 
 // =============================================================================
 // NEEDS SYSTEM SETUP
