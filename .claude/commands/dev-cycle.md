@@ -187,7 +187,13 @@ You are **never penalized** for doing unasked work that benefits the project.
 
 8. **Complete the ticket**: Move the ticket file from `pending/` to `completed/` using `mv`.
 
-9. **Git commit and push**:
+9. **Version bump**: Consider whether the changes warrant a version bump in `package.json`. Use semantic versioning:
+   - **patch** (0.0.x): Bug fixes, minor tweaks, internal refactors
+   - **minor** (0.x.0): New features, new systems, meaningful additions
+   - **Never bump major** — major version bumps are done manually by the human.
+   If a bump is appropriate, update the `version` field in `package.json` before committing.
+
+10. **Git commit and push**:
     ```bash
     git add -A
     git commit -m "[Aut] feat: <description from ticket>"
@@ -196,7 +202,7 @@ You are **never penalized** for doing unasked work that benefits the project.
     ```
     Use conventional commit format (feat/fix/refactor/chore/docs). Write a clear commit message. Always prefix with `[Aut]`.
 
-10. **Reflect**: Quickly scan the files you touched for:
+11. **Reflect**: Quickly scan the files you touched for:
    - Dead code that can be removed
    - Obvious duplication that can be consolidated
    - Simplification opportunities
