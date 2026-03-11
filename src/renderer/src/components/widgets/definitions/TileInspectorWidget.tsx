@@ -1,8 +1,15 @@
 import { Grid2X2 } from "lucide-react";
 import { useSelectedTile } from "../../../game-state";
 import { type TileInspectorData, tileInspectorSchema } from "../../../schemas";
+import type { ItemData } from "../../../world/types";
 import { InspectorForm } from "../../schema-form";
 import type { WidgetComponentProps, WidgetDefinition } from "../types";
+
+/** Format an items array into a human-readable summary string */
+function formatItemsSummary(items: ItemData[]): string {
+  if (items.length === 0) return "None";
+  return items.map((item) => `${item.type} x${item.quantity}`).join(", ");
+}
 
 /**
  * TileInspector widget component.
@@ -30,7 +37,7 @@ function TileInspectorWidget(_props: WidgetComponentProps) {
     temperature: tile.terrain.temperature,
     hasStructure: tile.structure !== null && tile.structure.type !== "none",
     structureType: tile.structure?.type,
-    itemCount: tile.items.length,
+    items: formatItemsSummary(tile.items),
     isPassable: tile.pathfinding.isPassable,
     movementCost: tile.pathfinding.movementCost,
   };

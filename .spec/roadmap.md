@@ -92,7 +92,7 @@
 - [ ] 65. Add quality levels for crafted items (awful → legendary)
 - [x] 66. Create material system (wood, stone, steel, gold, etc.) <!-- Done: MaterialType union + MaterialProperties in world/types.ts -->
 - [x] 67. Implement material properties affecting item stats <!-- Done: MaterialProperties with durability, flammability, beauty, value in world/types.ts -->
-- [ ] 68. Add item info tooltip/panel showing details on hover
+- [x] 68. Add item info tooltip/panel showing details on hover <!-- Ticket 0027: item details in tile inspector -->
 - [ ] 69. Create raw resource types (wood, stone chunks, steel slag, components)
 - [ ] 70. Implement food item types (raw food, meals, berries, meat)
 - [ ] 71. Add medicine item types (herbal medicine, industrial medicine, glitterworld medicine)

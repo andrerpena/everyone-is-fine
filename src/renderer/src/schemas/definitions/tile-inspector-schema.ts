@@ -48,8 +48,9 @@ export const tileInspectorSchema = nu
       enumValues: structureTypeOptions,
       editable: false,
     }),
-    itemCount: nu.number().withMetadata({
+    items: nu.string().withMetadata({
       label: "Items",
+      renderer: "readonly",
       editable: false,
     }),
     isPassable: nu.boolean().withMetadata({
@@ -90,7 +91,7 @@ export const tileInspectorSchema = nu
         {
           label: "Properties",
           fields: [
-            { name: "itemCount", fieldWidth: 12 },
+            { name: "items", fieldWidth: 12 },
             { name: "isPassable", fieldWidth: 6 },
             { name: "movementCost", fieldWidth: 6 },
           ],
@@ -110,7 +111,7 @@ export interface TileInspectorData {
   temperature: number;
   hasStructure: boolean;
   structureType?: string;
-  itemCount: number;
+  items: string;
   isPassable: boolean;
   movementCost: number;
 }

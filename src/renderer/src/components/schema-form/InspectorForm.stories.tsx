@@ -43,7 +43,7 @@ const sampleTileData: TileInspectorData = {
   temperature: 22,
   hasStructure: true,
   structureType: "wall_stone",
-  itemCount: 3,
+  items: "wood x25, stone x20, iron x5",
   isPassable: false,
   movementCost: 1.5,
 };
