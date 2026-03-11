@@ -4,12 +4,14 @@
 
 import { getConstructionCost } from "../../world/registries/construction-registry";
 import { getFloorConstructionCost } from "../../world/registries/floor-registry";
+import { TERRAIN_REGISTRY } from "../../world/registries/terrain-registry";
 import type {
   CropType,
   FloorType,
   ItemType,
   Position3D,
   StructureType,
+  TerrainType,
 } from "../../world/types";
 import type { EntityId } from "../types";
 import { generateJobId, type Job } from "./types";
@@ -82,6 +84,73 @@ export function createMineJob(characterId: EntityId, target: Position3D): Job {
         type: "spawn_items",
         position: target,
         items: [{ type: "stone", quantity: 20 }],
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/** Stone yield per terrain type when mined */
+const MINE_TERRAIN_YIELD: Partial<Record<TerrainType, ItemType>> = {
+  rock: "stone",
+  granite: "stone",
+  limestone: "stone",
+  marble: "stone",
+  obsidian: "stone",
+};
+
+/** Base stone quantity from mining (scaled by hardness) */
+const MINE_TERRAIN_BASE_QUANTITY = 15;
+
+/** Base work ticks for mining terrain (scaled by hardness) */
+const MINE_TERRAIN_BASE_TICKS = 360;
+
+/**
+ * Create a "mine terrain" job.
+ * Digs into a rock terrain tile, converting it to gravel and yielding stone.
+ * Work time scales with terrain hardness.
+ * Steps: move adjacent → work → transform terrain to gravel → spawn stone
+ */
+export function createMineTerrainJob(
+  characterId: EntityId,
+  target: Position3D,
+  terrainType: TerrainType,
+): Job {
+  const terrainProps = TERRAIN_REGISTRY[terrainType];
+  const workTicks = Math.round(
+    MINE_TERRAIN_BASE_TICKS * (0.5 + terrainProps.hardness),
+  );
+  const itemType = MINE_TERRAIN_YIELD[terrainType] ?? "stone";
+  const quantity = Math.round(
+    MINE_TERRAIN_BASE_QUANTITY * (0.5 + terrainProps.hardness),
+  );
+
+  return {
+    id: generateJobId(),
+    type: "mine_terrain",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      { type: "move", destination: target, adjacent: true, status: "pending" },
+      {
+        type: "work",
+        totalTicks: workTicks,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "transform_tile",
+        position: target,
+        newTerrain: "gravel",
+        status: "pending",
+      },
+      {
+        type: "spawn_items",
+        position: target,
+        items: [{ type: itemType, quantity }],
         status: "pending",
       },
     ],

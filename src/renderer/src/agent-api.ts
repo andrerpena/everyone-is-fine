@@ -15,6 +15,7 @@ import { entityStore } from "./simulation";
 import {
   createChopJob,
   createMineJob,
+  createMineTerrainJob,
   createMoveJob,
 } from "./simulation/jobs/job-factory";
 import type { Job } from "./simulation/jobs/types";
@@ -40,6 +41,7 @@ import {
   getFloorConstructionCost,
   isFloorBuildable,
 } from "./world/registries/floor-registry";
+import { TERRAIN_REGISTRY } from "./world/registries/terrain-registry";
 import type {
   BiomeType,
   CropType,
@@ -878,6 +880,37 @@ function createAgentApi(): GameAgentApi {
 
       // Directly place the floor (floor building is simpler than structure building)
       tile.floor = { type: floorType as FloorType, condition: 1.0 };
+    },
+
+    mineTerrain(
+      name: string,
+      target: { x: number; y: number },
+      z?: number,
+    ): Promise<{ success: boolean }> {
+      const char = findCharacterByName(name);
+      if (!char) throw new Error(`Character "${name}" not found`);
+
+      const state = useGameStore.getState();
+      const zLevel = z ?? state.currentZLevel;
+      const world = state.world;
+      if (!world) throw new Error("No world loaded");
+
+      const tile = getWorldTileAt(world, target.x, target.y, zLevel);
+      if (!tile)
+        throw new Error(`Tile (${target.x}, ${target.y}) out of bounds`);
+
+      const terrainProps = TERRAIN_REGISTRY[tile.terrain.type];
+      if (!terrainProps.isDiggable || terrainProps.hardness < 0.7) {
+        throw new Error(
+          `Terrain "${tile.terrain.type}" is not mineable (requires hardness >= 0.7)`,
+        );
+      }
+
+      const pos = { x: target.x, y: target.y, z: zLevel };
+      const job = createMineTerrainJob(char.id, pos, tile.terrain.type);
+      state.assignJob(job);
+
+      return waitForJob(job).then(() => ({ success: true }));
     },
 
     getAvailableMaterials(): Record<string, number> {

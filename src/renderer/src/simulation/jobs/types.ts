@@ -8,6 +8,7 @@ import type {
   ItemType,
   Position3D,
   StructureType,
+  TerrainType,
 } from "../../world/types";
 import type { EntityId } from "../types";
 
@@ -80,6 +81,8 @@ export interface TransformTileStep {
   position: Position3D;
   /** Remove the structure from the tile */
   removeStructure?: boolean;
+  /** Change terrain to this type */
+  newTerrain?: TerrainType;
   status: StepStatus;
 }
 

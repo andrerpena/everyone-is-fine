@@ -21,6 +21,7 @@ export {
   createHarvestJob,
   createHaulJob,
   createMineJob,
+  createMineTerrainJob,
   createMoveJob,
   createSleepJob,
   createSowJob,

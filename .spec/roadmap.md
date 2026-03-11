@@ -162,7 +162,7 @@
 - [x] 123. Add room stats calculation (size, beauty, cleanliness, wealth, impressiveness)
 - [x] 124. Create room role assignment (bedroom, dining room, workshop, prison, hospital)
 - [x] 125. Implement building deconstruction and material recovery
-- [ ] 126. Add mining job (dig into rock tiles, yield stone chunks and ores)
+- [x] 126. Add mining job (dig into rock tiles, yield stone chunks and ores)
 - [ ] 127. Create smoothing job (smooth rough stone floors and walls)
 - [ ] 128. Implement building repair system
 - [x] 129. Add building quality based on constructor skill level

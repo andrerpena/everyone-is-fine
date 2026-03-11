@@ -4,12 +4,14 @@
 // To add a new action, append a rule to ACTION_RULES. No other code changes needed.
 
 import { STRUCTURE_REGISTRY } from "../../world/registries/structure-registry";
+import { TERRAIN_REGISTRY } from "../../world/registries/terrain-registry";
 import {
   createBuildJob,
   createChopJob,
   createDeconstructJob,
   createForageJob,
   createMineJob,
+  createMineTerrainJob,
   createMoveJob,
 } from "./job-factory";
 import type { ActionRule } from "./types";
@@ -45,6 +47,19 @@ export const ACTION_RULES: ActionRule[] = [
     priority: 10,
     matches: (tile) => tile.structure?.type === "boulder",
     createJob: (characterId, target) => createMineJob(characterId, target),
+  },
+  {
+    id: "mine_terrain",
+    label: "Mine",
+    priority: 8,
+    matches: (tile) => {
+      const props = TERRAIN_REGISTRY[tile.terrain.type];
+      return (
+        props.isDiggable && props.hardness >= 0.7 && tile.structure === null
+      );
+    },
+    createJob: (characterId, target, tile) =>
+      createMineTerrainJob(characterId, target, tile.terrain.type),
   },
   {
     id: "deconstruct",

@@ -107,6 +107,11 @@ export interface GameAgentApi {
     name: string,
     target: { x: number; y: number },
   ) => Promise<{ success: boolean }>;
+  mineTerrain: (
+    name: string,
+    target: { x: number; y: number },
+    z?: number,
+  ) => Promise<{ success: boolean }>;
   cancelAction: (name: string) => void;
   draftCharacter: (name: string) => AgentCharacterInfo | null;
   undraftCharacter: (name: string) => AgentCharacterInfo | null;
@@ -174,7 +179,12 @@ export interface GameAgentApi {
       type?: string;
       z?: number;
       color?: number;
-      needs?: { hunger?: number; energy?: number; mood?: number; comfort?: number };
+      needs?: {
+        hunger?: number;
+        energy?: number;
+        mood?: number;
+        comfort?: number;
+      };
     },
   ) => AgentCharacterInfo;
   removeCharacter: (name: string) => boolean;

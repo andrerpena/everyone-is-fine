@@ -6,6 +6,7 @@ import { logger } from "../../lib/logger";
 import { FLOOR_REGISTRY } from "../../world/registries/floor-registry";
 import { ITEM_REGISTRY } from "../../world/registries/item-registry";
 import { STRUCTURE_REGISTRY } from "../../world/registries/structure-registry";
+import { TERRAIN_REGISTRY } from "../../world/registries/terrain-registry";
 import type {
   ItemData,
   ItemType,
@@ -367,18 +368,36 @@ export class JobProcessor {
   // ===========================================================================
 
   private executeTransformTile(step: TransformTileStep): void {
+    const updates: Partial<Tile> = {};
+
     if (step.removeStructure) {
+      updates.structure = null;
+      updates.pathfinding = {
+        isPassable: true,
+        movementCost: 1,
+        lastUpdated: Date.now(),
+      };
+    }
+
+    if (step.newTerrain) {
+      const terrainProps = TERRAIN_REGISTRY[step.newTerrain];
+      updates.terrain = {
+        type: step.newTerrain,
+        moisture: 0,
+        temperature: 0,
+      };
+      updates.pathfinding = {
+        isPassable: terrainProps.isPassable,
+        movementCost: terrainProps.movementCost,
+        lastUpdated: Date.now(),
+      };
+    }
+
+    if (Object.keys(updates).length > 0) {
       this.updateTile(
         { x: step.position.x, y: step.position.y },
         step.position.z,
-        {
-          structure: null,
-          pathfinding: {
-            isPassable: true,
-            movementCost: 1,
-            lastUpdated: Date.now(),
-          },
-        },
+        updates,
       );
     }
   }

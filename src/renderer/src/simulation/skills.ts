@@ -281,6 +281,7 @@ export function getSkillProgress(skill: SkillData): number {
 export const JOB_SKILL_MAP: Partial<Record<string, SkillId>> = {
   chop: "plants",
   mine: "mining",
+  mine_terrain: "mining",
   forage: "plants",
   sow: "plants",
   harvest: "plants",
