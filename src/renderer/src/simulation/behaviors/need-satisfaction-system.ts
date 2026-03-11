@@ -97,10 +97,14 @@ export class NeedSatisfactionSystem {
         const tile = getWorldTileAt(world, x, y, position.z);
         if (!tile || tile.structure?.type !== "bush") continue;
 
+        // Skip tiles already reserved by another colonist
+        const candidate = { x, y, z: position.z };
+        if (this.jobProcessor.reservations.isReserved(candidate)) continue;
+
         const dist = Math.abs(x - position.x) + Math.abs(y - position.y);
         if (dist < bestDist) {
           bestDist = dist;
-          bestPos = { x, y, z: position.z };
+          bestPos = candidate;
         }
       }
     }

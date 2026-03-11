@@ -106,7 +106,7 @@
 - [ ] 76. Add job priority system (1-4 priority per colonist per job type)
 - [ ] 77. Implement job assignment algorithm (match colonists to jobs by priority and skill)
 - [ ] 78. Create work schedule system (assign work/sleep/recreation/anything time blocks)
-- [ ] 79. Add job reservation system (prevent multiple colonists claiming same job)
+- [x] 79. Add job reservation system (prevent multiple colonists claiming same job) <!-- Ticket 0025 -->
 - [ ] 80. Implement job interruption and resumption
 - [ ] 81. Create hauling job type (move items from ground to stockpile)
 - [ ] 82. Implement cleaning job type (remove filth from floors)

@@ -28,6 +28,7 @@ export {
   type JobStatus,
   type JobStep,
   jobQueue,
+  ReservationSystem,
   resolveActions,
 } from "./jobs";
 // Movement

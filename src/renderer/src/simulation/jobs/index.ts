@@ -17,6 +17,8 @@ export {
 export { JobProcessor } from "./job-processor";
 // Job queue (scheduler stub)
 export { JobQueue, jobQueue } from "./job-queue";
+// Reservation system
+export { ReservationSystem } from "./reservation-system";
 // Types
 export type {
   Action,

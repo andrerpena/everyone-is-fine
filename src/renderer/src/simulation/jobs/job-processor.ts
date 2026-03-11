@@ -15,6 +15,7 @@ import type { EntityStore } from "../entity-store";
 import type { MovementSystem } from "../movement";
 import { findPath } from "../pathfinding";
 import { createMoveCommand, type EntityId } from "../types";
+import { ReservationSystem } from "./reservation-system";
 import type {
   Job,
   JobProgressInfo,
@@ -76,6 +77,7 @@ function findAdjacentPassableTile(
 
 export class JobProcessor {
   private activeJobs: Map<EntityId, Job> = new Map();
+  readonly reservations = new ReservationSystem();
 
   constructor(
     private entityStore: EntityStore,
@@ -102,6 +104,7 @@ export class JobProcessor {
 
     job.status = "active";
     this.activeJobs.set(job.characterId, job);
+    this.reservations.reserve(job.targetPosition, job.characterId);
 
     logger.debug(
       `Job assigned: ${job.type} to ${job.characterId} at (${job.targetPosition.x},${job.targetPosition.y})`,
@@ -116,6 +119,7 @@ export class JobProcessor {
 
     job.status = "cancelled";
     this.activeJobs.delete(characterId);
+    this.reservations.release(job.targetPosition);
 
     // Stop any in-progress movement
     this.movementSystem.cancelMove(characterId);
@@ -375,6 +379,7 @@ export class JobProcessor {
   private completeJob(characterId: EntityId, job: Job): void {
     job.status = "completed";
     this.activeJobs.delete(characterId);
+    this.reservations.release(job.targetPosition);
 
     logger.debug(`Job completed: ${job.type} for ${characterId}`, ["jobs"]);
   }
@@ -384,6 +389,7 @@ export class JobProcessor {
     const step = job.steps[job.currentStepIndex];
     if (step) step.status = "failed";
     this.activeJobs.delete(characterId);
+    this.reservations.release(job.targetPosition);
 
     logger.warn(`Job failed: ${job.type} for ${characterId} — ${reason}`, [
       "jobs",
