@@ -61,7 +61,7 @@
 - [x] 40. Create skill system (shooting, melee, construction, mining, cooking, etc.) <!-- Ticket 0006 -->
 - [x] 41. Implement skill experience gain and leveling <!-- Ticket 0008 -->
 - [x] 42. Add passion system (no interest, minor passion, major passion per skill) <!-- Ticket 0009 -->
-- [ ] 43. Create colonist bio/character sheet panel
+- [x] 43. Create colonist bio/character sheet panel <!-- Done: ColonistInfoWidget shows identity, skills, passions, traits, needs, thoughts -->
 
 ## Phase 4 — Needs System
 
@@ -79,19 +79,19 @@
 - [ ] 55. Add beauty/environment need (affected by surroundings cleanliness and aesthetics)
 - [ ] 56. Add social need (satisfied by conversations with other colonists)
 - [ ] 57. Implement need urgency priority system (colonists prioritize critical needs)
-- [ ] 58. Add colonist mood indicator icons on world sprites
+- [x] 58. Add colonist mood indicator icons on world sprites <!-- Ticket 0012 -->
 
 ## Phase 5 — Items & Inventory
 
-- [ ] 59. Define item data structure (type, stack size, weight, quality, hitpoints)
-- [ ] 60. Create item type registry with definitions for all item categories
-- [ ] 61. Implement item spawning on the ground (scattered on tiles)
-- [ ] 62. Add item rendering on the world map (small sprites on tiles)
-- [ ] 63. Create item stack merging and splitting logic
+- [x] 59. Define item data structure (type, stack size, weight, quality, hitpoints) <!-- Done: ItemData, ItemProperties in world/types.ts -->
+- [x] 60. Create item type registry with definitions for all item categories <!-- Done: ItemType union + ItemProperties in world/types.ts -->
+- [x] 61. Implement item spawning on the ground (scattered on tiles) <!-- Done: SpawnItemsStep in job-processor.ts, addItemToTile in tile-utils.ts -->
+- [x] 62. Add item rendering on the world map (small sprites on tiles) <!-- Done: itemsGraphics layer in World.tsx -->
+- [x] 63. Create item stack merging and splitting logic <!-- Done: addItemToTile merges matching stacks in tile-utils.ts -->
 - [ ] 64. Implement item deterioration over time when left outside
 - [ ] 65. Add quality levels for crafted items (awful → legendary)
-- [ ] 66. Create material system (wood, stone, steel, gold, etc.)
-- [ ] 67. Implement material properties affecting item stats
+- [x] 66. Create material system (wood, stone, steel, gold, etc.) <!-- Done: MaterialType union + MaterialProperties in world/types.ts -->
+- [x] 67. Implement material properties affecting item stats <!-- Done: MaterialProperties with durability, flammability, beauty, value in world/types.ts -->
 - [ ] 68. Add item info tooltip/panel showing details on hover
 - [ ] 69. Create raw resource types (wood, stone chunks, steel slag, components)
 - [ ] 70. Implement food item types (raw food, meals, berries, meat)
@@ -101,7 +101,7 @@
 
 ## Phase 6 — Jobs & Work System
 
-- [ ] 74. Implement job queue system (global list of available jobs)
+- [x] 74. Implement job queue system (global list of available jobs) <!-- Done: JobQueue class in simulation/jobs/job-queue.ts -->
 - [ ] 75. Create job type definitions (haul, construct, mine, grow, cook, hunt, etc.)
 - [ ] 76. Add job priority system (1-4 priority per colonist per job type)
 - [ ] 77. Implement job assignment algorithm (match colonists to jobs by priority and skill)

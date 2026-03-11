@@ -30,6 +30,10 @@ const SELECTION_PADDING = 4;
 const JOB_INDICATOR_RADIUS = 4;
 const JOB_INDICATOR_Y_OFFSET = -22;
 
+const MOOD_INDICATOR_RADIUS = 3;
+const MOOD_INDICATOR_X_OFFSET = -12;
+const MOOD_INDICATOR_Y_OFFSET = -18;
+
 // =============================================================================
 // CHARACTER GRAPHICS
 // =============================================================================
@@ -40,6 +44,7 @@ interface CharacterGraphics {
   directionIndicator: Graphics;
   selectionRing: Graphics;
   jobIndicator: Graphics;
+  moodIndicator: Graphics;
 }
 
 /** Character sprite size (32x32 pixels, fits one cell) */
@@ -47,6 +52,21 @@ const CHARACTER_SPRITE_SIZE = 32;
 
 /** Character sprite path */
 export const CHARACTER_SPRITE_PATH = "/sprites/characters/male-1/male-1.png";
+
+// =============================================================================
+// MOOD INDICATOR COLORS
+// =============================================================================
+
+/**
+ * Map a mood value (0-1) to an indicator color.
+ * Returns null if mood is good enough to hide the indicator (>= 0.5).
+ */
+export function getMoodIndicatorColor(mood: number): number | null {
+  if (mood >= 0.5) return null; // Happy enough — no indicator needed
+  if (mood >= 0.35) return 0xffc107; // Yellow — slightly low
+  if (mood >= 0.15) return 0xff9800; // Orange — low
+  return 0xf44336; // Red — critical
+}
 
 // =============================================================================
 // CHARACTER RENDERER CLASS
@@ -192,12 +212,18 @@ export class CharacterRenderer {
     jobIndicator.visible = false;
     container.addChild(jobIndicator);
 
+    // Mood indicator (hidden by default)
+    const moodIndicator = new Graphics();
+    moodIndicator.visible = false;
+    container.addChild(moodIndicator);
+
     return {
       container,
       body,
       directionIndicator,
       selectionRing,
       jobIndicator,
+      moodIndicator,
     };
   }
 
@@ -322,6 +348,34 @@ export class CharacterRenderer {
   }
 
   /**
+   * Draw the mood indicator dot to the upper-left of the character.
+   * Only visible when mood is below 0.5.
+   */
+  private drawMoodIndicator(graphics: Graphics, mood: number): void {
+    graphics.clear();
+
+    const color = getMoodIndicatorColor(mood);
+    if (color === null) {
+      graphics.visible = false;
+      return;
+    }
+
+    graphics.visible = true;
+    graphics.circle(
+      MOOD_INDICATOR_X_OFFSET,
+      MOOD_INDICATOR_Y_OFFSET,
+      MOOD_INDICATOR_RADIUS,
+    );
+    graphics.fill(color);
+    graphics.circle(
+      MOOD_INDICATOR_X_OFFSET,
+      MOOD_INDICATOR_Y_OFFSET,
+      MOOD_INDICATOR_RADIUS,
+    );
+    graphics.stroke({ width: 1, color: 0x000000, alpha: 0.4 });
+  }
+
+  /**
    * Update a character's graphics with current state.
    */
   private updateCharacterGraphics(
@@ -348,6 +402,9 @@ export class CharacterRenderer {
 
     // Update job indicator
     this.drawJobIndicator(charGraphics.jobIndicator, jobType);
+
+    // Update mood indicator
+    this.drawMoodIndicator(charGraphics.moodIndicator, character.needs.mood);
   }
 
   /**
