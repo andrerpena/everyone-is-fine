@@ -169,3 +169,49 @@ export function createMoveJob(characterId: EntityId, target: Position3D): Job {
     ],
   };
 }
+
+/**
+ * Create a "haul item" job.
+ * Steps: move to source → pick up item → move to destination → drop item
+ */
+export function createHaulJob(
+  characterId: EntityId,
+  sourcePos: Position3D,
+  destPos: Position3D,
+  itemId: string,
+): Job {
+  return {
+    id: generateJobId(),
+    type: "haul",
+    characterId,
+    targetPosition: sourcePos,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: sourcePos,
+        adjacent: false,
+        status: "pending",
+      },
+      {
+        type: "pickup_item",
+        position: sourcePos,
+        itemId,
+        status: "pending",
+      },
+      {
+        type: "move",
+        destination: destPos,
+        adjacent: false,
+        status: "pending",
+      },
+      {
+        type: "drop_item",
+        position: destPos,
+        status: "pending",
+      },
+    ],
+  };
+}

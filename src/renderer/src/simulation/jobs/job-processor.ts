@@ -4,13 +4,18 @@
 
 import { logger } from "../../lib/logger";
 import type {
+  ItemData,
   ItemType,
   Position2D,
   Position3D,
   Tile,
   World,
 } from "../../world/types";
-import { addItemToTile, getWorldTileAt } from "../../world/utils/tile-utils";
+import {
+  addItemToTile,
+  getWorldTileAt,
+  removeItemFromTile,
+} from "../../world/utils/tile-utils";
 import type { EntityStore } from "../entity-store";
 import type { MovementSystem } from "../movement";
 import { findPath } from "../pathfinding";
@@ -23,9 +28,11 @@ import {
 import { createMoveCommand, type EntityId } from "../types";
 import { ReservationSystem } from "./reservation-system";
 import type {
+  DropItemStep,
   Job,
   JobProgressInfo,
   MoveStep,
+  PickupItemStep,
   RestoreNeedStep,
   SpawnItemsStep,
   TransformTileStep,
@@ -83,6 +90,8 @@ function findAdjacentPassableTile(
 
 export class JobProcessor {
   private activeJobs: Map<EntityId, Job> = new Map();
+  /** Items currently being carried by characters (picked up but not yet dropped) */
+  private carriedItems: Map<EntityId, ItemData> = new Map();
   readonly reservations = new ReservationSystem();
 
   constructor(
@@ -126,6 +135,7 @@ export class JobProcessor {
     job.status = "cancelled";
     this.activeJobs.delete(characterId);
     this.reservations.release(job.targetPosition);
+    this.dropCarriedItemOnGround(characterId);
 
     // Stop any in-progress movement
     this.movementSystem.cancelMove(characterId);
@@ -233,6 +243,14 @@ export class JobProcessor {
         this.executeRestoreNeed(characterId, step);
         step.status = "completed";
         this.advanceToNextStep(characterId, job);
+        break;
+
+      case "pickup_item":
+        this.executePickupItem(characterId, job, step);
+        break;
+
+      case "drop_item":
+        this.executeDropItem(characterId, job, step);
         break;
     }
   }
@@ -392,6 +410,98 @@ export class JobProcessor {
   }
 
   // ===========================================================================
+  // PICKUP ITEM STEP
+  // ===========================================================================
+
+  private executePickupItem(
+    characterId: EntityId,
+    job: Job,
+    step: PickupItemStep,
+  ): void {
+    const world = this.getWorld();
+    if (!world) {
+      this.failJob(characterId, job, "World not initialized");
+      return;
+    }
+
+    const tile = getWorldTileAt(
+      world,
+      step.position.x,
+      step.position.y,
+      step.position.z,
+    );
+    if (!tile) {
+      this.failJob(characterId, job, "Source tile not found");
+      return;
+    }
+
+    const item = removeItemFromTile(tile, step.itemId);
+    if (!item) {
+      // Item already gone (picked up by someone else or deteriorated)
+      this.failJob(characterId, job, "Item no longer exists at source");
+      return;
+    }
+
+    this.carriedItems.set(characterId, item);
+
+    // Notify store so rendering updates
+    this.updateTile(
+      { x: step.position.x, y: step.position.y },
+      step.position.z,
+      {},
+    );
+
+    step.status = "completed";
+    this.advanceToNextStep(characterId, job);
+  }
+
+  // ===========================================================================
+  // DROP ITEM STEP
+  // ===========================================================================
+
+  private executeDropItem(
+    characterId: EntityId,
+    job: Job,
+    step: DropItemStep,
+  ): void {
+    const carried = this.carriedItems.get(characterId);
+    if (!carried) {
+      this.failJob(characterId, job, "No item being carried");
+      return;
+    }
+
+    const world = this.getWorld();
+    if (!world) {
+      this.failJob(characterId, job, "World not initialized");
+      return;
+    }
+
+    const tile = getWorldTileAt(
+      world,
+      step.position.x,
+      step.position.y,
+      step.position.z,
+    );
+    if (!tile) {
+      this.failJob(characterId, job, "Destination tile not found");
+      return;
+    }
+
+    addItemToTile(tile, carried);
+    this.carriedItems.delete(characterId);
+
+    // Notify store so rendering updates
+    this.updateTile(
+      { x: step.position.x, y: step.position.y },
+      step.position.z,
+      {},
+    );
+
+    step.status = "completed";
+    this.advanceToNextStep(characterId, job);
+  }
+
+  // ===========================================================================
   // JOB LIFECYCLE
   // ===========================================================================
 
@@ -416,9 +526,40 @@ export class JobProcessor {
     if (step) step.status = "failed";
     this.activeJobs.delete(characterId);
     this.reservations.release(job.targetPosition);
+    this.dropCarriedItemOnGround(characterId);
 
     logger.warn(`Job failed: ${job.type} for ${characterId} — ${reason}`, [
       "jobs",
     ]);
+  }
+
+  /**
+   * If a character is carrying an item (mid-haul), drop it at their current position.
+   * Called when a job is cancelled or fails.
+   */
+  private dropCarriedItemOnGround(characterId: EntityId): void {
+    const carried = this.carriedItems.get(characterId);
+    if (!carried) return;
+
+    const character = this.entityStore.get(characterId);
+    const world = this.getWorld();
+    if (character && world) {
+      const tile = getWorldTileAt(
+        world,
+        character.position.x,
+        character.position.y,
+        character.position.z,
+      );
+      if (tile) {
+        addItemToTile(tile, carried);
+        this.updateTile(
+          { x: character.position.x, y: character.position.y },
+          character.position.z,
+          {},
+        );
+      }
+    }
+
+    this.carriedItems.delete(characterId);
   }
 }

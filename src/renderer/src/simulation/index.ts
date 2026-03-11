@@ -20,9 +20,11 @@ export { ItemDeteriorationSystem } from "./items/item-deterioration-system";
 export {
   ACTION_RULES,
   createChopJob,
+  createHaulJob,
   createMineJob,
   createMoveJob,
   generateJobId,
+  HaulingSystem,
   type Job,
   JobProcessor,
   type JobProgressInfo,

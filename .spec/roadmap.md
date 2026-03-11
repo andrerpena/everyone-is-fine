@@ -108,7 +108,7 @@
 - [ ] 78. Create work schedule system (assign work/sleep/recreation/anything time blocks)
 - [x] 79. Add job reservation system (prevent multiple colonists claiming same job) <!-- Ticket 0025 -->
 - [x] 80. Implement job interruption and resumption <!-- Ticket 0026: critical need interruption; resumption deferred -->
-- [ ] 81. Create hauling job type (move items from ground to stockpile)
+- [x] 81. Create hauling job type (move items from ground to stockpile) <!-- Ticket 0036 -->
 - [ ] 82. Implement cleaning job type (remove filth from floors)
 - [ ] 83. Add bill/order system for crafting and cooking workstations
 - [ ] 84. Create work tab UI for managing colonist job priorities

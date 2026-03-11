@@ -5,10 +5,13 @@
 // Action resolution
 export { resolveActions } from "./action-resolver";
 export { ACTION_RULES } from "./action-rules";
+// Hauling system
+export { HaulingSystem } from "./hauling-system";
 // Job factories
 export {
   createChopJob,
   createForageJob,
+  createHaulJob,
   createMineJob,
   createMoveJob,
   createSleepJob,
@@ -23,11 +26,13 @@ export { ReservationSystem } from "./reservation-system";
 export type {
   Action,
   ActionRule,
+  DropItemStep,
   Job,
   JobProgressInfo,
   JobStatus,
   JobStep,
   MoveStep,
+  PickupItemStep,
   RestoreNeedStep,
   SpawnItemsStep,
   StepStatus,

@@ -13,6 +13,7 @@ import {
   findPath,
   GameNotifications,
   getOutdoorTemperature,
+  HaulingSystem,
   IdleBehaviorSystem,
   ItemDeteriorationSystem,
   MentalBreakSystem,
@@ -705,6 +706,12 @@ const idleBehavior = new IdleBehaviorSystem(
   () => useGameStore.getState().world,
 );
 
+const haulingSystem = new HaulingSystem(
+  entityStore,
+  jobProcessor,
+  () => useGameStore.getState().world,
+);
+
 // =============================================================================
 // GAME NOTIFICATIONS SETUP
 // =============================================================================
@@ -770,6 +777,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
 
   // Satisfy most critical need (hunger → forage, energy → sleep)
   needSatisfaction.update();
+
+  // Auto-assign hauling jobs to idle colonists
+  haulingSystem.update();
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();

@@ -93,12 +93,30 @@ export interface RestoreNeedStep {
   status: StepStatus;
 }
 
+export interface PickupItemStep {
+  type: "pickup_item";
+  /** Tile to pick up from */
+  position: Position3D;
+  /** ID of the specific item to pick up */
+  itemId: string;
+  status: StepStatus;
+}
+
+export interface DropItemStep {
+  type: "drop_item";
+  /** Tile to drop item onto */
+  position: Position3D;
+  status: StepStatus;
+}
+
 export type JobStep =
   | MoveStep
   | WorkStep
   | TransformTileStep
   | SpawnItemsStep
-  | RestoreNeedStep;
+  | RestoreNeedStep
+  | PickupItemStep
+  | DropItemStep;
 
 // =============================================================================
 // ACTION RULES - Declarative matching for tile → actions
