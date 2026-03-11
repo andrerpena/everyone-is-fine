@@ -253,6 +253,9 @@ export interface Tile {
 
   /** Visibility state */
   visibility: TileVisibility;
+
+  /** Snow depth on this tile (0 = none, 1 = fully covered) */
+  snowDepth: number;
 }
 
 /** Cached pathfinding information */
@@ -411,6 +414,7 @@ export const DEFAULT_TILE: Tile = {
     visible: false,
     lightLevel: 0,
   },
+  snowDepth: 0,
 };
 
 /** Chunk size for future chunk-based loading */

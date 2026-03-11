@@ -176,6 +176,7 @@ export {
   type SimulationState,
 } from "./types";
 // Weather
+export { SnowAccumulationSystem } from "./weather/snow-accumulation-system";
 export {
   WEATHER_LABELS,
   WEATHER_TEMP_MODIFIERS,

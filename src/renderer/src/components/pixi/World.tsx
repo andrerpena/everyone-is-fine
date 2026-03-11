@@ -260,6 +260,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
   const jobProgressRendererRef = useRef<JobProgressRenderer | null>(null);
   const weatherRendererRef = useRef<WeatherRenderer | null>(null);
   const zoneRendererRef = useRef<ZoneRenderer | null>(null);
+  const snowOverlayRef = useRef<Graphics | null>(null);
 
   // Interaction container for click handling
   const [interactionContainer, setInteractionContainer] =
@@ -399,6 +400,33 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       zoneRendererRef.current.update(zones, zLevel);
     });
 
+    // Subscribe to tick changes for snow overlay (throttled to every ~60 ticks)
+    let lastSnowTick = 0;
+    const unsubscribeSnow = useGameStore.subscribe((state) => {
+      if (!snowOverlayRef.current || !level) return;
+      const tick = state.simulation.currentTick;
+      if (tick - lastSnowTick < 60) return;
+      lastSnowTick = tick;
+
+      const overlay = snowOverlayRef.current;
+      overlay.clear();
+
+      for (let y = 0; y < level.height; y++) {
+        for (let x = 0; x < level.width; x++) {
+          const tile = level.tiles[y * level.width + x];
+          if (tile.snowDepth <= 0) continue;
+
+          const px = x * CELL_SIZE;
+          const py = y * CELL_SIZE;
+          overlay.rect(px, py, CELL_SIZE, CELL_SIZE);
+          overlay.fill({
+            color: 0xffffff,
+            alpha: tile.snowDepth * 0.6,
+          });
+        }
+      }
+    });
+
     const unsubscribeLayers = useLayerStore.subscribe((state) => {
       // Update heat map renderer
       if (heatMapRendererRef.current && level) {
@@ -481,6 +509,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       unsubscribeAmbient();
       unsubscribeWeather();
       unsubscribeZones();
+      unsubscribeSnow();
       unsubscribeLayers();
     };
   }, [zLevel, level]);
@@ -613,6 +642,11 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       itemsGraphics.visible = initialLayerVisibility.get("items") ?? true;
 
       logger.info("Pixi.js viewport initialized", ["pixi"]);
+
+      // Create snow accumulation overlay (above items, below zones)
+      const snowOverlay = new Graphics();
+      viewport.addChild(snowOverlay);
+      snowOverlayRef.current = snowOverlay;
 
       // Create zone overlay container (above items, below heatmap)
       const zoneContainer = new Container();
@@ -905,6 +939,10 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       if (zoneRendererRef.current) {
         zoneRendererRef.current.destroy();
         zoneRendererRef.current = null;
+      }
+      if (snowOverlayRef.current) {
+        snowOverlayRef.current.destroy();
+        snowOverlayRef.current = null;
       }
       if (appRef.current) {
         const app = appRef.current as Application & {

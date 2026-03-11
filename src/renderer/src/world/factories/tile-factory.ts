@@ -83,6 +83,7 @@ export function createTile(options?: {
       visible: false,
       lightLevel: 0,
     },
+    snowDepth: 0,
   };
 }
 
@@ -95,5 +96,6 @@ export function cloneTile(tile: Tile): Tile {
     items: tile.items.map((item) => ({ ...item })),
     pathfinding: { ...tile.pathfinding },
     visibility: { ...tile.visibility },
+    snowDepth: tile.snowDepth,
   };
 }
