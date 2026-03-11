@@ -32,7 +32,10 @@ import {
   createTerrainData,
 } from "./world/factories/tile-factory";
 import { createWorld as createWorldFactory } from "./world/factories/world-factory";
-import { isBuildable } from "./world/registries/construction-registry";
+import {
+  getConstructionCost,
+  isBuildable,
+} from "./world/registries/construction-registry";
 import type {
   BiomeType,
   CropType,
@@ -44,6 +47,10 @@ import type {
   TerrainType,
   Tile,
 } from "./world/types";
+import {
+  countAllItemsOnMap,
+  hasSufficientMaterials,
+} from "./world/utils/material-counter";
 import { deserializeWorld, serializeWorld } from "./world/utils/serialization";
 import { getWorldTileAt } from "./world/utils/tile-utils";
 import { useZoneStore } from "./zones";
@@ -798,6 +805,22 @@ function createAgentApi(): GameAgentApi {
         );
       }
 
+      // Check material availability
+      const cost = getConstructionCost(structureType as StructureType);
+      if (cost) {
+        const check = hasSufficientMaterials(world, cost.materials, (type) =>
+          getConstructionCost(type as StructureType),
+        );
+        if (!check.sufficient) {
+          const details = check.missing
+            .map((m) => `${m.type}: need ${m.needed}, have ${m.available}`)
+            .join(", ");
+          throw new Error(
+            `Insufficient materials for ${structureType}: ${details}`,
+          );
+        }
+      }
+
       tile.blueprint = createStructureData(structureType as StructureType);
     },
 
@@ -811,6 +834,19 @@ function createAgentApi(): GameAgentApi {
       if (!tile) throw new Error(`Tile (${x}, ${y}, ${zLevel}) out of bounds`);
 
       tile.blueprint = null;
+    },
+
+    getAvailableMaterials(): Record<string, number> {
+      const state = useGameStore.getState();
+      const world = state.world;
+      if (!world) throw new Error("No world loaded");
+
+      const counts = countAllItemsOnMap(world);
+      const result: Record<string, number> = {};
+      for (const [type, qty] of counts) {
+        result[type] = qty;
+      }
+      return result;
     },
 
     // =========================================================================

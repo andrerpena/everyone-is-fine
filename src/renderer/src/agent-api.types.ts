@@ -248,6 +248,7 @@ export interface GameAgentApi {
     z?: number,
   ) => void;
   cancelBlueprint: (x: number, y: number, z?: number) => void;
+  getAvailableMaterials: () => Record<string, number>;
 
   // Low-level command access
   commands: {
