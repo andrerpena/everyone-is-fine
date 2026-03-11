@@ -21,7 +21,7 @@
 - [x] 6. Add save/load game persistence via the existing storage service
 - [x] 7. Create game speed controls (pause, 1x, 2x, 3x, fast-forward)
 - [x] 8. Implement deterministic random number generator with seed support
-- [ ] 9. Add performance profiling hooks to the game loop <!-- Partial: FPS tracking exists but no per-system timing breakdown -->
+- [x] 9. Add performance profiling hooks to the game loop <!-- Partial: FPS tracking exists but no per-system timing breakdown -->
 - [ ] 10. Create debug overlay showing tick rate, entity count, and system timings <!-- Partial: FPS chart exists but no entity count or system timings -->
 
 ## Phase 2 — World & Map Basics

@@ -11,16 +11,33 @@ export interface FpsDataPoint {
   fps: number | null;
 }
 
+/** Per-system timing in milliseconds */
+export interface SystemTimings {
+  [systemName: string]: number;
+}
+
 interface PerformanceState {
   /** Current FPS (for status bar display) */
   fps: number;
   /** FPS history for charts (derived from circular buffer) */
   fpsHistory: FpsDataPoint[];
+  /** Per-system timing from last sampled tick (ms) */
+  systemTimings: SystemTimings;
+  /** Total entity count */
+  entityCount: number;
+  /** Ticks per second (actual simulation throughput) */
+  tps: number;
 }
 
 interface PerformanceActions {
   /** Push a new FPS value to the history buffer */
   pushFps: (fps: number) => void;
+  /** Push tick metrics (system timings, entity count) — throttled by caller */
+  pushTickMetrics: (metrics: {
+    systemTimings: SystemTimings;
+    entityCount: number;
+    tps: number;
+  }) => void;
 }
 
 type PerformanceStore = PerformanceState & PerformanceActions;
@@ -65,16 +82,27 @@ function pushToBuffer(fps: number): FpsDataPoint[] {
 // =============================================================================
 
 /**
- * Store for performance metrics like FPS.
+ * Store for performance metrics like FPS, TPS, entity count, and per-system timings.
  * Uses a circular buffer for O(1) insertions.
  * Values are updated in a throttled manner (every 500ms) to avoid overhead.
  */
 export const usePerformanceStore = create<PerformanceStore>((set) => ({
   fps: 0,
   fpsHistory: [],
+  systemTimings: {},
+  entityCount: 0,
+  tps: 0,
 
   pushFps: (fps) => {
     const fpsHistory = pushToBuffer(fps);
     set({ fps, fpsHistory });
+  },
+
+  pushTickMetrics: (metrics) => {
+    set({
+      systemTimings: metrics.systemTimings,
+      entityCount: metrics.entityCount,
+      tps: metrics.tps,
+    });
   },
 }));
