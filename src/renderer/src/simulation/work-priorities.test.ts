@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createDefaultSkills } from "./skills";
 import type { Character } from "./types";
 import { createCharacter } from "./types";
 import {
@@ -13,6 +14,17 @@ function makeChar(overrides: Partial<Character> & { name: string }): Character {
     position: { x: 0, y: 0, z: 0 },
     ...overrides,
   });
+}
+
+function skillsWithLevel(
+  skillId: string,
+  level: number,
+): ReturnType<typeof createDefaultSkills> {
+  const skills = createDefaultSkills();
+  if (skillId in skills) {
+    skills[skillId as keyof typeof skills].level = level;
+  }
+  return skills;
 }
 
 describe("work-priorities", () => {
@@ -150,7 +162,7 @@ describe("work-priorities", () => {
       expect(result).toBe(alice.id);
     });
 
-    it("picks closest when priorities are equal", () => {
+    it("picks closest when priorities and skills are equal", () => {
       const alice = makeChar({
         name: "Alice",
         position: { x: 10, y: 0, z: 0 },
@@ -166,6 +178,72 @@ describe("work-priorities", () => {
         { x: 0, y: 0, z: 0 },
         () => false,
       );
+      expect(result).toBe(bob.id);
+    });
+
+    it("prefers higher-skilled colonist when priorities are equal", () => {
+      const alice = makeChar({
+        name: "Alice",
+        position: { x: 0, y: 0, z: 0 },
+        skills: skillsWithLevel("cooking", 8),
+      });
+      const bob = makeChar({
+        name: "Bob",
+        position: { x: 0, y: 0, z: 0 },
+        skills: skillsWithLevel("cooking", 2),
+      });
+
+      const result = pickBestCharacter(
+        [bob, alice],
+        "cooking",
+        { x: 0, y: 0, z: 0 },
+        () => false,
+      );
+      expect(result).toBe(alice.id);
+    });
+
+    it("priority still beats skill", () => {
+      const alice = makeChar({
+        name: "Alice",
+        position: { x: 0, y: 0, z: 0 },
+        workPriorities: { ...createDefaultWorkPriorities(), mining: 4 },
+        skills: skillsWithLevel("mining", 15),
+      });
+      const bob = makeChar({
+        name: "Bob",
+        position: { x: 0, y: 0, z: 0 },
+        workPriorities: { ...createDefaultWorkPriorities(), mining: 1 },
+        skills: skillsWithLevel("mining", 1),
+      });
+
+      const result = pickBestCharacter(
+        [alice, bob],
+        "mining",
+        { x: 0, y: 0, z: 0 },
+        () => false,
+      );
+      expect(result).toBe(bob.id);
+    });
+
+    it("skill breaks tie before distance", () => {
+      const alice = makeChar({
+        name: "Alice",
+        position: { x: 1, y: 0, z: 0 },
+        skills: skillsWithLevel("construction", 3),
+      });
+      const bob = makeChar({
+        name: "Bob",
+        position: { x: 10, y: 0, z: 0 },
+        skills: skillsWithLevel("construction", 10),
+      });
+
+      const result = pickBestCharacter(
+        [alice, bob],
+        "construction",
+        { x: 0, y: 0, z: 0 },
+        () => false,
+      );
+      // Bob is farther but much more skilled — skill wins over distance
       expect(result).toBe(bob.id);
     });
   });

@@ -5,6 +5,7 @@
 // 0 = disabled, 1 = highest priority, 4 = lowest priority.
 
 import type { Position3D } from "../world/types";
+import type { SkillId } from "./skills";
 import type { Character, EntityId } from "./types";
 
 // =============================================================================
@@ -34,6 +35,15 @@ export const ALL_WORK_TYPES: readonly WorkType[] = [
   "mining",
 ] as const;
 
+/** Maps each work type to the skill that determines aptitude */
+export const WORK_TYPE_SKILL_MAP: Record<WorkType, SkillId> = {
+  hauling: "animals", // Hauling is general labor — use animals as closest fit
+  construction: "construction",
+  growing: "plants",
+  cooking: "cooking",
+  mining: "mining",
+};
+
 // =============================================================================
 // DEFAULTS
 // =============================================================================
@@ -56,12 +66,13 @@ export function createDefaultWorkPriorities(): WorkPriorities {
 export interface EligibleCharacter {
   id: EntityId;
   priority: WorkPriorityLevel;
+  skillLevel: number;
   distance: number;
 }
 
 /**
  * Get eligible characters for a work type, sorted by priority (ascending = higher priority first),
- * then by distance (ascending = closer first).
+ * then by skill level (descending = more skilled first), then by distance (ascending = closer first).
  *
  * Filters out:
  * - Characters with priority 0 (disabled) for this work type
@@ -94,16 +105,20 @@ export function getEligibleCharacters(
     // Skip disabled work types
     if (priority === 0) continue;
 
+    const relevantSkill = WORK_TYPE_SKILL_MAP[workType];
+    const skillLevel = character.skills[relevantSkill]?.level ?? 0;
+
     const distance =
       Math.abs(character.position.x - target.x) +
       Math.abs(character.position.y - target.y);
 
-    eligible.push({ id: character.id, priority, distance });
+    eligible.push({ id: character.id, priority, skillLevel, distance });
   }
 
-  // Sort by priority (ascending — 1 is highest), then by distance
+  // Sort by priority (ascending — 1 is highest), then skill (descending — higher is better), then distance
   eligible.sort((a, b) => {
     if (a.priority !== b.priority) return a.priority - b.priority;
+    if (a.skillLevel !== b.skillLevel) return b.skillLevel - a.skillLevel;
     return a.distance - b.distance;
   });
 
@@ -113,7 +128,7 @@ export function getEligibleCharacters(
 /**
  * Pick the best character for a work type at a given target position.
  * Returns the character ID with the highest priority (lowest number),
- * breaking ties by distance.
+ * breaking ties by skill level (higher preferred), then distance.
  */
 export function pickBestCharacter(
   characters: Iterable<Character>,
