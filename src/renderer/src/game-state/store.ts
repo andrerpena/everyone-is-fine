@@ -24,6 +24,7 @@ import {
   NeedSatisfactionSystem,
   NeedsSystem,
   PlantGrowthSystem,
+  RoomDetectionSystem,
   SnowAccumulationSystem,
   SowingSystem,
   simulationLoop,
@@ -744,6 +745,9 @@ const gameNotifications = new GameNotifications(entityStore, jobProcessor);
 // =============================================================================
 
 const visionSystem = new VisionSystem(entityStore);
+const roomDetection = new RoomDetectionSystem(
+  () => useGameStore.getState().world,
+);
 const itemDeterioration = new ItemDeteriorationSystem();
 const snowAccumulation = new SnowAccumulationSystem();
 const plantGrowth = new PlantGrowthSystem();
@@ -819,6 +823,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
 
   // Auto-assign construction jobs for blueprints
   constructionSystem.update();
+
+  // Detect enclosed rooms (walls + doors as boundaries)
+  roomDetection.update();
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();

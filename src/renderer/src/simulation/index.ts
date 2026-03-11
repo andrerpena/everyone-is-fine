@@ -19,6 +19,7 @@ export { ItemDeteriorationSystem } from "./items/item-deterioration-system";
 // Jobs
 export {
   ACTION_RULES,
+  ConstructionSystem,
   createChopJob,
   createHaulJob,
   createMineJob,
@@ -35,7 +36,6 @@ export {
   jobQueue,
   ReservationSystem,
   resolveActions,
-  ConstructionSystem,
   SowingSystem,
 } from "./jobs";
 // Movement
@@ -88,6 +88,8 @@ export {
 // Plants
 export { CROP_REGISTRY } from "./plants/crop-registry";
 export { PlantGrowthSystem } from "./plants/plant-growth-system";
+// Rooms
+export { type Room, RoomDetectionSystem } from "./rooms";
 // Simulation Loop
 export {
   MS_PER_TICK,
