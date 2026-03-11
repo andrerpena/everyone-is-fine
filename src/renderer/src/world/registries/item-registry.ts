@@ -11,6 +11,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 1.0,
     flammability: 1.0,
     nutrition: 0,
+    spoilageRate: 0,
   },
   stone: {
     type: "stone",
@@ -21,6 +22,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 1.5,
     flammability: 0,
     nutrition: 0,
+    spoilageRate: 0,
   },
   iron: {
     type: "iron",
@@ -31,6 +33,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 1.2,
     flammability: 0,
     nutrition: 0,
+    spoilageRate: 0,
   },
   gold: {
     type: "gold",
@@ -41,6 +44,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 1.5,
     flammability: 0,
     nutrition: 0,
+    spoilageRate: 0,
   },
   silver: {
     type: "silver",
@@ -51,6 +55,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 1.3,
     flammability: 0,
     nutrition: 0,
+    spoilageRate: 0,
   },
   coal: {
     type: "coal",
@@ -61,6 +66,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 0.8,
     flammability: 1.0,
     nutrition: 0,
+    spoilageRate: 0,
   },
   cloth: {
     type: "cloth",
@@ -71,6 +77,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 0.3,
     flammability: 0.8,
     nutrition: 0,
+    spoilageRate: 0,
   },
   leather: {
     type: "leather",
@@ -81,6 +88,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 0.4,
     flammability: 0.5,
     nutrition: 0,
+    spoilageRate: 0,
   },
 
   // Food
@@ -93,6 +101,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 0.5,
     flammability: 0,
     nutrition: 0.3,
+    spoilageRate: 0.01, // Spoils fastest — raw meat
   },
   berries: {
     type: "berries",
@@ -103,6 +112,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 0.1,
     flammability: 0,
     nutrition: 0.1,
+    spoilageRate: 0.006, // Medium spoilage — raw plant
   },
   vegetable: {
     type: "vegetable",
@@ -113,6 +123,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 0.3,
     flammability: 0,
     nutrition: 0.2,
+    spoilageRate: 0.006, // Medium spoilage — raw plant
   },
   meal_simple: {
     type: "meal_simple",
@@ -123,6 +134,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 0.5,
     flammability: 0,
     nutrition: 0.8,
+    spoilageRate: 0.003, // Cooked meals spoil slower
   },
   meal_fine: {
     type: "meal_fine",
@@ -133,6 +145,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 0.5,
     flammability: 0,
     nutrition: 1.0,
+    spoilageRate: 0.003, // Cooked meals spoil slower
   },
 
   // Tools
@@ -145,6 +158,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 2.0,
     flammability: 0,
     nutrition: 0,
+    spoilageRate: 0,
   },
   axe: {
     type: "axe",
@@ -155,6 +169,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 2.0,
     flammability: 0,
     nutrition: 0,
+    spoilageRate: 0,
   },
   hammer: {
     type: "hammer",
@@ -165,6 +180,7 @@ export const ITEM_REGISTRY: Record<ItemType, ItemProperties> = {
     weight: 2.0,
     flammability: 0,
     nutrition: 0,
+    spoilageRate: 0,
   },
 };
 

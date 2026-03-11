@@ -142,7 +142,7 @@
 - [ ] 106. Create meal types (simple meal, fine meal, lavish meal, nutrient paste)
 - [ ] 107. Implement eating action (colonist picks up food, sits, eats, restores hunger)
 - [ ] 108. Add food poisoning chance based on cooking skill
-- [ ] 109. Implement food spoilage system (food rots over time without refrigeration)
+- [x] 109. Implement food spoilage system (food rots over time without refrigeration) <!-- Ticket 0041 -->
 - [ ] 110. Create nutrient paste dispenser building (efficient but mood-negative meals)
 - [ ] 111. Add wild plant foraging (berry bushes, wild healroot)
 - [ ] 112. Implement hunting job (colonists hunt wild animals for meat)

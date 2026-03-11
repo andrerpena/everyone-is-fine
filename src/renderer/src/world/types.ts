@@ -215,6 +215,7 @@ export interface ItemProperties {
   readonly weight: number; // Affects hauling speed
   readonly flammability: number; // 0-1
   readonly nutrition: number; // 0-1, 0 for non-food
+  readonly spoilageRate: number; // Condition lost per check cycle, 0 = non-perishable
 }
 
 /** Unique identifier for entity references */
