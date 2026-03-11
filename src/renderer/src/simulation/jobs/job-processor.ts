@@ -4,6 +4,7 @@
 
 import { logger } from "../../lib/logger";
 import { ITEM_REGISTRY } from "../../world/registries/item-registry";
+import { STRUCTURE_REGISTRY } from "../../world/registries/structure-registry";
 import type {
   ItemData,
   ItemType,
@@ -37,6 +38,7 @@ import type {
   JobProgressInfo,
   MoveStep,
   PickupItemStep,
+  PlaceStructureStep,
   PlantCropStep,
   RestoreNeedStep,
   SpawnItemsStep,
@@ -268,6 +270,10 @@ export class JobProcessor {
 
       case "consume_item":
         this.executeConsumeItem(characterId, job, step);
+        break;
+
+      case "place_structure":
+        this.executePlaceStructure(characterId, job, step);
         break;
     }
   }
@@ -608,6 +614,63 @@ export class JobProcessor {
       quality: 1,
       condition: 1,
     });
+
+    // Notify store so rendering updates
+    this.updateTile(
+      { x: step.position.x, y: step.position.y },
+      step.position.z,
+      {},
+    );
+
+    step.status = "completed";
+    this.advanceToNextStep(characterId, job);
+  }
+
+  // ===========================================================================
+  // PLACE STRUCTURE STEP
+  // ===========================================================================
+
+  private executePlaceStructure(
+    characterId: EntityId,
+    job: Job,
+    step: PlaceStructureStep,
+  ): void {
+    const world = this.getWorld();
+    if (!world) {
+      this.failJob(characterId, job, "World not initialized");
+      return;
+    }
+
+    const tile = getWorldTileAt(
+      world,
+      step.position.x,
+      step.position.y,
+      step.position.z,
+    );
+    if (!tile) {
+      this.failJob(characterId, job, "Tile not found");
+      return;
+    }
+
+    // Place the structure
+    const props = STRUCTURE_REGISTRY[step.structureType];
+    tile.structure = {
+      type: step.structureType,
+      health: props.maxHealth,
+      rotation: 0,
+    };
+
+    // Clear the blueprint
+    tile.blueprint = null;
+
+    // Update pathfinding if structure blocks movement
+    if (props.blocksMovement) {
+      tile.pathfinding = {
+        isPassable: false,
+        movementCost: tile.pathfinding.movementCost,
+        lastUpdated: Date.now(),
+      };
+    }
 
     // Notify store so rendering updates
     this.updateTile(

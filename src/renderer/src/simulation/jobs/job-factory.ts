@@ -2,7 +2,8 @@
 // JOB FACTORY - Creates concrete job instances
 // =============================================================================
 
-import type { CropType, Position3D } from "../../world/types";
+import { getConstructionCost } from "../../world/registries/construction-registry";
+import type { CropType, Position3D, StructureType } from "../../world/types";
 import type { EntityId } from "../types";
 import { generateJobId, type Job } from "./types";
 
@@ -244,6 +245,49 @@ export function createHarvestJob(
         type: "harvest_crop",
         position: target,
         cropType,
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/**
+ * Create a "build structure" job.
+ * Steps: move adjacent → work (variable ticks based on structure type) → place structure
+ */
+export function createBuildJob(
+  characterId: EntityId,
+  target: Position3D,
+  structureType: StructureType,
+): Job {
+  const cost = getConstructionCost(structureType);
+  const workTicks = cost?.workTicks ?? 300;
+
+  return {
+    id: generateJobId(),
+    type: "build",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: target,
+        adjacent: true,
+        status: "pending",
+      },
+      {
+        type: "work",
+        totalTicks: workTicks,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "place_structure",
+        position: target,
+        structureType,
         status: "pending",
       },
     ],

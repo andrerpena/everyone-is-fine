@@ -240,6 +240,15 @@ export interface GameAgentApi {
   plantCrop: (x: number, y: number, cropType: string, z?: number) => void;
   setGrowingZoneCrop: (zoneId: string, cropType: string) => void;
 
+  // Construction
+  placeBlueprint: (
+    x: number,
+    y: number,
+    structureType: string,
+    z?: number,
+  ) => void;
+  cancelBlueprint: (x: number, y: number, z?: number) => void;
+
   // Low-level command access
   commands: {
     dispatch: (commandId: string, payload?: unknown) => Promise<void>;

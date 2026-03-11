@@ -150,9 +150,9 @@
 
 ## Phase 9 — Construction & Building
 
-- [ ] 114. Define building data structure (size, required materials, work amount, properties)
-- [ ] 115. Create building blueprint/ghost system (place before construction)
-- [ ] 116. Implement construction job (colonists build from blueprints)
+- [x] 114. Define building data structure (size, required materials, work amount, properties) <!-- Ticket 0044 -->
+- [x] 115. Create building blueprint/ghost system (place before construction) <!-- Ticket 0044 -->
+- [x] 116. Implement construction job (colonists build from blueprints) <!-- Ticket 0044 -->
 - [ ] 117. Add wall building (single-tile, blocks movement and line of sight)
 - [ ] 118. Create door building (allows movement, can be locked)
 - [ ] 119. Implement floor/tile building (affects movement speed and beauty)

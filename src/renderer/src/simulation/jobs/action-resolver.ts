@@ -23,7 +23,8 @@ export function resolveActions(position: Position3D, world: World): Action[] {
         id: rule.id,
         label: rule.label,
         priority: rule.priority,
-        createJob: rule.createJob,
+        createJob: (characterId, target) =>
+          rule.createJob(characterId, target, tile),
       });
     }
   }

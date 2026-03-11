@@ -85,6 +85,7 @@ export function createTile(options?: {
     },
     snowDepth: 0,
     crop: null,
+    blueprint: null,
   };
 }
 
@@ -99,5 +100,6 @@ export function cloneTile(tile: Tile): Tile {
     visibility: { ...tile.visibility },
     snowDepth: tile.snowDepth,
     crop: tile.crop ? { ...tile.crop } : null,
+    blueprint: tile.blueprint ? { ...tile.blueprint } : null,
   };
 }

@@ -22,6 +22,7 @@ function makeTile(terrainType: string, snowDepth = 0): Tile {
     visibility: { explored: false, visible: false, lightLevel: 0 },
     snowDepth,
     crop: null,
+    blueprint: null,
   };
 }
 

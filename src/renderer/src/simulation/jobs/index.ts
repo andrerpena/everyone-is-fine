@@ -5,12 +5,15 @@
 // Action resolution
 export { resolveActions } from "./action-resolver";
 export { ACTION_RULES } from "./action-rules";
+// Construction system
+export { ConstructionSystem } from "./construction-system";
 // Harvesting system
 export { HarvestingSystem } from "./harvesting-system";
 // Hauling system
 export { HaulingSystem } from "./hauling-system";
 // Job factories
 export {
+  createBuildJob,
   createChopJob,
   createForageJob,
   createHarvestJob,
@@ -40,6 +43,7 @@ export type {
   JobStep,
   MoveStep,
   PickupItemStep,
+  PlaceStructureStep,
   PlantCropStep,
   RestoreNeedStep,
   SpawnItemsStep,

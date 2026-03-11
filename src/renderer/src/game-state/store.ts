@@ -9,6 +9,7 @@ import type { SystemTimings } from "../lib/performance-store";
 import { usePerformanceStore } from "../lib/performance-store";
 import {
   advanceTime,
+  ConstructionSystem,
   entityStore,
   findPath,
   GameNotifications,
@@ -726,6 +727,11 @@ const haulingSystem = new HaulingSystem(
   jobProcessor,
   () => useGameStore.getState().world,
 );
+const constructionSystem = new ConstructionSystem(
+  entityStore,
+  jobProcessor,
+  () => useGameStore.getState().world,
+);
 
 // =============================================================================
 // GAME NOTIFICATIONS SETUP
@@ -810,6 +816,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
 
   // Auto-assign harvest jobs for mature crops
   harvestingSystem.update();
+
+  // Auto-assign construction jobs for blueprints
+  constructionSystem.update();
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();

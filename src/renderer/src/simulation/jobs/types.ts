@@ -2,7 +2,12 @@
 // JOB SYSTEM TYPES
 // =============================================================================
 
-import type { CropType, ItemType, Position3D } from "../../world/types";
+import type {
+  CropType,
+  ItemType,
+  Position3D,
+  StructureType,
+} from "../../world/types";
 import type { EntityId } from "../types";
 
 // =============================================================================
@@ -134,6 +139,15 @@ export interface ConsumeItemStep {
   status: StepStatus;
 }
 
+export interface PlaceStructureStep {
+  type: "place_structure";
+  /** Tile to place the structure on */
+  position: Position3D;
+  /** Structure type to build */
+  structureType: StructureType;
+  status: StepStatus;
+}
+
 export type JobStep =
   | MoveStep
   | WorkStep
@@ -144,7 +158,8 @@ export type JobStep =
   | DropItemStep
   | PlantCropStep
   | HarvestCropStep
-  | ConsumeItemStep;
+  | ConsumeItemStep
+  | PlaceStructureStep;
 
 // =============================================================================
 // ACTION RULES - Declarative matching for tile → actions
@@ -160,7 +175,7 @@ export interface ActionRule {
   /** Return true if this action applies to the given tile */
   matches: (tile: Tile, position: Position3D) => boolean;
   /** Create a job for this action */
-  createJob: (characterId: EntityId, target: Position3D) => Job;
+  createJob: (characterId: EntityId, target: Position3D, tile: Tile) => Job;
 }
 
 // =============================================================================

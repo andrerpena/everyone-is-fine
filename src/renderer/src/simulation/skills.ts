@@ -284,6 +284,7 @@ export const JOB_SKILL_MAP: Partial<Record<string, SkillId>> = {
   forage: "plants",
   sow: "plants",
   harvest: "plants",
+  build: "construction",
 };
 
 /** Base XP granted per completed work step */

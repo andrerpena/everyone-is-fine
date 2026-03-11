@@ -4,6 +4,7 @@
 // To add a new action, append a rule to ACTION_RULES. No other code changes needed.
 
 import {
+  createBuildJob,
   createChopJob,
   createForageJob,
   createMineJob,
@@ -12,6 +13,14 @@ import {
 import type { ActionRule } from "./types";
 
 export const ACTION_RULES: ActionRule[] = [
+  {
+    id: "build",
+    label: "Build",
+    priority: 15,
+    matches: (tile) => tile.blueprint !== null && tile.structure === null,
+    createJob: (characterId, target, tile) =>
+      createBuildJob(characterId, target, tile.blueprint!.type),
+  },
   {
     id: "chop",
     label: "Chop",

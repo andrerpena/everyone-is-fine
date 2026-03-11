@@ -32,6 +32,7 @@ import {
   createTerrainData,
 } from "./world/factories/tile-factory";
 import { createWorld as createWorldFactory } from "./world/factories/world-factory";
+import { isBuildable } from "./world/registries/construction-registry";
 import type {
   BiomeType,
   CropType,
@@ -772,6 +773,44 @@ function createAgentApi(): GameAgentApi {
         stage: "seedling",
         plantedDay: world.time.day,
       };
+    },
+
+    // =========================================================================
+    // CONSTRUCTION
+    // =========================================================================
+
+    placeBlueprint(x: number, y: number, structureType: string, z?: number) {
+      const state = useGameStore.getState();
+      const world = state.world;
+      if (!world) throw new Error("No world loaded");
+
+      const zLevel = z ?? 0;
+      const tile = getWorldTileAt(world, x, y, zLevel);
+      if (!tile) throw new Error(`Tile (${x}, ${y}, ${zLevel}) out of bounds`);
+
+      if (!isBuildable(structureType as StructureType)) {
+        throw new Error(`Structure type "${structureType}" is not buildable`);
+      }
+
+      if (tile.structure !== null) {
+        throw new Error(
+          `Tile (${x}, ${y}) already has a structure: ${tile.structure.type}`,
+        );
+      }
+
+      tile.blueprint = createStructureData(structureType as StructureType);
+    },
+
+    cancelBlueprint(x: number, y: number, z?: number) {
+      const state = useGameStore.getState();
+      const world = state.world;
+      if (!world) throw new Error("No world loaded");
+
+      const zLevel = z ?? 0;
+      const tile = getWorldTileAt(world, x, y, zLevel);
+      if (!tile) throw new Error(`Tile (${x}, ${y}, ${zLevel}) out of bounds`);
+
+      tile.blueprint = null;
     },
 
     // =========================================================================

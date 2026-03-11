@@ -287,6 +287,9 @@ export interface Tile {
 
   /** Crop planted on this tile (null = no crop) */
   crop: CropData | null;
+
+  /** Blueprint for a structure to be built here (null = no blueprint) */
+  blueprint: StructureData | null;
 }
 
 /** Cached pathfinding information */
@@ -447,6 +450,7 @@ export const DEFAULT_TILE: Tile = {
   },
   snowDepth: 0,
   crop: null,
+  blueprint: null,
 };
 
 /** Chunk size for future chunk-based loading */

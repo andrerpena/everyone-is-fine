@@ -22,6 +22,7 @@ function makeWorld(items: ItemData[], temperature = 20): World {
     visibility: { explored: false, visible: false, lightLevel: 0 },
     snowDepth: 0,
     crop: null,
+    blueprint: null,
   };
 
   const level: ZLevel = {

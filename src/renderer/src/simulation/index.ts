@@ -37,6 +37,8 @@ export {
   resolveActions,
   SowingSystem,
 } from "./jobs";
+// Construction
+export { ConstructionSystem } from "./jobs/construction-system";
 // Movement
 export {
   type Direction,
