@@ -1,8 +1,8 @@
 # Everyone Is Fine
 
-[everyoneisfine.com](everyoneisfine.com) is an early-stage colony simulation game that aims to be like RimWorld one day, if Claude Code and my prompts are good enough.
+[everyoneisfine.com](https://everyoneisfine.com) is an early-stage colony simulation game that aims to be like RimWorld one day, if Claude Code and my prompts are good enough.
 
-While RimWorld is better than [everyoneisfine.com](everyoneisfine.com), everyone is still fine.
+While RimWorld is better than [everyoneisfine.com](https://everyoneisfine.com), everyone is still fine.
 
 <img width="1486" height="952" alt="image" src="https://github.com/user-attachments/assets/341903dc-1cf1-4f1e-a61b-cb2636356860" />
 
