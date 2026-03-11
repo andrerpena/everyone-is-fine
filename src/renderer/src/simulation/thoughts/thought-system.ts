@@ -5,8 +5,24 @@
 
 import type { EntityStore } from "../entity-store";
 import { getNeedThreshold } from "../needs/needs-config";
+import type { Room } from "../rooms/room-types";
 import type { Character } from "../types";
 import { THOUGHT_MAP, type ThoughtId } from "./thought-definitions";
+
+// =============================================================================
+// ENVIRONMENT CONTEXT
+// =============================================================================
+
+/** Environmental context for a character's current location */
+export interface EnvironmentContext {
+  /** Average beauty of the room (null = outdoors or no room) */
+  roomBeauty: number | null;
+  /** Composite impressiveness score (null = outdoors or no room) */
+  roomImpressiveness: number | null;
+}
+
+/** Function to look up a room at a position */
+export type RoomLookup = (x: number, y: number, z: number) => Room | null;
 
 // =============================================================================
 // TYPES
@@ -54,6 +70,7 @@ export function computeMoodFromThoughts(thoughts: ActiveThought[]): number {
  */
 export function evaluateConditionThoughts(
   character: Character,
+  envContext?: EnvironmentContext,
 ): Set<ThoughtId> {
   const thoughts = new Set<ThoughtId>();
   const { needs, traits } = character;
@@ -108,6 +125,25 @@ export function evaluateConditionThoughts(
     thoughts.add("feeling_brave");
   }
 
+  // --- Environment/beauty thoughts ---
+  if (envContext) {
+    const { roomBeauty, roomImpressiveness } = envContext;
+    if (roomBeauty !== null) {
+      if (roomBeauty >= 2.0) {
+        thoughts.add("environment_beautiful");
+      } else if (roomBeauty >= 1.0) {
+        thoughts.add("environment_pleasant");
+      } else if (roomBeauty <= -1.5) {
+        thoughts.add("environment_hideous");
+      } else if (roomBeauty <= -0.5) {
+        thoughts.add("environment_ugly");
+      }
+    }
+    if (roomImpressiveness !== null && roomImpressiveness >= 60) {
+      thoughts.add("environment_impressive");
+    }
+  }
+
   return thoughts;
 }
 
@@ -123,9 +159,11 @@ export function evaluateConditionThoughts(
  */
 export class MoodThoughtSystem {
   private entityStore: EntityStore;
+  private getRoomAt: RoomLookup | null;
 
-  constructor(entityStore: EntityStore) {
+  constructor(entityStore: EntityStore, getRoomAt?: RoomLookup) {
     this.entityStore = entityStore;
+    this.getRoomAt = getRoomAt ?? null;
   }
 
   /**
@@ -157,6 +195,19 @@ export class MoodThoughtSystem {
     }
   }
 
+  private getEnvironmentContext(
+    character: Character,
+  ): EnvironmentContext | undefined {
+    if (!this.getRoomAt) return undefined;
+    const { x, y, z } = character.position;
+    const room = this.getRoomAt(x, y, z);
+    if (!room || room.isOutdoors || !room.stats) return undefined;
+    return {
+      roomBeauty: room.stats.beauty,
+      roomImpressiveness: room.stats.impressiveness,
+    };
+  }
+
   private updateCharacterThoughts(
     character: Character,
     currentTick: number,
@@ -167,7 +218,8 @@ export class MoodThoughtSystem {
     );
 
     // 2. Evaluate which condition-based thoughts should be active
-    const conditionThoughts = evaluateConditionThoughts(character);
+    const envContext = this.getEnvironmentContext(character);
+    const conditionThoughts = evaluateConditionThoughts(character, envContext);
 
     // 3. Identify condition-based thought IDs currently active
     const conditionBased = new Set<ThoughtId>();

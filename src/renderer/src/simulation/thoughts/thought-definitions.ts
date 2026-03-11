@@ -22,7 +22,12 @@ export type ThoughtId =
   | "content"
   | "mental_break_sad_wander"
   | "mental_break_food_binge"
-  | "mental_break_daze";
+  | "mental_break_daze"
+  | "environment_beautiful"
+  | "environment_pleasant"
+  | "environment_ugly"
+  | "environment_hideous"
+  | "environment_impressive";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -140,6 +145,42 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     label: "Mental Break: Daze",
     description: "Staring blankly, unresponsive to the world",
     moodEffect: -0.08,
+    durationSeconds: 0,
+  },
+  // Environment/beauty thoughts (condition-based, duration = 0)
+  {
+    id: "environment_beautiful",
+    label: "Beautiful Room",
+    description: "Surrounded by beauty, this room is wonderful",
+    moodEffect: 0.1,
+    durationSeconds: 0,
+  },
+  {
+    id: "environment_pleasant",
+    label: "Pleasant Surroundings",
+    description: "This room looks nice",
+    moodEffect: 0.05,
+    durationSeconds: 0,
+  },
+  {
+    id: "environment_ugly",
+    label: "Ugly Environment",
+    description: "This place is not easy on the eyes",
+    moodEffect: -0.05,
+    durationSeconds: 0,
+  },
+  {
+    id: "environment_hideous",
+    label: "Hideous Environment",
+    description: "This place is appallingly ugly",
+    moodEffect: -0.1,
+    durationSeconds: 0,
+  },
+  {
+    id: "environment_impressive",
+    label: "Impressive Room",
+    description: "This room is truly impressive",
+    moodEffect: 0.05,
     durationSeconds: 0,
   },
 ] as const;

@@ -753,7 +753,9 @@ const snowAccumulation = new SnowAccumulationSystem();
 const plantGrowth = new PlantGrowthSystem();
 const weatherSystem = new WeatherSystem();
 const needsSystem = new NeedsSystem(entityStore);
-const moodThoughtSystem = new MoodThoughtSystem(entityStore);
+const moodThoughtSystem = new MoodThoughtSystem(entityStore, (x, y, z) =>
+  roomDetection.getRoomAt(x, y, z),
+);
 const mentalBreakSystem = new MentalBreakSystem(
   entityStore,
   jobProcessor,
