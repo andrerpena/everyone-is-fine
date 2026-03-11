@@ -81,7 +81,7 @@ export interface CharacterNeeds {
 }
 
 /** Mental break types */
-export type MentalBreakType = "sad_wander";
+export type MentalBreakType = "sad_wander" | "food_binge" | "daze";
 
 /** Active mental break state */
 export interface MentalBreakState {

@@ -20,7 +20,9 @@ export type ThoughtId =
   | "neurotic_anxiety"
   | "feeling_brave"
   | "content"
-  | "mental_break_sad_wander";
+  | "mental_break_sad_wander"
+  | "mental_break_food_binge"
+  | "mental_break_daze";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -124,6 +126,20 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     label: "Mental Break: Sad Wander",
     description: "Overwhelmed by sadness, wandering aimlessly",
     moodEffect: -0.05,
+    durationSeconds: 0,
+  },
+  {
+    id: "mental_break_food_binge",
+    label: "Mental Break: Food Binge",
+    description: "Compulsively seeking and eating food",
+    moodEffect: -0.03,
+    durationSeconds: 0,
+  },
+  {
+    id: "mental_break_daze",
+    label: "Mental Break: Daze",
+    description: "Staring blankly, unresponsive to the world",
+    moodEffect: -0.08,
     durationSeconds: 0,
   },
 ] as const;

@@ -2,18 +2,19 @@
 // MENTAL BREAK SYSTEM
 // =============================================================================
 // Monitors colonist mood and triggers/ends mental breaks.
-// Currently supports "sad_wander" — colonist ignores commands and wanders.
+// Supports: sad_wander, food_binge, daze.
 
 import type { World } from "../../world/types";
 import { getWorldTileAt } from "../../world/utils/tile-utils";
 import type { EntityStore } from "../entity-store";
 import type { JobProcessor } from "../jobs";
+import { createForageJob } from "../jobs/job-factory";
 import type { Job, MoveStep } from "../jobs/types";
 import { generateJobId } from "../jobs/types";
 import type { MovementSystem } from "../movement";
 import { findPath } from "../pathfinding";
 import { TICKS_PER_SECOND } from "../simulation-loop";
-import type { EntityId } from "../types";
+import type { EntityId, MentalBreakType } from "../types";
 
 // =============================================================================
 // CONSTANTS
@@ -31,6 +32,9 @@ const BREAK_WANDER_COOLDOWN_MAX = 3;
 
 /** Wander radius during mental break */
 const BREAK_WANDER_RADIUS = 6;
+
+/** Search radius for food binge (larger than normal forage) */
+const FOOD_BINGE_SEARCH_RADIUS = 30;
 
 // =============================================================================
 // SIMPLE LCG RNG (deterministic per-entity)
@@ -111,13 +115,31 @@ export class MentalBreakSystem {
     this.jobProcessor.cancelJob(characterId);
     this.movementSystem.cancelMove(characterId);
 
+    // Select break type using deterministic RNG
+    const breakType = this.selectBreakType(characterId);
+
     // Set mental break state
     this.entityStore.update(characterId, {
-      mentalBreak: { type: "sad_wander", startedAtTick: currentTick },
+      mentalBreak: { type: breakType, startedAtTick: currentTick },
     });
 
-    // Reset wander cooldown (start wandering immediately)
+    // Reset cooldown (start behavior immediately)
     this.cooldowns.set(characterId, 0);
+  }
+
+  /**
+   * Select a mental break type using deterministic RNG.
+   * Distribution: sad_wander 50%, food_binge 30%, daze 20%.
+   */
+  private selectBreakType(characterId: EntityId): MentalBreakType {
+    let seed = this.seeds.get(characterId) ?? this.hashId(characterId);
+    seed = lcgNext(seed);
+    this.seeds.set(characterId, seed);
+
+    const roll = lcgFloat(seed);
+    if (roll < 0.5) return "sad_wander";
+    if (roll < 0.8) return "food_binge";
+    return "daze";
   }
 
   /**
@@ -131,25 +153,61 @@ export class MentalBreakSystem {
   }
 
   /**
-   * During a break, assign wander jobs (similar to idle but more frequent/erratic).
+   * During a break, dispatch to the appropriate behavior based on break type.
    */
   private updateBreakBehavior(characterId: EntityId): void {
     const character = this.entityStore.get(characterId);
+    if (!character || !character.mentalBreak) return;
+
+    switch (character.mentalBreak.type) {
+      case "sad_wander":
+        this.updateSadWanderBehavior(characterId);
+        break;
+      case "food_binge":
+        this.updateFoodBingeBehavior(characterId);
+        break;
+      case "daze":
+        // Daze: colonist stands still, does nothing
+        break;
+    }
+  }
+
+  /**
+   * Sad wander: assign wander jobs (similar to idle but more frequent/erratic).
+   */
+  private updateSadWanderBehavior(characterId: EntityId): void {
+    const character = this.entityStore.get(characterId);
     if (!character) return;
 
-    // Don't assign new wander if already moving or has a job
     if (character.movement.isMoving) return;
     if (this.jobProcessor.getJob(characterId)) return;
 
-    // Manage cooldown
     const remaining = this.cooldowns.get(characterId) ?? 0;
     if (remaining > 0) {
       this.cooldowns.set(characterId, remaining - 1);
       return;
     }
 
-    // Try to wander
     this.tryBreakWander(characterId);
+  }
+
+  /**
+   * Food binge: compulsively seek and eat from bushes.
+   */
+  private updateFoodBingeBehavior(characterId: EntityId): void {
+    const character = this.entityStore.get(characterId);
+    if (!character) return;
+
+    if (character.movement.isMoving) return;
+    if (this.jobProcessor.getJob(characterId)) return;
+
+    const remaining = this.cooldowns.get(characterId) ?? 0;
+    if (remaining > 0) {
+      this.cooldowns.set(characterId, remaining - 1);
+      return;
+    }
+
+    this.tryFoodBinge(characterId);
   }
 
   /**
@@ -214,6 +272,60 @@ export class MentalBreakSystem {
 
     this.jobProcessor.assignJob(job);
     this.cooldowns.set(characterId, this.randomCooldown(characterId));
+  }
+
+  /**
+   * Food binge: find nearest bush and assign a forage job.
+   * Falls back to sad wander if no bush is found.
+   */
+  private tryFoodBinge(characterId: EntityId): void {
+    const character = this.entityStore.get(characterId);
+    if (!character) return;
+
+    const world = this.getWorld();
+    if (!world) return;
+
+    const { position } = character;
+    const level = world.levels.get(position.z);
+    if (!level) return;
+
+    // Search for nearest bush
+    let bestDist = Number.POSITIVE_INFINITY;
+    let bestPos: { x: number; y: number; z: number } | null = null;
+
+    const minX = Math.max(0, position.x - FOOD_BINGE_SEARCH_RADIUS);
+    const maxX = Math.min(
+      level.width - 1,
+      position.x + FOOD_BINGE_SEARCH_RADIUS,
+    );
+    const minY = Math.max(0, position.y - FOOD_BINGE_SEARCH_RADIUS);
+    const maxY = Math.min(
+      level.height - 1,
+      position.y + FOOD_BINGE_SEARCH_RADIUS,
+    );
+
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        const tile = getWorldTileAt(world, x, y, position.z);
+        if (!tile || tile.structure?.type !== "bush") continue;
+
+        const dist = Math.abs(x - position.x) + Math.abs(y - position.y);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestPos = { x, y, z: position.z };
+        }
+      }
+    }
+
+    if (bestPos) {
+      // Assign forage job (eat compulsively)
+      const job = createForageJob(characterId, bestPos);
+      this.jobProcessor.assignJob(job);
+      this.cooldowns.set(characterId, this.randomCooldown(characterId));
+    } else {
+      // No bush found — fall back to wandering
+      this.tryBreakWander(characterId);
+    }
   }
 
   private randomCooldown(characterId: EntityId): number {

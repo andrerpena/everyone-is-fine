@@ -87,6 +87,12 @@ export function evaluateConditionThoughts(
   if (character.mentalBreak?.type === "sad_wander") {
     thoughts.add("mental_break_sad_wander");
   }
+  if (character.mentalBreak?.type === "food_binge") {
+    thoughts.add("mental_break_food_binge");
+  }
+  if (character.mentalBreak?.type === "daze") {
+    thoughts.add("mental_break_daze");
+  }
 
   // --- Trait-based thoughts ---
   if (traits.includes("optimist")) {
