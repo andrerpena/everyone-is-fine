@@ -6,6 +6,7 @@
 
 import { STRUCTURE_REGISTRY } from "../../world/registries/structure-registry";
 import type { World, ZLevel } from "../../world/types";
+import { calculateRoomStats } from "./room-stats";
 import { generateRoomId, type Room } from "./room-types";
 
 /** How often (in ticks) the system re-detects rooms */
@@ -92,6 +93,7 @@ export function detectRoomsForLevel(level: ZLevel): Room[] {
         zLevel: level.z,
         tiles: roomTiles,
         isOutdoors: touchesEdge,
+        stats: null,
       });
     }
   }
@@ -121,6 +123,14 @@ export class RoomDetectionSystem {
 
     for (const level of world.levels.values()) {
       const rooms = detectRoomsForLevel(level);
+
+      // Compute stats for indoor rooms (skip outdoors — too large and not meaningful)
+      for (const room of rooms) {
+        if (!room.isOutdoors) {
+          room.stats = calculateRoomStats(room, level);
+        }
+      }
+
       this.roomsByLevel.set(level.z, rooms);
 
       for (const room of rooms) {

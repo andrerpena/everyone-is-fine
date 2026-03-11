@@ -89,7 +89,7 @@ export {
 export { CROP_REGISTRY } from "./plants/crop-registry";
 export { PlantGrowthSystem } from "./plants/plant-growth-system";
 // Rooms
-export { type Room, RoomDetectionSystem } from "./rooms";
+export { type Room, RoomDetectionSystem, type RoomStats } from "./rooms";
 // Simulation Loop
 export {
   MS_PER_TICK,

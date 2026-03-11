@@ -159,7 +159,7 @@
 - [x] 120. ~~Add furniture buildings~~ (bed, chair, table defined with construction costs)
 - [ ] 121. Create workstation buildings (crafting spot, stonecutter, tailoring bench) <!-- Partial: generic workbench exists but no specialized workstations -->
 - [x] 122. Implement room detection system (enclosed areas become rooms)
-- [ ] 123. Add room stats calculation (size, beauty, cleanliness, wealth, impressiveness)
+- [x] 123. Add room stats calculation (size, beauty, cleanliness, wealth, impressiveness)
 - [ ] 124. Create room role assignment (bedroom, dining room, workshop, prison, hospital)
 - [ ] 125. Implement building deconstruction and material recovery
 - [ ] 126. Add mining job (dig into rock tiles, yield stone chunks and ores)

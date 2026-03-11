@@ -130,6 +130,8 @@ export interface StructureProperties {
   readonly isInteractable: boolean;
   readonly maxHealth: number;
   readonly flammability: number; // 0-1
+  readonly beauty: number; // Aesthetic value (affects room beauty stat)
+  readonly baseValue: number; // Economic value (affects room wealth stat)
 }
 
 /** Structure instance data */

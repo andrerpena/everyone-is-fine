@@ -7,4 +7,5 @@ export {
   ROOM_CHECK_INTERVAL,
   RoomDetectionSystem,
 } from "./room-detection-system";
-export { generateRoomId, type Room } from "./room-types";
+export { calculateRoomStats } from "./room-stats";
+export { generateRoomId, type Room, type RoomStats } from "./room-types";

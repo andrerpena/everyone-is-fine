@@ -9,6 +9,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: false,
     maxHealth: 0,
     flammability: 0,
+    beauty: 0,
+    baseValue: 0,
   },
   wall_stone: {
     type: "wall_stone",
@@ -18,6 +20,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: false,
     maxHealth: 500,
     flammability: 0,
+    beauty: 1,
+    baseValue: 10,
   },
   wall_wood: {
     type: "wall_wood",
@@ -27,6 +31,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: false,
     maxHealth: 200,
     flammability: 0.8,
+    beauty: 0,
+    baseValue: 5,
   },
   wall_metal: {
     type: "wall_metal",
@@ -36,6 +42,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: false,
     maxHealth: 800,
     flammability: 0,
+    beauty: 1,
+    baseValue: 30,
   },
   wall_brick: {
     type: "wall_brick",
@@ -45,6 +53,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: false,
     maxHealth: 400,
     flammability: 0,
+    beauty: 2,
+    baseValue: 15,
   },
   door_wood: {
     type: "door_wood",
@@ -54,6 +64,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true,
     maxHealth: 100,
     flammability: 0.9,
+    beauty: 0,
+    baseValue: 10,
   },
   door_metal: {
     type: "door_metal",
@@ -63,6 +75,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true,
     maxHealth: 300,
     flammability: 0,
+    beauty: 1,
+    baseValue: 40,
   },
   door_auto: {
     type: "door_auto",
@@ -72,6 +86,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true,
     maxHealth: 200,
     flammability: 0.1,
+    beauty: 2,
+    baseValue: 100,
   },
   bed: {
     type: "bed",
@@ -81,6 +97,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true,
     maxHealth: 100,
     flammability: 0.7,
+    beauty: 2,
+    baseValue: 60,
   },
   chair: {
     type: "chair",
@@ -90,6 +108,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true,
     maxHealth: 50,
     flammability: 0.7,
+    beauty: 1,
+    baseValue: 20,
   },
   table: {
     type: "table",
@@ -99,6 +119,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true,
     maxHealth: 80,
     flammability: 0.7,
+    beauty: 2,
+    baseValue: 30,
   },
   workbench: {
     type: "workbench",
@@ -108,6 +130,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true,
     maxHealth: 150,
     flammability: 0.5,
+    beauty: -1,
+    baseValue: 150,
   },
   chest: {
     type: "chest",
@@ -117,6 +141,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true,
     maxHealth: 100,
     flammability: 0.6,
+    beauty: 0,
+    baseValue: 40,
   },
   shelf: {
     type: "shelf",
@@ -126,6 +152,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true,
     maxHealth: 60,
     flammability: 0.7,
+    beauty: 1,
+    baseValue: 25,
   },
   stockpile_zone: {
     type: "stockpile_zone",
@@ -135,6 +163,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: false,
     maxHealth: Number.POSITIVE_INFINITY,
     flammability: 0,
+    beauty: 0,
+    baseValue: 0,
   },
   tree_oak: {
     type: "tree_oak",
@@ -144,6 +174,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true, // Can be chopped
     maxHealth: 200,
     flammability: 0.6,
+    beauty: 1,
+    baseValue: 0,
   },
   tree_pine: {
     type: "tree_pine",
@@ -153,6 +185,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true,
     maxHealth: 180,
     flammability: 0.7,
+    beauty: 1,
+    baseValue: 0,
   },
   bush: {
     type: "bush",
@@ -162,6 +196,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true,
     maxHealth: 50,
     flammability: 0.8,
+    beauty: 1,
+    baseValue: 0,
   },
   boulder: {
     type: "boulder",
@@ -171,6 +207,8 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     isInteractable: true, // Can be mined
     maxHealth: 400,
     flammability: 0,
+    beauty: -1,
+    baseValue: 0,
   },
 };
 
