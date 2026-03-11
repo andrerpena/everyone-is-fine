@@ -24,12 +24,24 @@ export type SkillId =
   | "artistic"
   | "intellectual";
 
+/** Passion level for a skill — affects XP gain rate */
+export type Passion = "none" | "minor" | "major";
+
+/** XP multipliers per passion level */
+export const PASSION_XP_MULTIPLIERS: Record<Passion, number> = {
+  none: 1,
+  minor: 1.5,
+  major: 2,
+} as const;
+
 /** Data for a single skill */
 export interface SkillData {
   /** Current skill level (0-20) */
   level: number;
   /** Experience points toward next level */
   experience: number;
+  /** Passion level affecting XP gain rate */
+  passion: Passion;
 }
 
 /** All skills for a character */
@@ -121,7 +133,7 @@ export const MAX_SKILL_LEVEL = 20;
 export function createDefaultSkills(): CharacterSkills {
   const skills = {} as CharacterSkills;
   for (const id of ALL_SKILL_IDS) {
-    skills[id] = { level: 0, experience: 0 };
+    skills[id] = { level: 0, experience: 0, passion: "none" };
   }
   return skills;
 }
@@ -129,6 +141,7 @@ export function createDefaultSkills(): CharacterSkills {
 /**
  * Generate random starting skills for a new colonist.
  * Most skills are low (0-3), with 2-4 "aptitude" skills at higher levels (3-8).
+ * Passions: 1-2 major passions, 3-5 minor passions, rest none.
  */
 export function generateRandomSkills(rng: SeededRandom): CharacterSkills {
   const skills = createDefaultSkills();
@@ -150,6 +163,19 @@ export function generateRandomSkills(rng: SeededRandom): CharacterSkills {
 
   for (let i = 0; i < aptitudeCount; i++) {
     skills[shuffled[i]].level = rng.nextInt(3, 9);
+  }
+
+  // Assign passions using the already-shuffled array
+  // First 1-2 get major passion, next 3-5 get minor passion
+  const majorCount = rng.nextInt(1, 3);
+  const minorCount = rng.nextInt(3, 6);
+
+  for (let i = 0; i < shuffled.length; i++) {
+    if (i < majorCount) {
+      skills[shuffled[i]].passion = "major";
+    } else if (i < majorCount + minorCount) {
+      skills[shuffled[i]].passion = "minor";
+    }
   }
 
   return skills;
@@ -199,8 +225,13 @@ export function grantExperience(
     return { skills, leveledUp: false, levelsGained: 0 };
   }
 
+  // Apply passion multiplier to XP gained
+  const effectiveAmount = Math.floor(
+    amount * PASSION_XP_MULTIPLIERS[current.passion],
+  );
+
   let level = current.level;
-  let xp = current.experience + amount;
+  let xp = current.experience + effectiveAmount;
   let levelsGained = 0;
 
   // Process level-ups (handle multiple in one grant)
@@ -219,7 +250,7 @@ export function grantExperience(
 
   const updatedSkills: CharacterSkills = {
     ...skills,
-    [skillId]: { level, experience: xp },
+    [skillId]: { level, experience: xp, passion: current.passion },
   };
 
   return {
@@ -251,10 +282,26 @@ export function formatSkillsSummary(skills: CharacterSkills): string {
   const entries = ALL_SKILL_IDS.filter((id) => skills[id].level > 0)
     .map((id) => {
       const def = SKILL_DEFINITIONS.find((d) => d.id === id);
-      return { label: def?.label ?? id, level: skills[id].level };
+      const skill = skills[id];
+      const passionIndicator =
+        skill.passion === "major"
+          ? "\u2605\u2605"
+          : skill.passion === "minor"
+            ? "\u2605"
+            : "";
+      return {
+        label: def?.label ?? id,
+        level: skill.level,
+        passionIndicator,
+      };
     })
     .sort((a, b) => b.level - a.level);
 
   if (entries.length === 0) return "None";
-  return entries.map((e) => `${e.label} ${e.level}`).join(", ");
+  return entries
+    .map(
+      (e) =>
+        `${e.label} ${e.level}${e.passionIndicator ? ` ${e.passionIndicator}` : ""}`,
+    )
+    .join(", ");
 }

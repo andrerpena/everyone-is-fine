@@ -60,7 +60,7 @@
 - [ ] 39. Add trait system (personality traits that affect behavior and stats)
 - [x] 40. Create skill system (shooting, melee, construction, mining, cooking, etc.) <!-- Ticket 0006 -->
 - [x] 41. Implement skill experience gain and leveling <!-- Ticket 0008 -->
-- [ ] 42. Add passion system (no interest, minor passion, major passion per skill)
+- [x] 42. Add passion system (no interest, minor passion, major passion per skill) <!-- Ticket 0009 -->
 - [ ] 43. Create colonist bio/character sheet panel
 
 ## Phase 4 — Needs System

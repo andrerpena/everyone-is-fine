@@ -87,6 +87,8 @@ export {
   getSkillProgress,
   grantExperience,
   MAX_SKILL_LEVEL,
+  PASSION_XP_MULTIPLIERS,
+  type Passion,
   SKILL_DEFINITIONS,
   type SkillData,
   type SkillDefinition,
