@@ -275,6 +275,9 @@ export class EntityStore {
       ...base,
       ...changes,
       // Deep merge nested objects
+      biography: changes.biography
+        ? { ...base.biography, ...changes.biography }
+        : base.biography,
       movement: changes.movement
         ? { ...base.movement, ...changes.movement }
         : base.movement,

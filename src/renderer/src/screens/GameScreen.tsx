@@ -10,6 +10,7 @@ import {
   useWorld,
   useWorldActions,
 } from "../game-state";
+import { generateColonistIdentity } from "../simulation/colonist-generator";
 import { createCharacter } from "../simulation/types";
 import { useGameColorStore } from "../theming/game-color-store";
 import { generateWorld } from "../world/factories/procedural-generator";
@@ -24,8 +25,6 @@ const DEFAULT_WORLD_CONFIG = {
   seed: 42,
   biome: "temperate_forest" as BiomeType,
 };
-
-const COLONIST_NAMES = ["Alice", "Bob", "Charlie"];
 
 /**
  * Find a cluster of nearby passable tiles for spawning characters.
@@ -123,13 +122,16 @@ export const GameScreen: React.FC = () => {
     );
     if (spawnPositions.length === 0) return;
 
-    // Create demo colonists
+    // Create colonists with procedurally generated identities
+    const identityRng = new SeededRandom(DEFAULT_WORLD_CONFIG.seed + 1000);
     const { colonistPalette, colonistFallback } =
       useGameColorStore.getState().resolved.characters;
     let firstCharacterId: string | null = null;
     spawnPositions.forEach((pos, index) => {
+      const identity = generateColonistIdentity(identityRng);
       const character = createCharacter({
-        name: COLONIST_NAMES[index] ?? `Colonist ${index + 1}`,
+        name: identity.name,
+        biography: identity.biography,
         type: "colonist",
         position: { x: pos.x, y: pos.y, z: currentZLevel },
         color: colonistPalette[index] ?? colonistFallback,

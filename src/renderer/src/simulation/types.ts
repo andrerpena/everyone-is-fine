@@ -22,6 +22,23 @@ export interface Entity {
 /** Character types */
 export type CharacterType = "colonist" | "creature" | "visitor";
 
+/** Character gender */
+export type Gender = "male" | "female";
+
+/** Character biographical identity */
+export interface CharacterBiography {
+  /** Character's first name */
+  firstName: string;
+  /** Optional nickname (displayed in quotes) */
+  nickname: string | null;
+  /** Character's last name */
+  lastName: string;
+  /** Character's age in years */
+  age: number;
+  /** Character's gender */
+  gender: Gender;
+}
+
 /** Character movement state */
 export interface CharacterMovement {
   /** Movement speed in tiles per second */
@@ -63,6 +80,8 @@ export interface CharacterNeeds {
 export interface Character extends Entity {
   type: CharacterType;
   name: string;
+  /** Biographical identity (age, gender, name components) */
+  biography: CharacterBiography;
   /** Visual color for rendering */
   color: number;
   movement: CharacterMovement;
@@ -229,6 +248,13 @@ export function createCharacter(
   return {
     id: generateEntityId("char"),
     type: "colonist",
+    biography: {
+      firstName: options.name,
+      nickname: null,
+      lastName: "",
+      age: 25,
+      gender: "male",
+    },
     color: 0x4a90d9,
     visualOffset: { x: 0, y: 0 },
     movement: {

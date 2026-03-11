@@ -13,49 +13,49 @@
 
 ## Phase 1 — Core Engine & Simulation Foundations
 
-- [ ] 1. Implement game loop with configurable tick rate (ticks per second)
-- [ ] 2. Create Entity-Component-System (ECS) architecture for game objects
-- [ ] 3. Implement tick-based update system with priority ordering
-- [ ] 4. Create event bus for decoupled system communication
-- [ ] 5. Implement game state serialization/deserialization framework
-- [ ] 6. Add save/load game persistence via the existing storage service
-- [ ] 7. Create game speed controls (pause, 1x, 2x, 3x, fast-forward)
-- [ ] 8. Implement deterministic random number generator with seed support
-- [ ] 9. Add performance profiling hooks to the game loop
-- [ ] 10. Create debug overlay showing tick rate, entity count, and system timings
+- [x] 1. Implement game loop with configurable tick rate (ticks per second)
+- [x] 2. ~~Create Entity-Component-System (ECS) architecture for game objects~~ (entity-based object model with specialized systems — sufficient for colony sim)
+- [x] 3. Implement tick-based update system with priority ordering
+- [x] 4. Create event bus for decoupled system communication
+- [x] 5. Implement game state serialization/deserialization framework
+- [x] 6. Add save/load game persistence via the existing storage service
+- [x] 7. Create game speed controls (pause, 1x, 2x, 3x, fast-forward)
+- [x] 8. Implement deterministic random number generator with seed support
+- [ ] 9. Add performance profiling hooks to the game loop <!-- Partial: FPS tracking exists but no per-system timing breakdown -->
+- [ ] 10. Create debug overlay showing tick rate, entity count, and system timings <!-- Partial: FPS chart exists but no entity count or system timings -->
 
 ## Phase 2 — World & Map Basics
 
-- [ ] 11. Define tile data structure (terrain type, elevation, fertility, properties)
-- [ ] 12. Implement tile map grid with configurable dimensions
-- [ ] 13. Create terrain types (soil, rock, sand, water, marsh, gravel)
-- [ ] 14. Implement basic map generation algorithm with terrain distribution
-- [ ] 15. Add elevation/height map generation using noise functions
-- [ ] 16. Create fertility map generation (affects plant growth)
-- [ ] 17. Implement tile rendering with Pixi.js sprite tiles
-- [ ] 18. Add camera controls (pan, zoom) for map navigation
-- [ ] 19. Implement fog of war / unexplored area rendering
-- [ ] 20. Create minimap widget showing overview of the full map
-- [ ] 21. Add tile selection and hover highlighting
-- [ ] 22. Implement coordinate system with world-to-screen conversion
-- [ ] 23. Create map chunk system for efficient rendering of large maps
+- [x] 11. Define tile data structure (terrain type, elevation, fertility, properties)
+- [x] 12. Implement tile map grid with configurable dimensions
+- [x] 13. Create terrain types (soil, rock, sand, water, marsh, gravel)
+- [x] 14. Implement basic map generation algorithm with terrain distribution
+- [x] 15. Add elevation/height map generation using noise functions
+- [x] 16. Create fertility map generation (affects plant growth)
+- [x] 17. Implement tile rendering with Pixi.js sprite tiles
+- [x] 18. Add camera controls (pan, zoom) for map navigation
+- [ ] 19. Implement fog of war / unexplored area rendering <!-- Partial: visibility flags defined but no fog rendering effect -->
+- [x] 20. Create minimap widget showing overview of the full map
+- [x] 21. Add tile selection and hover highlighting
+- [x] 22. Implement coordinate system with world-to-screen conversion
+- [ ] 23. Create map chunk system for efficient rendering of large maps <!-- Types defined but not implemented -->
 - [ ] 24. Add terrain blending between adjacent tile types
-- [ ] 25. Implement natural feature generation (rivers, mountains, caves)
+- [ ] 25. Implement natural feature generation (rivers, mountains, caves) <!-- Partial: trees/bushes/boulders exist, but no rivers/mountains/caves -->
 
 ## Phase 3 — Colonist Fundamentals
 
-- [ ] 26. Define colonist entity with core properties (name, age, gender)
-- [ ] 27. Implement colonist spawning system
-- [ ] 28. Create colonist movement system (grid-based, tile-to-tile)
-- [ ] 29. Implement A* pathfinding algorithm on the tile grid
-- [ ] 30. Add pathfinding cache for frequently traveled routes
-- [ ] 31. Create colonist sprite rendering and animation system
-- [ ] 32. Implement colonist selection (click to select, box select multiple)
+- [x] 26. Define colonist entity with core properties (name, age, gender) <!-- Ticket 0001 -->
+- [x] 27. Implement colonist spawning system
+- [x] 28. Create colonist movement system (grid-based, tile-to-tile)
+- [x] 29. Implement A* pathfinding algorithm on the tile grid
+- [x] 30. Add pathfinding cache for frequently traveled routes
+- [ ] 31. Create colonist sprite rendering and animation system <!-- Partial: static sprite rendering exists, no animation -->
+- [x] 32. Implement colonist selection (click to select, box select multiple)
 - [ ] 33. Add colonist info panel showing basic stats
-- [ ] 34. Create colonist list/roster panel widget
-- [ ] 35. Implement movement speed modifiers based on terrain type
+- [x] 34. Create colonist list/roster panel widget
+- [ ] 35. Implement movement speed modifiers based on terrain type <!-- Partial: movementCost exists on terrain, integration unclear -->
 - [ ] 36. Add idle wandering behavior for colonists with no tasks
-- [ ] 37. Create colonist name generator (first name + nickname + last name)
+- [x] 37. Create colonist name generator (first name + nickname + last name) <!-- Ticket 0001 -->
 - [ ] 38. Implement backstory system (childhood + adulthood backstories)
 - [ ] 39. Add trait system (personality traits that affect behavior and stats)
 - [ ] 40. Create skill system (shooting, melee, construction, mining, cooking, etc.)

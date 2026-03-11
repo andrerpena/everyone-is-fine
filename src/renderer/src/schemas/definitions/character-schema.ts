@@ -22,6 +22,14 @@ export const characterSchema = nu
     type: nu.string().withMetadata({
       label: "Type",
     }),
+    age: nu.number().withMetadata({
+      label: "Age",
+      renderer: "readonly",
+    }),
+    gender: nu.string().withMetadata({
+      label: "Gender",
+      renderer: "readonly",
+    }),
     position: nu.string().withMetadata({
       label: "Position",
       renderer: "readonly",
