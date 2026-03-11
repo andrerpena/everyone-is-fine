@@ -24,6 +24,7 @@ export {
   createMineJob,
   createMoveJob,
   generateJobId,
+  HarvestingSystem,
   HaulingSystem,
   type Job,
   JobProcessor,

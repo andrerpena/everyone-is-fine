@@ -136,7 +136,7 @@
 - [x] 100. Create crop types (rice, potatoes, corn, strawberries, healroot) <!-- Ticket 0038: included in plant growth system -->
 - [x] 101. Add soil fertility affecting crop growth speed <!-- Ticket 0038: terrain moisture affects growth rate -->
 - [x] 102. Implement sowing job (colonists plant seeds in growing zones) <!-- Ticket 0039 -->
-- [ ] 103. Implement harvesting job (colonists gather mature crops)
+- [x] 103. Implement harvesting job (colonists gather mature crops) <!-- Ticket 0040 -->
 - [ ] 104. Create cooking workstation (campfire, fueled stove, electric stove)
 - [ ] 105. Implement cooking job (convert raw food into meals)
 - [ ] 106. Create meal types (simple meal, fine meal, lavish meal, nutrient paste)

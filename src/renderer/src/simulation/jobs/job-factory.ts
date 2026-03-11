@@ -211,6 +211,46 @@ export function createSowJob(
 }
 
 /**
+ * Create a "harvest crop" job.
+ * Steps: move adjacent → work 180 ticks (~3s at 60 TPS) → harvest crop (remove + spawn yield)
+ */
+export function createHarvestJob(
+  characterId: EntityId,
+  target: Position3D,
+  cropType: CropType,
+): Job {
+  return {
+    id: generateJobId(),
+    type: "harvest",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: target,
+        adjacent: true,
+        status: "pending",
+      },
+      {
+        type: "work",
+        totalTicks: 180,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "harvest_crop",
+        position: target,
+        cropType,
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/**
  * Create a "haul item" job.
  * Steps: move to source → pick up item → move to destination → drop item
  */

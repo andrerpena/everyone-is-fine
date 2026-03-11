@@ -19,6 +19,7 @@ import {
 import type { EntityStore } from "../entity-store";
 import type { MovementSystem } from "../movement";
 import { findPath } from "../pathfinding";
+import { CROP_REGISTRY } from "../plants/crop-registry";
 import {
   BASE_WORK_XP,
   getWorkSpeedMultiplier,
@@ -29,6 +30,7 @@ import { createMoveCommand, type EntityId } from "../types";
 import { ReservationSystem } from "./reservation-system";
 import type {
   DropItemStep,
+  HarvestCropStep,
   Job,
   JobProgressInfo,
   MoveStep,
@@ -256,6 +258,10 @@ export class JobProcessor {
 
       case "plant_crop":
         this.executePlantCrop(characterId, job, step);
+        break;
+
+      case "harvest_crop":
+        this.executeHarvestCrop(characterId, job, step);
         break;
     }
   }
@@ -539,6 +545,63 @@ export class JobProcessor {
       stage: "seedling",
       plantedDay: world.time.day,
     };
+
+    // Notify store so rendering updates
+    this.updateTile(
+      { x: step.position.x, y: step.position.y },
+      step.position.z,
+      {},
+    );
+
+    step.status = "completed";
+    this.advanceToNextStep(characterId, job);
+  }
+
+  // ===========================================================================
+  // HARVEST CROP STEP
+  // ===========================================================================
+
+  private executeHarvestCrop(
+    characterId: EntityId,
+    job: Job,
+    step: HarvestCropStep,
+  ): void {
+    const world = this.getWorld();
+    if (!world) {
+      this.failJob(characterId, job, "World not initialized");
+      return;
+    }
+
+    const tile = getWorldTileAt(
+      world,
+      step.position.x,
+      step.position.y,
+      step.position.z,
+    );
+    if (!tile) {
+      this.failJob(characterId, job, "Tile not found");
+      return;
+    }
+
+    if (!tile.crop || tile.crop.stage !== "mature") {
+      this.failJob(characterId, job, "No mature crop to harvest");
+      return;
+    }
+
+    // Look up yield from crop registry
+    const props = CROP_REGISTRY[step.cropType];
+
+    // Remove the crop
+    tile.crop = null;
+
+    // Spawn yield items
+    addItemToTile(tile, {
+      id: `item_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      type: props.yieldType,
+      quantity: props.yieldQuantity,
+      quality: 1,
+      condition: 1,
+    });
 
     // Notify store so rendering updates
     this.updateTile(

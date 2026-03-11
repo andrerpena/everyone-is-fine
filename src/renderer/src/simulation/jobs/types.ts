@@ -118,6 +118,15 @@ export interface PlantCropStep {
   status: StepStatus;
 }
 
+export interface HarvestCropStep {
+  type: "harvest_crop";
+  /** Tile to harvest from */
+  position: Position3D;
+  /** Which crop is being harvested (for yield lookup) */
+  cropType: CropType;
+  status: StepStatus;
+}
+
 export type JobStep =
   | MoveStep
   | WorkStep
@@ -126,7 +135,8 @@ export type JobStep =
   | RestoreNeedStep
   | PickupItemStep
   | DropItemStep
-  | PlantCropStep;
+  | PlantCropStep
+  | HarvestCropStep;
 
 // =============================================================================
 // ACTION RULES - Declarative matching for tile → actions

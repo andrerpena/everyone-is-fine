@@ -13,6 +13,7 @@ import {
   findPath,
   GameNotifications,
   getOutdoorTemperature,
+  HarvestingSystem,
   HaulingSystem,
   IdleBehaviorSystem,
   ItemDeteriorationSystem,
@@ -709,6 +710,11 @@ const idleBehavior = new IdleBehaviorSystem(
   () => useGameStore.getState().world,
 );
 
+const harvestingSystem = new HarvestingSystem(
+  entityStore,
+  jobProcessor,
+  () => useGameStore.getState().world,
+);
 const sowingSystem = new SowingSystem(
   entityStore,
   jobProcessor,
@@ -797,6 +803,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
 
   // Auto-assign sowing jobs to idle colonists in growing zones
   sowingSystem.update();
+
+  // Auto-assign harvest jobs for mature crops
+  harvestingSystem.update();
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();
