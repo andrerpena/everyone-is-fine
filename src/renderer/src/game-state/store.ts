@@ -70,7 +70,18 @@ const initialState = {
 // MOVEMENT SYSTEM & JOB PROCESSOR SETUP
 // =============================================================================
 
-const movementSystem = new MovementSystem(entityStore);
+/** Look up terrain movement cost at a world position */
+function getTerrainMovementCost(position: Position3D): number {
+  const world = useGameStore.getState().world;
+  if (!world) return 1;
+  const level = world.levels.get(position.z);
+  if (!level) return 1;
+  const index = position.y * level.width + position.x;
+  const tile = level.tiles[index];
+  return tile?.pathfinding?.movementCost ?? 1;
+}
+
+const movementSystem = new MovementSystem(entityStore, getTerrainMovementCost);
 
 // =============================================================================
 // STORE CREATION

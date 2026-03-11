@@ -53,7 +53,7 @@
 - [x] 32. Implement colonist selection (click to select, box select multiple)
 - [x] 33. Add colonist info panel showing basic stats <!-- Ticket 0003 -->
 - [x] 34. Create colonist list/roster panel widget
-- [ ] 35. Implement movement speed modifiers based on terrain type <!-- Partial: movementCost exists on terrain, integration unclear -->
+- [x] 35. Implement movement speed modifiers based on terrain type <!-- Ticket 0004 -->
 - [ ] 36. Add idle wandering behavior for colonists with no tasks
 - [x] 37. Create colonist name generator (first name + nickname + last name) <!-- Ticket 0001 -->
 - [ ] 38. Implement backstory system (childhood + adulthood backstories)

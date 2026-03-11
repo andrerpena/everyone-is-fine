@@ -22,6 +22,9 @@ import type { Character, EntityId, MoveCommand } from "../types";
 export class MovementSystem {
   private entityStore: EntityStore;
 
+  /** Callback to look up terrain movement cost at a position (default: 1) */
+  private getMovementCost: (position: Position3D) => number;
+
   /** Callback when a character's position changes */
   onPositionChange: ((id: EntityId, character: Character) => void) | null =
     null;
@@ -30,8 +33,12 @@ export class MovementSystem {
   onMovementComplete: ((id: EntityId, character: Character) => void) | null =
     null;
 
-  constructor(entityStore: EntityStore) {
+  constructor(
+    entityStore: EntityStore,
+    getMovementCost?: (position: Position3D) => number,
+  ) {
     this.entityStore = entityStore;
+    this.getMovementCost = getMovementCost ?? (() => 1);
   }
 
   /**
@@ -72,8 +79,12 @@ export class MovementSystem {
     const dy = nextWaypoint.y - currentWaypoint.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    // Progress per tick based on speed
-    const progressIncrement = (speed * deltaTime) / distance;
+    // Apply terrain movement cost to effective speed
+    const terrainCost = this.getMovementCost(nextWaypoint);
+    const effectiveSpeed = speed / terrainCost;
+
+    // Progress per tick based on effective speed
+    const progressIncrement = (effectiveSpeed * deltaTime) / distance;
 
     // Update progress
     const newProgress = movement.progress + progressIncrement;
