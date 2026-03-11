@@ -40,6 +40,7 @@ export interface AgentCharacterInfo {
     energy: number;
     mood: number;
     comfort: number;
+    recreation: number;
   };
   biography: AgentBiography;
   traits: string[];
@@ -187,6 +188,7 @@ export interface GameAgentApi {
         energy?: number;
         mood?: number;
         comfort?: number;
+        recreation?: number;
       };
     },
   ) => AgentCharacterInfo;

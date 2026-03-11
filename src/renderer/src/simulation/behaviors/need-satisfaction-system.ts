@@ -12,6 +12,7 @@ import type { JobProcessor } from "../jobs";
 import {
   createEatJob,
   createForageJob,
+  createRelaxJob,
   createSleepJob,
 } from "../jobs/job-factory";
 import { getNeedThreshold } from "../needs/needs-config";
@@ -50,11 +51,12 @@ export class NeedSatisfactionSystem {
       // If the character has an active job, check if a critical need should interrupt it
       const activeJob = this.jobProcessor.getJob(character.id);
       if (activeJob) {
-        // Never interrupt need-satisfying jobs (forage, eat, sleep)
+        // Never interrupt need-satisfying jobs (forage, eat, sleep, relax)
         if (
           activeJob.type === "forage" ||
           activeJob.type === "eat" ||
-          activeJob.type === "sleep"
+          activeJob.type === "sleep" ||
+          activeJob.type === "relax"
         )
           continue;
 
@@ -85,6 +87,9 @@ export class NeedSatisfactionSystem {
         case "sleep":
           this.trySleep(character);
           break;
+        case "relax":
+          this.tryRelax(character);
+          break;
       }
     }
   }
@@ -92,14 +97,17 @@ export class NeedSatisfactionSystem {
   /**
    * Determine which need-satisfying action is most urgent.
    * Returns null if no needs are below threshold.
-   * Priority: hunger/energy (whichever is lower) > comfort
+   * Priority: hunger/energy (whichever is lower) > comfort > recreation
    */
-  private getMostUrgentAction(character: Character): "forage" | "sleep" | null {
-    const { hunger, energy, comfort } = character.needs;
+  private getMostUrgentAction(
+    character: Character,
+  ): "forage" | "sleep" | "relax" | null {
+    const { hunger, energy, comfort, recreation } = character.needs;
 
     const hungerLow = hunger < NEED_THRESHOLD;
     const energyLow = energy < NEED_THRESHOLD;
     const comfortLow = comfort < NEED_THRESHOLD;
+    const recreationLow = recreation < NEED_THRESHOLD;
 
     // Check hunger and energy first (vital needs)
     if (hungerLow && energyLow) {
@@ -110,6 +118,9 @@ export class NeedSatisfactionSystem {
 
     // Comfort is lower priority — satisfied by sleeping (preferably on a bed)
     if (comfortLow) return "sleep";
+
+    // Recreation is lowest priority — satisfied by relaxing
+    if (recreationLow) return "relax";
 
     return null;
   }
@@ -221,6 +232,14 @@ export class NeedSatisfactionSystem {
       const job = createSleepJob(character.id, character.position, false);
       this.jobProcessor.assignJob(job);
     }
+  }
+
+  /**
+   * Relax at the current position to restore recreation.
+   */
+  private tryRelax(character: Character): void {
+    const job = createRelaxJob(character.id, character.position);
+    this.jobProcessor.assignJob(job);
   }
 
   /**

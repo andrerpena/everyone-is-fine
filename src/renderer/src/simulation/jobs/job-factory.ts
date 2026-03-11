@@ -248,6 +248,42 @@ export function createSleepJob(
 }
 
 /**
+ * Create a "relax" job to restore recreation.
+ * Steps: move to target → idle (work) 300 ticks → restore recreation
+ */
+export function createRelaxJob(characterId: EntityId, target: Position3D): Job {
+  return {
+    id: generateJobId(),
+    type: "relax",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: target,
+        adjacent: false,
+        status: "pending",
+      },
+      {
+        type: "work",
+        totalTicks: 300,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "restore_need",
+        needId: "recreation",
+        amount: 0.3,
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/**
  * Create a "cook meal" job.
  * The CookingSystem removes raw food before assigning this job.
  * Steps: move adjacent to campfire → work 180 ticks → spawn meal_simple
