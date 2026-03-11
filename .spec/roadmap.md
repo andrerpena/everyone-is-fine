@@ -165,7 +165,7 @@
 - [ ] 126. Add mining job (dig into rock tiles, yield stone chunks and ores)
 - [ ] 127. Create smoothing job (smooth rough stone floors and walls)
 - [ ] 128. Implement building repair system
-- [ ] 129. Add building quality based on constructor skill level
+- [x] 129. Add building quality based on constructor skill level
 - [ ] 130. Create architect/build menu UI for placing buildings
 - [ ] 131. Implement resource cost checking before allowing placement
 - [ ] 132. Add roof system (auto-roofing enclosed areas, roof collapse on large spans)

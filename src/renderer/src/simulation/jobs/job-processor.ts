@@ -22,6 +22,7 @@ import type { EntityStore } from "../entity-store";
 import type { MovementSystem } from "../movement";
 import { findPath } from "../pathfinding";
 import { CROP_REGISTRY } from "../plants/crop-registry";
+import { calculateQualityFromSkill } from "../quality";
 import {
   BASE_WORK_XP,
   getWorkSpeedMultiplier,
@@ -652,11 +653,17 @@ export class JobProcessor {
       return;
     }
 
+    // Calculate build quality from constructor's skill
+    const character = this.entityStore.get(characterId);
+    const constructionLevel = character?.skills.construction?.level ?? 0;
+    const quality = calculateQualityFromSkill(constructionLevel);
+
     // Place the structure
     const props = STRUCTURE_REGISTRY[step.structureType];
     tile.structure = {
       type: step.structureType,
       health: props.maxHealth,
+      quality,
       rotation: 0,
     };
 

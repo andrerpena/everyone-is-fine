@@ -139,6 +139,7 @@ export interface StructureData {
   type: StructureType;
   material?: MaterialType;
   health: number; // Current health
+  quality?: number; // 0-1 build quality (from builder skill), affects beauty/value
   ownerId?: EntityId; // For furniture ownership
   isOpen?: boolean; // For doors
   rotation: 0 | 90 | 180 | 270; // Degrees

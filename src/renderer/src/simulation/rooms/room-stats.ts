@@ -32,11 +32,12 @@ export function calculateRoomStats(room: Room, level: ZLevel): RoomStats {
     const tile = level.tiles[index];
     if (!tile) continue;
 
-    // Structure beauty and value
+    // Structure beauty and value (scaled by build quality)
     if (tile.structure) {
       const props = STRUCTURE_REGISTRY[tile.structure.type];
-      totalBeauty += props.beauty;
-      totalWealth += props.baseValue;
+      const quality = tile.structure.quality ?? 1;
+      totalBeauty += props.beauty * quality;
+      totalWealth += props.baseValue * quality;
     }
 
     // Item wealth
