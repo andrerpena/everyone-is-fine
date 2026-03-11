@@ -8,7 +8,13 @@
 // =============================================================================
 
 /** Identifiers for character needs */
-export type NeedId = "hunger" | "energy" | "mood" | "comfort" | "recreation";
+export type NeedId =
+  | "hunger"
+  | "energy"
+  | "mood"
+  | "comfort"
+  | "recreation"
+  | "social";
 
 /** Threshold levels from satisfied to critical */
 export type NeedThreshold = "satisfied" | "minor" | "major" | "critical";
@@ -34,12 +40,14 @@ export interface NeedConfig {
  * - Energy:  ~21 minutes (0.0008/s)
  * - Comfort:    ~33 minutes (0.0005/s)
  * - Recreation: ~42 minutes (0.0004/s)
+ * - Social:     ~56 minutes (0.0003/s)
  */
 export const NEED_CONFIGS: readonly NeedConfig[] = [
   { id: "hunger", label: "Hunger", decayPerSecond: 0.001 },
   { id: "energy", label: "Energy", decayPerSecond: 0.0008 },
   { id: "comfort", label: "Comfort", decayPerSecond: 0.0005 },
   { id: "recreation", label: "Recreation", decayPerSecond: 0.0004 },
+  { id: "social", label: "Social", decayPerSecond: 0.0003 },
 ] as const;
 
 // =============================================================================

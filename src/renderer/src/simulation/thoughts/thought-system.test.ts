@@ -71,6 +71,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);
@@ -86,6 +87,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);
@@ -101,6 +103,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);
@@ -115,6 +118,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);
@@ -129,6 +133,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);
@@ -143,6 +148,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);
@@ -157,6 +163,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);
@@ -174,6 +181,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);
@@ -189,6 +197,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);
@@ -204,6 +213,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);
@@ -219,6 +229,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);
@@ -233,6 +244,7 @@ describe("evaluateConditionThoughts", () => {
         mood: 0.5,
         comfort: 0.5,
         recreation: 0.5,
+        social: 0.5,
       },
     });
     const thoughts = evaluateConditionThoughts(char);

@@ -625,6 +625,7 @@ function createAgentApi(): GameAgentApi {
               mood: options.needs.mood ?? 1,
               comfort: options.needs.comfort ?? 1,
               recreation: options.needs.recreation ?? 1,
+              social: options.needs.social ?? 1,
             }
           : undefined,
       });

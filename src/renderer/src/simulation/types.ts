@@ -82,6 +82,8 @@ export interface CharacterNeeds {
   comfort: number;
   /** Recreation level (0-1, 1 = entertained) */
   recreation: number;
+  /** Social level (0-1, 1 = socially fulfilled) */
+  social: number;
 }
 
 /** Mental break types */
@@ -300,6 +302,7 @@ export function createCharacter(
       mood: 1,
       comfort: 1,
       recreation: 1,
+      social: 1,
     },
     skills: createDefaultSkills(),
     traits: [],

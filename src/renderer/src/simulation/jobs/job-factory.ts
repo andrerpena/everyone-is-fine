@@ -284,6 +284,45 @@ export function createRelaxJob(characterId: EntityId, target: Position3D): Job {
 }
 
 /**
+ * Create a "socialize" job to restore the social need.
+ * Steps: move adjacent to another colonist → chat (work) 200 ticks → restore social
+ */
+export function createSocializeJob(
+  characterId: EntityId,
+  target: Position3D,
+): Job {
+  return {
+    id: generateJobId(),
+    type: "socialize",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: target,
+        adjacent: true,
+        status: "pending",
+      },
+      {
+        type: "work",
+        totalTicks: 200,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "restore_need",
+        needId: "social",
+        amount: 0.35,
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/**
  * Create a "cook meal" job.
  * The CookingSystem removes raw food before assigning this job.
  * Steps: move adjacent to campfire → work 180 ticks → spawn meal_simple

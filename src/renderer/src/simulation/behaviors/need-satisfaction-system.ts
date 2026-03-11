@@ -14,6 +14,7 @@ import {
   createForageJob,
   createRelaxJob,
   createSleepJob,
+  createSocializeJob,
 } from "../jobs/job-factory";
 import { getNeedThreshold } from "../needs/needs-config";
 import type { Character } from "../types";
@@ -30,6 +31,9 @@ const FORAGE_SEARCH_RADIUS = 20;
 
 /** Maximum distance (in tiles) to search for a bed */
 const BED_SEARCH_RADIUS = 30;
+
+/** Maximum distance (in tiles) to search for another colonist to socialize with */
+const SOCIALIZE_SEARCH_RADIUS = 25;
 
 // =============================================================================
 // NEED SATISFACTION SYSTEM
@@ -51,12 +55,13 @@ export class NeedSatisfactionSystem {
       // If the character has an active job, check if a critical need should interrupt it
       const activeJob = this.jobProcessor.getJob(character.id);
       if (activeJob) {
-        // Never interrupt need-satisfying jobs (forage, eat, sleep, relax)
+        // Never interrupt need-satisfying jobs
         if (
           activeJob.type === "forage" ||
           activeJob.type === "eat" ||
           activeJob.type === "sleep" ||
-          activeJob.type === "relax"
+          activeJob.type === "relax" ||
+          activeJob.type === "socialize"
         )
           continue;
 
@@ -90,6 +95,9 @@ export class NeedSatisfactionSystem {
         case "relax":
           this.tryRelax(character);
           break;
+        case "socialize":
+          this.trySocialize(character);
+          break;
       }
     }
   }
@@ -97,17 +105,18 @@ export class NeedSatisfactionSystem {
   /**
    * Determine which need-satisfying action is most urgent.
    * Returns null if no needs are below threshold.
-   * Priority: hunger/energy (whichever is lower) > comfort > recreation
+   * Priority: hunger/energy (whichever is lower) > comfort > recreation > social
    */
   private getMostUrgentAction(
     character: Character,
-  ): "forage" | "sleep" | "relax" | null {
-    const { hunger, energy, comfort, recreation } = character.needs;
+  ): "forage" | "sleep" | "relax" | "socialize" | null {
+    const { hunger, energy, comfort, recreation, social } = character.needs;
 
     const hungerLow = hunger < NEED_THRESHOLD;
     const energyLow = energy < NEED_THRESHOLD;
     const comfortLow = comfort < NEED_THRESHOLD;
     const recreationLow = recreation < NEED_THRESHOLD;
+    const socialLow = social < NEED_THRESHOLD;
 
     // Check hunger and energy first (vital needs)
     if (hungerLow && energyLow) {
@@ -119,8 +128,11 @@ export class NeedSatisfactionSystem {
     // Comfort is lower priority — satisfied by sleeping (preferably on a bed)
     if (comfortLow) return "sleep";
 
-    // Recreation is lowest priority — satisfied by relaxing
+    // Recreation — satisfied by relaxing
     if (recreationLow) return "relax";
+
+    // Social is lowest priority — satisfied by socializing with another colonist
+    if (socialLow) return "socialize";
 
     return null;
   }
@@ -232,6 +244,35 @@ export class NeedSatisfactionSystem {
       const job = createSleepJob(character.id, character.position, false);
       this.jobProcessor.assignJob(job);
     }
+  }
+
+  /**
+   * Socialize with a nearby idle colonist to restore social need.
+   */
+  private trySocialize(character: Character): void {
+    let bestDist = Number.POSITIVE_INFINITY;
+    let bestTarget: Character | null = null;
+
+    for (const other of this.entityStore.values()) {
+      if (other.id === character.id) continue;
+      if (other.position.z !== character.position.z) continue;
+      // Prefer idle colonists, but allow socializing with any colonist
+      if (other.mentalBreak !== null) continue;
+
+      const dist =
+        Math.abs(other.position.x - character.position.x) +
+        Math.abs(other.position.y - character.position.y);
+      if (dist > SOCIALIZE_SEARCH_RADIUS) continue;
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestTarget = other;
+      }
+    }
+
+    if (!bestTarget) return;
+
+    const job = createSocializeJob(character.id, bestTarget.position);
+    this.jobProcessor.assignJob(job);
   }
 
   /**
