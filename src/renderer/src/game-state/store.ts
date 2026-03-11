@@ -11,6 +11,7 @@ import {
   advanceTime,
   entityStore,
   findPath,
+  GameNotifications,
   IdleBehaviorSystem,
   MentalBreakSystem,
   MoodThoughtSystem,
@@ -701,6 +702,12 @@ const idleBehavior = new IdleBehaviorSystem(
 );
 
 // =============================================================================
+// GAME NOTIFICATIONS SETUP
+// =============================================================================
+
+const gameNotifications = new GameNotifications(entityStore);
+
+// =============================================================================
 // NEEDS SYSTEM SETUP
 // =============================================================================
 
@@ -777,6 +784,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
     },
   }));
   const t3 = performance.now();
+
+  // --- Game event notifications (throttled internally) ---
+  gameNotifications.update();
 
   // --- Push metrics (throttled) ---
   tickCountSinceLastUpdate++;
