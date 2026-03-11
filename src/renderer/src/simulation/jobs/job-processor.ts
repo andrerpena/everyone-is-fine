@@ -33,6 +33,7 @@ import type {
   JobProgressInfo,
   MoveStep,
   PickupItemStep,
+  PlantCropStep,
   RestoreNeedStep,
   SpawnItemsStep,
   TransformTileStep,
@@ -251,6 +252,10 @@ export class JobProcessor {
 
       case "drop_item":
         this.executeDropItem(characterId, job, step);
+        break;
+
+      case "plant_crop":
+        this.executePlantCrop(characterId, job, step);
         break;
     }
   }
@@ -489,6 +494,51 @@ export class JobProcessor {
 
     addItemToTile(tile, carried);
     this.carriedItems.delete(characterId);
+
+    // Notify store so rendering updates
+    this.updateTile(
+      { x: step.position.x, y: step.position.y },
+      step.position.z,
+      {},
+    );
+
+    step.status = "completed";
+    this.advanceToNextStep(characterId, job);
+  }
+
+  // ===========================================================================
+  // PLANT CROP STEP
+  // ===========================================================================
+
+  private executePlantCrop(
+    characterId: EntityId,
+    job: Job,
+    step: PlantCropStep,
+  ): void {
+    const world = this.getWorld();
+    if (!world) {
+      this.failJob(characterId, job, "World not initialized");
+      return;
+    }
+
+    const tile = getWorldTileAt(
+      world,
+      step.position.x,
+      step.position.y,
+      step.position.z,
+    );
+    if (!tile) {
+      this.failJob(characterId, job, "Tile not found");
+      return;
+    }
+
+    // Plant the crop
+    tile.crop = {
+      type: step.cropType,
+      growthProgress: 0,
+      stage: "seedling",
+      plantedDay: world.time.day,
+    };
 
     // Notify store so rendering updates
     this.updateTile(

@@ -749,6 +749,14 @@ function createAgentApi(): GameAgentApi {
     // PLANT MANAGEMENT
     // =========================================================================
 
+    setGrowingZoneCrop(zoneId: string, cropType: string) {
+      const zone = useZoneStore.getState().zones.get(zoneId);
+      if (!zone || zone.type !== "growing") {
+        throw new Error(`Zone "${zoneId}" not found or is not a growing zone`);
+      }
+      useZoneStore.getState().setGrowingZoneCrop(zoneId, cropType);
+    },
+
     plantCrop(x: number, y: number, cropType: string, z?: number) {
       const state = useGameStore.getState();
       const world = state.world;

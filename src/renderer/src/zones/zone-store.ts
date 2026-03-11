@@ -35,6 +35,8 @@ interface ZoneActions {
   getAllZones: () => ZoneData[];
   /** Update the stockpile filter for a zone */
   setStockpileFilter: (zoneId: string, filter: StockpileFilter) => void;
+  /** Set the crop type for a growing zone */
+  setGrowingZoneCrop: (zoneId: string, cropType: string) => void;
   /** Clear all zones */
   clearAll: () => void;
 }
@@ -60,6 +62,7 @@ export const useZoneStore = create<ZoneStore>()((set, get) => ({
       zLevel,
       tiles: new Set(),
       ...(type === "stockpile" ? { filter: createDefaultFilter() } : {}),
+      ...(type === "growing" ? { cropType: "potato" as const } : {}),
     };
 
     set((state) => ({
@@ -165,6 +168,21 @@ export const useZoneStore = create<ZoneStore>()((set, get) => ({
     set((state) => {
       const newZones = new Map(state.zones);
       newZones.set(zoneId, { ...zone, filter });
+      return { zones: newZones };
+    });
+  },
+
+  setGrowingZoneCrop: (zoneId, cropType) => {
+    const { zones } = get();
+    const zone = zones.get(zoneId);
+    if (!zone || zone.type !== "growing") return;
+
+    set((state) => {
+      const newZones = new Map(state.zones);
+      newZones.set(zoneId, {
+        ...zone,
+        cropType: cropType as ZoneData["cropType"],
+      });
       return { zones: newZones };
     });
   },

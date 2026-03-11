@@ -2,6 +2,7 @@
 // ZONE TYPES
 // =============================================================================
 
+import type { CropType } from "../world/types";
 import type { StockpileFilter } from "./stockpile-filter";
 
 /** Types of zones that can be designated */
@@ -20,6 +21,8 @@ export interface ZoneData {
   tiles: Set<ZoneTileKey>;
   /** Item filter for stockpile zones (only meaningful when type === "stockpile") */
   filter?: StockpileFilter;
+  /** Crop type for growing zones (only meaningful when type === "growing") */
+  cropType?: CropType;
 }
 
 /** Zone display colors (semi-transparent overlays) */

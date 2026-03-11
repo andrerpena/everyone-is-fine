@@ -2,7 +2,7 @@
 // JOB FACTORY - Creates concrete job instances
 // =============================================================================
 
-import type { Position3D } from "../../world/types";
+import type { CropType, Position3D } from "../../world/types";
 import type { EntityId } from "../types";
 import { generateJobId, type Job } from "./types";
 
@@ -164,6 +164,46 @@ export function createMoveJob(characterId: EntityId, target: Position3D): Job {
         type: "move",
         destination: target,
         adjacent: false,
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/**
+ * Create a "sow crop" job.
+ * Steps: move to tile → work 150 ticks (~2.5s at 60 TPS) → plant crop
+ */
+export function createSowJob(
+  characterId: EntityId,
+  target: Position3D,
+  cropType: CropType,
+): Job {
+  return {
+    id: generateJobId(),
+    type: "sow",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: target,
+        adjacent: false,
+        status: "pending",
+      },
+      {
+        type: "work",
+        totalTicks: 150,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "plant_crop",
+        position: target,
+        cropType,
         status: "pending",
       },
     ],

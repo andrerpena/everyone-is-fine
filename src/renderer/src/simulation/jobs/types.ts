@@ -2,7 +2,7 @@
 // JOB SYSTEM TYPES
 // =============================================================================
 
-import type { ItemType, Position3D } from "../../world/types";
+import type { CropType, ItemType, Position3D } from "../../world/types";
 import type { EntityId } from "../types";
 
 // =============================================================================
@@ -109,6 +109,15 @@ export interface DropItemStep {
   status: StepStatus;
 }
 
+export interface PlantCropStep {
+  type: "plant_crop";
+  /** Tile to plant on */
+  position: Position3D;
+  /** Which crop to plant */
+  cropType: CropType;
+  status: StepStatus;
+}
+
 export type JobStep =
   | MoveStep
   | WorkStep
@@ -116,7 +125,8 @@ export type JobStep =
   | SpawnItemsStep
   | RestoreNeedStep
   | PickupItemStep
-  | DropItemStep;
+  | DropItemStep
+  | PlantCropStep;
 
 // =============================================================================
 // ACTION RULES - Declarative matching for tile → actions

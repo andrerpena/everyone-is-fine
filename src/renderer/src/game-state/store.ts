@@ -23,6 +23,7 @@ import {
   NeedsSystem,
   PlantGrowthSystem,
   SnowAccumulationSystem,
+  SowingSystem,
   simulationLoop,
   WEATHER_TEMP_MODIFIERS,
   WeatherSystem,
@@ -708,6 +709,11 @@ const idleBehavior = new IdleBehaviorSystem(
   () => useGameStore.getState().world,
 );
 
+const sowingSystem = new SowingSystem(
+  entityStore,
+  jobProcessor,
+  () => useGameStore.getState().world,
+);
 const haulingSystem = new HaulingSystem(
   entityStore,
   jobProcessor,
@@ -788,6 +794,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
 
   // Auto-assign hauling jobs to idle colonists
   haulingSystem.update();
+
+  // Auto-assign sowing jobs to idle colonists in growing zones
+  sowingSystem.update();
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();

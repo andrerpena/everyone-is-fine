@@ -238,6 +238,7 @@ export interface GameAgentApi {
 
   // Plant management
   plantCrop: (x: number, y: number, cropType: string, z?: number) => void;
+  setGrowingZoneCrop: (zoneId: string, cropType: string) => void;
 
   // Low-level command access
   commands: {

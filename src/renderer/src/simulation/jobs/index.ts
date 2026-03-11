@@ -15,6 +15,7 @@ export {
   createMineJob,
   createMoveJob,
   createSleepJob,
+  createSowJob,
 } from "./job-factory";
 // Job processor
 export { JobProcessor } from "./job-processor";
@@ -22,6 +23,8 @@ export { JobProcessor } from "./job-processor";
 export { JobQueue, jobQueue } from "./job-queue";
 // Reservation system
 export { ReservationSystem } from "./reservation-system";
+// Sowing system
+export { SowingSystem } from "./sowing-system";
 // Types
 export type {
   Action,
@@ -33,6 +36,7 @@ export type {
   JobStep,
   MoveStep,
   PickupItemStep,
+  PlantCropStep,
   RestoreNeedStep,
   SpawnItemsStep,
   StepStatus,

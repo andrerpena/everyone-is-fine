@@ -34,6 +34,7 @@ export {
   jobQueue,
   ReservationSystem,
   resolveActions,
+  SowingSystem,
 } from "./jobs";
 // Movement
 export {
