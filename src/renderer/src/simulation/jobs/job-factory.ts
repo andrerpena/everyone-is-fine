@@ -248,6 +248,46 @@ export function createSleepJob(
 }
 
 /**
+ * Create a "cook meal" job.
+ * The CookingSystem removes raw food before assigning this job.
+ * Steps: move adjacent to campfire → work 180 ticks → spawn meal_simple
+ */
+export function createCookJob(
+  characterId: EntityId,
+  campfirePos: Position3D,
+): Job {
+  return {
+    id: generateJobId(),
+    type: "cook",
+    characterId,
+    targetPosition: campfirePos,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: campfirePos,
+        adjacent: true,
+        status: "pending",
+      },
+      {
+        type: "work",
+        totalTicks: 180,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "spawn_items",
+        position: campfirePos,
+        items: [{ type: "meal_simple", quantity: 1 }],
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/**
  * Create a simple "move" job.
  * Steps: move to destination
  */

@@ -137,8 +137,8 @@
 - [x] 101. Add soil fertility affecting crop growth speed <!-- Ticket 0038: terrain moisture affects growth rate -->
 - [x] 102. Implement sowing job (colonists plant seeds in growing zones) <!-- Ticket 0039 -->
 - [x] 103. Implement harvesting job (colonists gather mature crops) <!-- Ticket 0040 -->
-- [ ] 104. Create cooking workstation (campfire, fueled stove, electric stove)
-- [ ] 105. Implement cooking job (convert raw food into meals)
+- [x] 104. Create cooking workstation (campfire, fueled stove, electric stove)
+- [x] 105. Implement cooking job (convert raw food into meals)
 - [ ] 106. Create meal types (simple meal, fine meal, lavish meal, nutrient paste)
 - [x] 107. Implement eating action (colonist picks up food, sits, eats, restores hunger) <!-- Ticket 0042 -->
 - [ ] 108. Add food poisoning chance based on cooking skill

@@ -288,6 +288,7 @@ export const JOB_SKILL_MAP: Partial<Record<string, SkillId>> = {
   build: "construction",
   build_floor: "construction",
   deconstruct: "construction",
+  cook: "cooking",
 };
 
 /** Base XP granted per completed work step */

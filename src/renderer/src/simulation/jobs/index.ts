@@ -7,6 +7,8 @@ export { resolveActions } from "./action-resolver";
 export { ACTION_RULES } from "./action-rules";
 // Construction system
 export { ConstructionSystem } from "./construction-system";
+// Cooking system
+export { CookingSystem } from "./cooking-system";
 // Harvesting system
 export { HarvestingSystem } from "./harvesting-system";
 // Hauling system
@@ -16,6 +18,7 @@ export {
   createBuildFloorJob,
   createBuildJob,
   createChopJob,
+  createCookJob,
   createDeconstructJob,
   createForageJob,
   createHarvestJob,

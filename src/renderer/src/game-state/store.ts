@@ -10,6 +10,7 @@ import { usePerformanceStore } from "../lib/performance-store";
 import {
   advanceTime,
   ConstructionSystem,
+  CookingSystem,
   entityStore,
   findPath,
   GameNotifications,
@@ -723,6 +724,11 @@ const sowingSystem = new SowingSystem(
   jobProcessor,
   () => useGameStore.getState().world,
 );
+const cookingSystem = new CookingSystem(
+  entityStore,
+  jobProcessor,
+  () => useGameStore.getState().world,
+);
 const haulingSystem = new HaulingSystem(
   entityStore,
   jobProcessor,
@@ -819,6 +825,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
 
   // Auto-assign sowing jobs to idle colonists in growing zones
   sowingSystem.update();
+
+  // Auto-assign cooking jobs when campfires have nearby raw food
+  cookingSystem.update();
 
   // Auto-assign harvest jobs for mature crops
   harvestingSystem.update();

@@ -77,6 +77,13 @@ export const CONSTRUCTION_REGISTRY: Partial<
     ],
     workTicks: 400,
   },
+  campfire: {
+    materials: [
+      { type: "wood", quantity: 5 },
+      { type: "stone", quantity: 3 },
+    ],
+    workTicks: 120,
+  },
 
   // Containers
   chest: {

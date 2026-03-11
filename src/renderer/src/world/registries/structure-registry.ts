@@ -133,6 +133,17 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     beauty: -1,
     baseValue: 150,
   },
+  campfire: {
+    type: "campfire",
+    category: "machine",
+    blocksMovement: false,
+    blocksVision: false,
+    isInteractable: true,
+    maxHealth: 100,
+    flammability: 0,
+    beauty: 0,
+    baseValue: 20,
+  },
   chest: {
     type: "chest",
     category: "container",

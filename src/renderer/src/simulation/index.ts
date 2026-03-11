@@ -20,6 +20,7 @@ export { ItemDeteriorationSystem } from "./items/item-deterioration-system";
 export {
   ACTION_RULES,
   ConstructionSystem,
+  CookingSystem,
   createChopJob,
   createHaulJob,
   createMineJob,

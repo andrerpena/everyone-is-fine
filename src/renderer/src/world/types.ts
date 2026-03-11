@@ -110,6 +110,7 @@ export type StructureType =
   | "chair"
   | "table"
   | "workbench"
+  | "campfire"
   // Containers
   | "chest"
   | "shelf"

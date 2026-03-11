@@ -73,6 +73,7 @@ export const defaultGameColors: GameColors = {
     chair: "#daa520",
     table: "#d2691e",
     workbench: "#808000",
+    campfire: "#ff6600",
     chest: "#654321",
     shelf: "#bc8f8f",
     stockpile_zone: "#000000",
