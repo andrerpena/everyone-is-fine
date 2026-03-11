@@ -119,7 +119,7 @@
 ## Phase 7 — Zone System
 
 - [x] 88. Implement zone designation framework (paint tiles to create zones) <!-- Ticket 0034 -->
-- [ ] 89. Create stockpile zone type with item filter configuration
+- [x] 89. Create stockpile zone type with item filter configuration <!-- Ticket 0035 -->
 - [ ] 90. Add growing zone type (designate crop planting areas)
 - [ ] 91. Create dumping zone type (for unwanted items)
 - [ ] 92. Implement allowed area zones (restrict colonist movement)

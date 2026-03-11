@@ -4,6 +4,7 @@
 // Zustand store for managing zone designations (stockpile, growing, dumping).
 
 import { create } from "zustand";
+import { createDefaultFilter, type StockpileFilter } from "./stockpile-filter";
 import type { ZoneData, ZoneTileKey, ZoneType } from "./types";
 
 // =============================================================================
@@ -32,6 +33,8 @@ interface ZoneActions {
   getZoneAtTile: (tileKey: ZoneTileKey) => ZoneData | undefined;
   /** Get all zones */
   getAllZones: () => ZoneData[];
+  /** Update the stockpile filter for a zone */
+  setStockpileFilter: (zoneId: string, filter: StockpileFilter) => void;
   /** Clear all zones */
   clearAll: () => void;
 }
@@ -56,6 +59,7 @@ export const useZoneStore = create<ZoneStore>()((set, get) => ({
       name,
       zLevel,
       tiles: new Set(),
+      ...(type === "stockpile" ? { filter: createDefaultFilter() } : {}),
     };
 
     set((state) => ({
@@ -151,6 +155,18 @@ export const useZoneStore = create<ZoneStore>()((set, get) => ({
 
   getAllZones: () => {
     return Array.from(get().zones.values());
+  },
+
+  setStockpileFilter: (zoneId, filter) => {
+    const { zones } = get();
+    const zone = zones.get(zoneId);
+    if (!zone || zone.type !== "stockpile") return;
+
+    set((state) => {
+      const newZones = new Map(state.zones);
+      newZones.set(zoneId, { ...zone, filter });
+      return { zones: newZones };
+    });
   },
 
   clearAll: () => {

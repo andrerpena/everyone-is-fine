@@ -215,14 +215,23 @@ export interface GameAgentApi {
       zLevel: number;
       tileCount: number;
     }>;
-    get: (
-      zoneId: string,
-    ) => {
+    get: (zoneId: string) => {
       id: string;
       type: string;
       name: string;
       zLevel: number;
       tileCount: number;
+    } | null;
+    setFilter: (
+      zoneId: string,
+      config: {
+        allowedCategories?: string[];
+        disallowedTypes?: string[];
+      },
+    ) => void;
+    getFilter: (zoneId: string) => {
+      allowedCategories: string[];
+      disallowedTypes: string[];
     } | null;
     clearAll: () => void;
   };

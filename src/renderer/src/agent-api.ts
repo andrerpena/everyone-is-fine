@@ -35,6 +35,8 @@ import { createWorld as createWorldFactory } from "./world/factories/world-facto
 import type {
   BiomeType,
   FloorType,
+  ItemCategory,
+  ItemType,
   SerializedWorld,
   StructureType,
   TerrainType,
@@ -43,6 +45,7 @@ import type {
 import { deserializeWorld, serializeWorld } from "./world/utils/serialization";
 import { getWorldTileAt } from "./world/utils/tile-utils";
 import { useZoneStore } from "./zones";
+import type { StockpileFilter } from "./zones/stockpile-filter";
 import type { AgentZoneInfo, ZoneType } from "./zones/types";
 
 // =============================================================================
@@ -701,6 +704,39 @@ function createAgentApi(): GameAgentApi {
           name: zone.name,
           zLevel: zone.zLevel,
           tileCount: zone.tiles.size,
+        };
+      },
+      setFilter(
+        zoneId: string,
+        config: {
+          allowedCategories?: string[];
+          disallowedTypes?: string[];
+        },
+      ): void {
+        const zone = useZoneStore.getState().zones.get(zoneId);
+        if (!zone || zone.type !== "stockpile") {
+          throw new Error(`Zone "${zoneId}" not found or is not a stockpile`);
+        }
+        const filter: StockpileFilter = {
+          allowedCategories: new Set(
+            (config.allowedCategories ?? []) as ItemCategory[],
+          ),
+          disallowedTypes: new Set(
+            (config.disallowedTypes ?? []) as ItemType[],
+          ),
+        };
+        useZoneStore.getState().setStockpileFilter(zoneId, filter);
+      },
+      getFilter(zoneId: string): {
+        allowedCategories: string[];
+        disallowedTypes: string[];
+      } | null {
+        const zone = useZoneStore.getState().zones.get(zoneId);
+        if (!zone || zone.type !== "stockpile") return null;
+        if (!zone.filter) return null;
+        return {
+          allowedCategories: Array.from(zone.filter.allowedCategories),
+          disallowedTypes: Array.from(zone.filter.disallowedTypes),
         };
       },
       clearAll(): void {

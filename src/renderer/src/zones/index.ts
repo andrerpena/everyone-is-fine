@@ -2,6 +2,13 @@
 // ZONE MODULE EXPORTS
 // =============================================================================
 
+export type { StockpileFilter } from "./stockpile-filter";
+export {
+  ALL_CATEGORIES,
+  CATEGORY_ITEMS,
+  createDefaultFilter,
+  doesItemPassFilter,
+} from "./stockpile-filter";
 export type {
   AgentZoneInfo,
   ZoneData,

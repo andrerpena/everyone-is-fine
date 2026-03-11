@@ -2,6 +2,8 @@
 // ZONE TYPES
 // =============================================================================
 
+import type { StockpileFilter } from "./stockpile-filter";
+
 /** Types of zones that can be designated */
 export type ZoneType = "stockpile" | "growing" | "dumping";
 
@@ -16,6 +18,8 @@ export interface ZoneData {
   zLevel: number;
   /** Set of tile keys ("x,y") belonging to this zone */
   tiles: Set<ZoneTileKey>;
+  /** Item filter for stockpile zones (only meaningful when type === "stockpile") */
+  filter?: StockpileFilter;
 }
 
 /** Zone display colors (semi-transparent overlays) */
