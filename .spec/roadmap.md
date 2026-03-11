@@ -96,7 +96,7 @@
 - [x] 69. ~~Create raw resource types~~ (done: wood, stone, iron, gold, silver, coal, cloth, leather in ItemType + ITEM_REGISTRY)
 - [x] 70. ~~Implement food item types~~ (done: meat, berries, vegetable, meal_simple, meal_fine in ItemType + ITEM_REGISTRY)
 - [x] 71. Add medicine item types (herbal medicine, industrial medicine, glitterworld medicine)
-- [ ] 72. Create weapon item types (melee and ranged)
+- [x] 72. Create weapon item types (melee and ranged)
 - [ ] 73. Create apparel/clothing item types with body part slots
 
 ## Phase 6 — Jobs & Work System

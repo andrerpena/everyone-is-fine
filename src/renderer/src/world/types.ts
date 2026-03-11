@@ -209,6 +209,14 @@ export type ItemType =
   | "medicine_herbal"
   | "medicine_industrial"
   | "medicine_glitterworld"
+  // Weapons — Melee
+  | "knife"
+  | "sword"
+  | "spear"
+  | "club"
+  // Weapons — Ranged
+  | "bow"
+  | "pistol"
   // Tools
   | "pickaxe"
   | "axe"
