@@ -120,6 +120,8 @@ export interface Character extends Entity {
   relationships: Record<EntityId, number>;
   /** Romantic partner, or null if single */
   partner: EntityId | null;
+  /** Married spouse, or null if unmarried */
+  spouse: EntityId | null;
   /** Active mental break, or null if not in a break */
   mentalBreak: MentalBreakState | null;
   /** Per-work-type priority (0 = disabled, 1 = highest, 4 = lowest) */
@@ -321,6 +323,7 @@ export function createCharacter(
     thoughts: [],
     relationships: {},
     partner: null,
+    spouse: null,
     mentalBreak: null,
     workPriorities: createDefaultWorkPriorities(),
     schedule: createDefaultSchedule(),

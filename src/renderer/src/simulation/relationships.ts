@@ -25,6 +25,9 @@ export const ROMANCE_OPINION_THRESHOLD = 75;
 /** Opinion below which a romantic relationship breaks */
 export const BREAKUP_OPINION_THRESHOLD = 20;
 
+/** Minimum mutual opinion for a marriage proposal */
+export const MARRIAGE_OPINION_THRESHOLD = 85;
+
 // =============================================================================
 // RELATIONSHIP LABELS
 // =============================================================================

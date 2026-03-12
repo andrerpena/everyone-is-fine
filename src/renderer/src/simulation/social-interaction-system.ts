@@ -10,6 +10,7 @@ import {
   adjustOpinion,
   canFormRomance,
   getOpinion,
+  MARRIAGE_OPINION_THRESHOLD,
   shouldBreakUp,
 } from "./relationships";
 import { TICKS_PER_SECOND } from "./simulation-loop";
@@ -72,6 +73,15 @@ export const FIGHT_OPINION_DELTA = -10;
 /** Minimum ticks between fights for the same pair */
 export const FIGHT_COOLDOWN = 3600;
 
+/** Minimum ticks a partnership must last before a proposal can happen */
+export const MIN_PARTNERSHIP_TICKS = 7200;
+
+/** Probability of a marriage proposal per eligible pair per social check */
+export const PROPOSAL_CHANCE = 0.02;
+
+/** Max Manhattan distance for colonists to count as wedding attendees */
+export const WEDDING_ATTENDEE_PROXIMITY = 10;
+
 // =============================================================================
 // HELPERS
 // =============================================================================
@@ -120,6 +130,8 @@ export class SocialInteractionSystem {
   private ticksSinceLastCheck = 0;
   private recentChats: Map<string, number> = new Map();
   private recentFights: Map<string, number> = new Map();
+  /** Tracks when partnerships formed (pairKey → tick) */
+  private partnershipStartTick: Map<string, number> = new Map();
   private currentTick = 0;
 
   constructor(private entityStore: EntityStore) {}
@@ -138,6 +150,9 @@ export class SocialInteractionSystem {
 
     // Check for social fights
     this.checkFights();
+
+    // Check for marriage proposals among partnered colonists
+    this.checkMarriageProposals();
 
     const characters = this.entityStore.getAll();
     const chatted = new Set<EntityId>();
@@ -243,6 +258,10 @@ export class SocialInteractionSystem {
     const romanceFormed =
       !aInsults && !bInsults && canFormRomance(updatedA, updatedB);
 
+    if (romanceFormed) {
+      this.partnershipStartTick.set(pairKey(a.id, b.id), this.currentTick);
+    }
+
     this.entityStore.update(a.id, {
       needs: aNeeds,
       relationships: aRelationships,
@@ -264,7 +283,9 @@ export class SocialInteractionSystem {
       | "was_insulted"
       | "chatted_with_friend"
       | "chatted_with_rival"
-      | "social_fight",
+      | "social_fight"
+      | "got_married"
+      | "attended_wedding",
   ): ActiveThought[] {
     const def = THOUGHT_MAP.get(thoughtId);
     if (!def) return existingThoughts;
@@ -342,21 +363,24 @@ export class SocialInteractionSystem {
       expiresAtTick,
     };
 
-    // Clear partner and add breakup thought for A
+    // Clear partner/spouse and add breakup thought for A
     const a = this.entityStore.get(aId);
     if (a) {
       const thoughts = a.thoughts.filter((t) => t.thoughtId !== "broke_up");
       thoughts.push(brokeUpThought);
-      this.entityStore.update(aId, { partner: null, thoughts });
+      this.entityStore.update(aId, { partner: null, spouse: null, thoughts });
     }
 
-    // Clear partner and add breakup thought for B
+    // Clear partner/spouse and add breakup thought for B
     const b = this.entityStore.get(bId);
     if (b) {
       const thoughts = b.thoughts.filter((t) => t.thoughtId !== "broke_up");
       thoughts.push(brokeUpThought);
-      this.entityStore.update(bId, { partner: null, thoughts });
+      this.entityStore.update(bId, { partner: null, spouse: null, thoughts });
     }
+
+    // Clean up partnership tracking
+    this.partnershipStartTick.delete(pairKey(aId, bId));
   }
 
   private checkFights(): void {
@@ -437,6 +461,85 @@ export class SocialInteractionSystem {
       .addEntry("info", `${a.name} and ${b.name} got into a fight!`, [
         "social",
       ]);
+  }
+
+  private checkMarriageProposals(): void {
+    const processed = new Set<EntityId>();
+
+    for (const character of this.entityStore.values()) {
+      if (
+        character.partner === null ||
+        character.spouse !== null ||
+        processed.has(character.id)
+      )
+        continue;
+
+      const partner = this.entityStore.get(character.partner);
+      if (!partner || partner.spouse !== null) continue;
+
+      processed.add(character.id);
+      processed.add(partner.id);
+
+      // Check mutual opinion
+      const aOpinion = getOpinion(character.relationships, partner.id);
+      const bOpinion = getOpinion(partner.relationships, character.id);
+      if (
+        aOpinion < MARRIAGE_OPINION_THRESHOLD ||
+        bOpinion < MARRIAGE_OPINION_THRESHOLD
+      )
+        continue;
+
+      // Check minimum partnership duration
+      const key = pairKey(character.id, partner.id);
+      const startTick = this.partnershipStartTick.get(key);
+      if (
+        startTick === undefined ||
+        this.currentTick - startTick < MIN_PARTNERSHIP_TICKS
+      )
+        continue;
+
+      // Roll for proposal
+      if (Math.random() >= PROPOSAL_CHANCE) continue;
+
+      this.triggerWedding(character, partner);
+    }
+  }
+
+  private triggerWedding(a: Character, b: Character): void {
+    // Add wedding thoughts to the couple
+    const aThoughts = this.addTimedThought(a.thoughts, "got_married");
+    const bThoughts = this.addTimedThought(b.thoughts, "got_married");
+
+    this.entityStore.update(a.id, {
+      spouse: b.id,
+      thoughts: aThoughts,
+    });
+    this.entityStore.update(b.id, {
+      spouse: a.id,
+      thoughts: bThoughts,
+    });
+
+    // Give "attended_wedding" thought to nearby colonists
+    for (const colonist of this.entityStore.values()) {
+      if (colonist.id === a.id || colonist.id === b.id) continue;
+      if (colonist.position.z !== a.position.z) continue;
+
+      const dist =
+        Math.abs(colonist.position.x - a.position.x) +
+        Math.abs(colonist.position.y - a.position.y);
+      if (dist > WEDDING_ATTENDEE_PROXIMITY) continue;
+
+      const thoughts = this.addTimedThought(
+        colonist.thoughts,
+        "attended_wedding",
+      );
+      this.entityStore.update(colonist.id, { thoughts });
+    }
+
+    // Log the event
+    useLogStore
+      .getState()
+      .addEntry("info", `${a.name} and ${b.name} got married!`, ["social"]);
   }
 
   private cleanupCooldowns(): void {

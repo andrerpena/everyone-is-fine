@@ -38,7 +38,9 @@ export type ThoughtId =
   | "in_relationship"
   | "broke_up"
   | "was_insulted"
-  | "social_fight";
+  | "social_fight"
+  | "got_married"
+  | "attended_wedding";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -273,6 +275,20 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     description: "Got into a physical fight with someone",
     moodEffect: -0.1,
     durationSeconds: 43200, // 12 hours
+  },
+  {
+    id: "got_married",
+    label: "Got Married",
+    description: "We tied the knot! Everything feels wonderful.",
+    moodEffect: 0.2,
+    durationSeconds: 259200, // 72 hours
+  },
+  {
+    id: "attended_wedding",
+    label: "Attended a Wedding",
+    description: "Witnessed a beautiful ceremony between two colonists.",
+    moodEffect: 0.08,
+    durationSeconds: 86400, // 24 hours
   },
 ] as const;
 
