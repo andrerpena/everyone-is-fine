@@ -25,6 +25,18 @@ export const HIGH_MOOD_THRESHOLD = 0.7;
 /** Colony mood below this threshold biases toward positive events */
 export const LOW_MOOD_THRESHOLD = 0.4;
 
+/** Colonist count at which difficulty factor reaches 1.0 */
+export const DIFFICULTY_COLONIST_BASELINE = 5;
+
+/** Day at which difficulty factor reaches 1.0 */
+export const DIFFICULTY_DAY_BASELINE = 20;
+
+/** Minimum difficulty multiplier (events happen slower) */
+export const MIN_DIFFICULTY = 0.5;
+
+/** Maximum difficulty multiplier (events happen faster) */
+export const MAX_DIFFICULTY = 2.0;
+
 // =============================================================================
 // STORYTELLER CLASS
 // =============================================================================
@@ -61,10 +73,34 @@ export class Storyteller {
   }
 
   /**
-   * Check if enough time has passed since the last event.
+   * Compute a difficulty multiplier based on colony size and age.
+   * Higher values mean events fire more frequently.
+   *
+   * - Colony size factor: colonistCount / BASELINE (clamped 0.5–1.5)
+   * - Time factor: day / BASELINE (clamped 0.5–1.5)
+   * - Combined: average of both, clamped to [MIN_DIFFICULTY, MAX_DIFFICULTY]
    */
-  canFireEvent(currentTick: number): boolean {
-    return currentTick - this.lastEventTick >= GLOBAL_EVENT_COOLDOWN;
+  getDifficultyMultiplier(colonistCount: number, day: number): number {
+    const sizeFactor = Math.max(
+      0.5,
+      Math.min(1.5, colonistCount / DIFFICULTY_COLONIST_BASELINE),
+    );
+    const timeFactor = Math.max(
+      0.5,
+      Math.min(1.5, day / DIFFICULTY_DAY_BASELINE),
+    );
+    const combined = (sizeFactor + timeFactor) / 2;
+    return Math.max(MIN_DIFFICULTY, Math.min(MAX_DIFFICULTY, combined));
+  }
+
+  /**
+   * Check if enough time has passed since the last event.
+   * The cooldown is scaled by the difficulty multiplier — higher difficulty
+   * means shorter cooldowns (more frequent events).
+   */
+  canFireEvent(currentTick: number, difficultyMultiplier = 1): boolean {
+    const scaledCooldown = GLOBAL_EVENT_COOLDOWN / difficultyMultiplier;
+    return currentTick - this.lastEventTick >= scaledCooldown;
   }
 
   /**
@@ -80,13 +116,18 @@ export class Storyteller {
   /**
    * Select which events are eligible to be evaluated this tick.
    * Returns a filtered list of events that pass the storyteller's pacing
-   * and mood-based category filter.
+   * and mood-based category filter. Uses difficulty scaling based on
+   * colony size and age.
    */
   selectEligibleEvents(
     allEvents: readonly EventDefinition[],
     ctx: EventContext,
   ): EventDefinition[] {
-    if (!this.canFireEvent(ctx.tick)) return [];
+    const difficulty = this.getDifficultyMultiplier(
+      ctx.entityStore.size,
+      ctx.world.time.day,
+    );
+    if (!this.canFireEvent(ctx.tick, difficulty)) return [];
 
     const avgMood = this.getAverageMood(ctx.entityStore);
     const allowed = this.getAllowedCategories(avgMood);

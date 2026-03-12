@@ -276,7 +276,7 @@
 - [x] 216. Create volcanic winter event (reduced temperature and plant growth)
 - [x] 217. Add psychic drone event (mood penalty to specific gender)
 - [ ] 218. Create transport pod crash event (rescue the survivor)
-- [ ] 219. Implement event difficulty scaling with colony wealth and time
+- [x] 219. Implement event difficulty scaling with colony wealth and time
 - [x] 220. Add event notification/letter system with UI
 
 ## Phase 17 — Animals

@@ -4,9 +4,13 @@ import { EntityStore } from "../entity-store";
 import { createCharacter } from "../types";
 import type { EventContext, EventDefinition } from "./event-definitions";
 import {
+  DIFFICULTY_COLONIST_BASELINE,
+  DIFFICULTY_DAY_BASELINE,
   GLOBAL_EVENT_COOLDOWN,
   HIGH_MOOD_THRESHOLD,
   LOW_MOOD_THRESHOLD,
+  MAX_DIFFICULTY,
+  MIN_DIFFICULTY,
   Storyteller,
 } from "./storyteller";
 
@@ -207,5 +211,162 @@ describe("Storyteller.selectEligibleEvents", () => {
     const ctx = makeContext({ entityStore: store, tick: 5000 });
     const eligible = storyteller.selectEligibleEvents(events, ctx);
     expect(eligible.map((e) => e.id)).toEqual(["pos", "neg"]);
+  });
+});
+
+describe("Storyteller Difficulty Constants", () => {
+  it("colonist baseline is 5", () => {
+    expect(DIFFICULTY_COLONIST_BASELINE).toBe(5);
+  });
+
+  it("day baseline is 20", () => {
+    expect(DIFFICULTY_DAY_BASELINE).toBe(20);
+  });
+
+  it("min difficulty is 0.5", () => {
+    expect(MIN_DIFFICULTY).toBe(0.5);
+  });
+
+  it("max difficulty is 2.0", () => {
+    expect(MAX_DIFFICULTY).toBe(2.0);
+  });
+});
+
+describe("Storyteller.getDifficultyMultiplier", () => {
+  it("returns 0.5 for 0 colonists on day 1", () => {
+    const storyteller = new Storyteller();
+    const result = storyteller.getDifficultyMultiplier(0, 1);
+    expect(result).toBe(0.5);
+  });
+
+  it("returns 1.0 at baseline values (5 colonists, day 20)", () => {
+    const storyteller = new Storyteller();
+    const result = storyteller.getDifficultyMultiplier(5, 20);
+    expect(result).toBeCloseTo(1.0, 5);
+  });
+
+  it("returns higher multiplier for large colony", () => {
+    const storyteller = new Storyteller();
+    const small = storyteller.getDifficultyMultiplier(2, 10);
+    const large = storyteller.getDifficultyMultiplier(8, 10);
+    expect(large).toBeGreaterThan(small);
+  });
+
+  it("returns higher multiplier for older colony", () => {
+    const storyteller = new Storyteller();
+    const young = storyteller.getDifficultyMultiplier(5, 5);
+    const old = storyteller.getDifficultyMultiplier(5, 30);
+    expect(old).toBeGreaterThan(young);
+  });
+
+  it("clamps to MIN_DIFFICULTY", () => {
+    const storyteller = new Storyteller();
+    const result = storyteller.getDifficultyMultiplier(0, 0);
+    expect(result).toBe(MIN_DIFFICULTY);
+  });
+
+  it("clamps to MAX_DIFFICULTY", () => {
+    const storyteller = new Storyteller();
+    const result = storyteller.getDifficultyMultiplier(100, 1000);
+    expect(result).toBeLessThanOrEqual(MAX_DIFFICULTY);
+  });
+});
+
+describe("Storyteller.canFireEvent with difficulty", () => {
+  it("fires sooner with higher difficulty multiplier", () => {
+    const storyteller = new Storyteller();
+    storyteller.recordEventFired(0);
+
+    // At difficulty 2.0, cooldown = 1800 / 2 = 900
+    expect(storyteller.canFireEvent(900, 2.0)).toBe(true);
+    // At difficulty 1.0, cooldown = 1800 — not enough time
+    expect(storyteller.canFireEvent(900, 1.0)).toBe(false);
+  });
+
+  it("fires later with lower difficulty multiplier", () => {
+    const storyteller = new Storyteller();
+    storyteller.recordEventFired(0);
+
+    // At difficulty 0.5, cooldown = 1800 / 0.5 = 3600
+    expect(storyteller.canFireEvent(3000, 0.5)).toBe(false);
+    expect(storyteller.canFireEvent(3600, 0.5)).toBe(true);
+  });
+
+  it("defaults to multiplier 1 when not provided", () => {
+    const storyteller = new Storyteller();
+    storyteller.recordEventFired(0);
+    expect(storyteller.canFireEvent(GLOBAL_EVENT_COOLDOWN)).toBe(true);
+    expect(storyteller.canFireEvent(GLOBAL_EVENT_COOLDOWN - 1)).toBe(false);
+  });
+});
+
+describe("Storyteller.selectEligibleEvents with difficulty", () => {
+  it("uses difficulty scaling from colony context", () => {
+    const storyteller = new Storyteller();
+    storyteller.recordEventFired(0);
+
+    // Large colony on late day — high difficulty, shorter cooldown
+    const store = makeEntityStore([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]);
+    const events = [makeEvent()];
+
+    // At 8 colonists, day 30: sizeFactor=1.5, timeFactor=1.5, combined=1.5
+    // Scaled cooldown = 1800 / 1.5 = 1200
+    const ctx = makeContext({
+      entityStore: store,
+      tick: 1200,
+      world: {
+        dimensions: { width: 50, height: 50, minZ: -1, maxZ: 1 },
+        levels: new Map(),
+        surfaceZ: 0,
+        metadata: { seed: 42, createdAt: 0, version: "1", tickCount: 0 },
+        time: {
+          tickCount: 0,
+          day: 30,
+          hour: 12,
+          minute: 0,
+          season: "summer",
+          year: 1,
+        },
+        weather: {} as never,
+      } as never,
+    });
+
+    const eligible = storyteller.selectEligibleEvents(events, ctx);
+    expect(eligible.length).toBe(1);
+  });
+
+  it("small early colony has longer cooldown", () => {
+    const storyteller = new Storyteller();
+    storyteller.recordEventFired(0);
+
+    // 1 colonist, day 1 — low difficulty
+    const store = makeEntityStore([0.5]);
+    const events = [makeEvent()];
+
+    // At 1 colonist, day 1: sizeFactor=0.5, timeFactor=0.5, combined=0.5
+    // Scaled cooldown = 1800 / 0.5 = 3600
+    const ctx = makeContext({
+      entityStore: store,
+      tick: 2000,
+      world: {
+        dimensions: { width: 50, height: 50, minZ: -1, maxZ: 1 },
+        levels: new Map(),
+        surfaceZ: 0,
+        metadata: { seed: 42, createdAt: 0, version: "1", tickCount: 0 },
+        time: {
+          tickCount: 0,
+          day: 1,
+          hour: 12,
+          minute: 0,
+          season: "summer",
+          year: 1,
+        },
+        weather: {} as never,
+      } as never,
+    });
+
+    // 2000 ticks < 3600 scaled cooldown — should not be eligible
+    const eligible = storyteller.selectEligibleEvents(events, ctx);
+    expect(eligible.length).toBe(0);
   });
 });

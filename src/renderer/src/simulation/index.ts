@@ -27,9 +27,13 @@ export {
 // Events
 export { EventSystem } from "./events/event-system";
 export {
+  DIFFICULTY_COLONIST_BASELINE,
+  DIFFICULTY_DAY_BASELINE,
   GLOBAL_EVENT_COOLDOWN,
   HIGH_MOOD_THRESHOLD,
   LOW_MOOD_THRESHOLD,
+  MAX_DIFFICULTY,
+  MIN_DIFFICULTY,
   Storyteller,
 } from "./events/storyteller";
 // Filth
