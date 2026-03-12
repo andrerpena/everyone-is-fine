@@ -32,8 +32,17 @@ export const CHAT_CHANCE = 0.05;
 /** Social need restored per ambient chat */
 export const CHAT_SOCIAL_RESTORE = 0.05;
 
-/** Opinion adjustment per ambient chat */
+/** Base opinion adjustment per ambient chat */
 export const CHAT_OPINION_DELTA = 1;
+
+/** Extra opinion bonus when speaker has "kind" trait */
+export const CHAT_KIND_BONUS = 1;
+
+/** Opinion penalty when speaker has "abrasive" trait */
+export const CHAT_ABRASIVE_PENALTY = 1;
+
+/** Opinion bonus when speaker and listener share a trait */
+export const CHAT_SHARED_TRAIT_BONUS = 1;
 
 /** Minimum ticks between chats for the same pair */
 export const CHAT_COOLDOWN = 600;
@@ -57,6 +66,25 @@ export const INSULT_OPINION_DELTA = -3;
 /** Create a consistent key for a pair of entity IDs (order-independent) */
 export function pairKey(a: EntityId, b: EntityId): string {
   return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+/** Calculate opinion delta for a positive chat based on speaker/listener traits */
+export function getChatOpinionDelta(
+  speaker: Character,
+  listener: Character,
+): number {
+  let delta = CHAT_OPINION_DELTA;
+  if (speaker.traits.includes("kind")) {
+    delta += CHAT_KIND_BONUS;
+  }
+  if (speaker.traits.includes("abrasive")) {
+    delta -= CHAT_ABRASIVE_PENALTY;
+  }
+  // Shared trait bonus
+  if (speaker.traits.some((t) => listener.traits.includes(t))) {
+    delta += CHAT_SHARED_TRAIT_BONUS;
+  }
+  return Math.max(0, delta);
 }
 
 /** Calculate insult chance for a character based on traits */
@@ -158,8 +186,12 @@ export class SocialInteractionSystem {
     // Adjust opinions based on insult outcomes
     // If A insulted B: B's opinion of A drops. A's opinion is unchanged.
     // If neither insulted: normal positive chat for both.
-    const aOpinionDelta = bInsults ? INSULT_OPINION_DELTA : CHAT_OPINION_DELTA;
-    const bOpinionDelta = aInsults ? INSULT_OPINION_DELTA : CHAT_OPINION_DELTA;
+    const aOpinionDelta = bInsults
+      ? INSULT_OPINION_DELTA
+      : getChatOpinionDelta(b, a);
+    const bOpinionDelta = aInsults
+      ? INSULT_OPINION_DELTA
+      : getChatOpinionDelta(a, b);
 
     const aRelationships = adjustOpinion(a.relationships, b.id, aOpinionDelta);
     const bRelationships = adjustOpinion(b.relationships, a.id, bOpinionDelta);
