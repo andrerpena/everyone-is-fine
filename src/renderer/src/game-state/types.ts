@@ -214,6 +214,8 @@ export interface SimulationStateSlice {
   characters: Map<EntityId, Character>;
   /** Active job progress snapshots for rendering */
   jobProgress: Map<EntityId, JobProgressInfo>;
+  /** Currently active world events (e.g. "eclipse") */
+  activeEvents: ReadonlySet<string>;
 }
 
 /**

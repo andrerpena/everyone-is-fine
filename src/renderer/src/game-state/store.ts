@@ -68,6 +68,7 @@ const initialSimulationState: SimulationStateSlice = {
   currentTick: 0,
   characters: new Map(),
   jobProgress: new Map(),
+  activeEvents: new Set(),
 };
 
 const initialState = {
@@ -876,12 +877,15 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
   }
   const jobProgress = jobProcessor.getActiveJobProgress();
 
+  const activeEvents = eventSystem.getActiveEventIds();
+
   useGameStore.setState((state) => ({
     simulation: {
       ...state.simulation,
       currentTick: tick,
       characters,
       jobProgress,
+      activeEvents,
     },
   }));
   const t3 = performance.now();

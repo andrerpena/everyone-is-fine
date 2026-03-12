@@ -352,13 +352,19 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
 
     // Subscribe to time changes for ambient lighting (only redraws when hour changes)
     let lastAmbientHour = -1;
+    let lastEclipseActive = false;
     const unsubscribeAmbient = useGameStore.subscribe((state) => {
       const world = state.world;
       if (!world || !ambientOverlayRef.current || !level) return;
 
       const hour = world.time.hour;
-      if (hour === lastAmbientHour) return;
+      const eclipseActive = state.simulation.activeEvents.has("eclipse");
+
+      // Only re-render when hour or eclipse state changes
+      if (hour === lastAmbientHour && eclipseActive === lastEclipseActive)
+        return;
       lastAmbientHour = hour;
+      lastEclipseActive = eclipseActive;
 
       const layerEnabled =
         useLayerStore.getState().visibility.get("ambient-lighting") ?? true;
@@ -372,6 +378,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         level.width * CELL_SIZE,
         level.height * CELL_SIZE,
         hour,
+        eclipseActive,
       );
     });
 
@@ -484,13 +491,14 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
           ambientOverlayRef.current.visible = false;
         } else {
           // Re-apply current lighting when layer is re-enabled
-          const world = useGameStore.getState().world;
-          if (world && level) {
+          const gameState = useGameStore.getState();
+          if (gameState.world && level) {
             updateAmbientOverlay(
               ambientOverlayRef.current,
               level.width * CELL_SIZE,
               level.height * CELL_SIZE,
-              world.time.hour,
+              gameState.world.time.hour,
+              gameState.simulation.activeEvents.has("eclipse"),
             );
           }
         }
@@ -707,13 +715,14 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       ambientOverlayRef.current = ambientOverlay;
 
       // Initial ambient lighting render
-      const initialWorld = useGameStore.getState().world;
-      if (initialWorld) {
+      const initialGameState = useGameStore.getState();
+      if (initialGameState.world) {
         updateAmbientOverlay(
           ambientOverlay,
           level.width * CELL_SIZE,
           level.height * CELL_SIZE,
-          initialWorld.time.hour,
+          initialGameState.world.time.hour,
+          initialGameState.simulation.activeEvents.has("eclipse"),
         );
       }
       // Apply initial layer visibility
@@ -746,8 +755,8 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       viewport.addChild(weatherRenderer.getDisplayObject());
       weatherRendererRef.current = weatherRenderer;
       // Set initial weather type
-      if (initialWorld) {
-        weatherRenderer.setWeatherType(initialWorld.weather.type);
+      if (initialGameState.world) {
+        weatherRenderer.setWeatherType(initialGameState.world.weather.type);
       }
       const weatherLayerEnabled =
         initialLayerVisibility.get("weather-effects") ?? true;

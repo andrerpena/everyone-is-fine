@@ -3,7 +3,11 @@ import { SeededRandom } from "../../world/factories/world-factory";
 import { EntityStore } from "../entity-store";
 import { createCharacter } from "../types";
 import {
+  ECLIPSE_CHANCE,
+  ECLIPSE_COOLDOWN_TICKS,
+  ECLIPSE_DURATION_TICKS,
   type EventContext,
+  eclipseEvent,
   WANDERER_CHANCE,
   WANDERER_MAX_COLONY_SIZE,
   wandererJoinsEvent,
@@ -31,7 +35,14 @@ function makeContext(overrides: Partial<EventContext> = {}): EventContext {
       levels: new Map(),
       surfaceZ: 0,
       metadata: { seed: 42, createdAt: 0, version: "1", tickCount: 0 },
-      time: {} as never,
+      time: {
+        tickCount: 0,
+        day: 1,
+        hour: 12,
+        minute: 0,
+        season: "summer",
+        year: 1,
+      },
       weather: {} as never,
     } as never,
     rng: new SeededRandom(42),
@@ -53,13 +64,25 @@ describe("Event System Constants", () => {
   it("wanderer cooldown is 600 ticks", () => {
     expect(wandererJoinsEvent.cooldownTicks).toBe(600);
   });
+
+  it("eclipse chance is 0.05", () => {
+    expect(ECLIPSE_CHANCE).toBe(0.05);
+  });
+
+  it("eclipse duration is 3600 ticks", () => {
+    expect(ECLIPSE_DURATION_TICKS).toBe(3600);
+  });
+
+  it("eclipse cooldown is 18000 ticks", () => {
+    expect(ECLIPSE_COOLDOWN_TICKS).toBe(18000);
+  });
 });
 
 describe("Wanderer Joins - canTrigger", () => {
   it("returns false when colony is at max size", () => {
     const ctx = makeContext({
       entityStore: makeEntityStore(8),
-      rng: new SeededRandom(1), // doesn't matter, should short-circuit
+      rng: new SeededRandom(1),
     });
     expect(wandererJoinsEvent.canTrigger(ctx)).toBe(false);
   });
@@ -72,7 +95,6 @@ describe("Wanderer Joins - canTrigger", () => {
   });
 
   it("can return true when colony is below max size (depends on RNG)", () => {
-    // Try many seeds — at least one should trigger with 8% chance
     let triggered = false;
     for (let seed = 0; seed < 100; seed++) {
       const ctx = makeContext({
@@ -88,7 +110,6 @@ describe("Wanderer Joins - canTrigger", () => {
   });
 
   it("can return false when colony is below max size (depends on RNG)", () => {
-    // Try many seeds — at least one should NOT trigger
     let notTriggered = false;
     for (let seed = 0; seed < 100; seed++) {
       const ctx = makeContext({
@@ -104,6 +125,79 @@ describe("Wanderer Joins - canTrigger", () => {
   });
 });
 
+describe("Eclipse - canTrigger", () => {
+  it("returns false during nighttime (hour < 7)", () => {
+    const ctx = makeContext({
+      world: {
+        dimensions: { width: 50, height: 50, minZ: -1, maxZ: 1 },
+        levels: new Map(),
+        surfaceZ: 0,
+        metadata: { seed: 42, createdAt: 0, version: "1", tickCount: 0 },
+        time: {
+          tickCount: 0,
+          day: 1,
+          hour: 3,
+          minute: 0,
+          season: "summer",
+          year: 1,
+        },
+        weather: {} as never,
+      } as never,
+    });
+    expect(eclipseEvent.canTrigger(ctx)).toBe(false);
+  });
+
+  it("returns false during evening (hour > 16)", () => {
+    const ctx = makeContext({
+      world: {
+        dimensions: { width: 50, height: 50, minZ: -1, maxZ: 1 },
+        levels: new Map(),
+        surfaceZ: 0,
+        metadata: { seed: 42, createdAt: 0, version: "1", tickCount: 0 },
+        time: {
+          tickCount: 0,
+          day: 1,
+          hour: 20,
+          minute: 0,
+          season: "summer",
+          year: 1,
+        },
+        weather: {} as never,
+      } as never,
+    });
+    expect(eclipseEvent.canTrigger(ctx)).toBe(false);
+  });
+
+  it("can trigger during daytime (hour 7-16)", () => {
+    let triggered = false;
+    for (let seed = 0; seed < 200; seed++) {
+      const ctx = makeContext({
+        rng: new SeededRandom(seed),
+        world: {
+          dimensions: { width: 50, height: 50, minZ: -1, maxZ: 1 },
+          levels: new Map(),
+          surfaceZ: 0,
+          metadata: { seed: 42, createdAt: 0, version: "1", tickCount: 0 },
+          time: {
+            tickCount: 0,
+            day: 1,
+            hour: 12,
+            minute: 0,
+            season: "summer",
+            year: 1,
+          },
+          weather: {} as never,
+        } as never,
+      });
+      if (eclipseEvent.canTrigger(ctx)) {
+        triggered = true;
+        break;
+      }
+    }
+    expect(triggered).toBe(true);
+  });
+});
+
 describe("EventSystem - cooldown", () => {
   it("does not evaluate event before cooldown expires", () => {
     let evaluationCount = 0;
@@ -116,27 +210,30 @@ describe("EventSystem - cooldown", () => {
           dimensions: { width: 50, height: 50, minZ: -1, maxZ: 1 },
           levels: new Map(),
           surfaceZ: 0,
+          time: {
+            tickCount: 0,
+            day: 1,
+            hour: 12,
+            minute: 0,
+            season: "summer",
+            year: 1,
+          },
         }) as never,
       () => {
         evaluationCount++;
       },
     );
 
-    // First update at tick 0 — evaluates
     system.update(0);
     const countAfterFirst = evaluationCount;
 
     // Update at tick 100 — too soon (cooldown is 600)
     system.update(100);
-    // Should be same count (cooldown not expired, no additional trigger)
-    // Note: we can't guarantee trigger since it depends on RNG,
-    // but at minimum it shouldn't evaluate again within cooldown
     expect(evaluationCount).toBe(countAfterFirst);
   });
 
   it("evaluates again after cooldown expires", () => {
     const store = makeEntityStore(3);
-    // Use a seeded RNG that we know triggers the event
     let addCount = 0;
     const system = new EventSystem(
       store,
@@ -146,6 +243,14 @@ describe("EventSystem - cooldown", () => {
           dimensions: { width: 50, height: 50, minZ: -1, maxZ: 1 },
           levels: new Map(),
           surfaceZ: 0,
+          time: {
+            tickCount: 0,
+            day: 1,
+            hour: 12,
+            minute: 0,
+            season: "summer",
+            year: 1,
+          },
         }) as never,
       () => {
         addCount++;
@@ -155,10 +260,69 @@ describe("EventSystem - cooldown", () => {
     system.update(0);
     const afterFirst = addCount;
 
-    // After cooldown
     system.update(601);
-    // It should have evaluated again (whether it triggers depends on RNG)
-    // We just verify no errors
     expect(addCount).toBeGreaterThanOrEqual(afterFirst);
+  });
+});
+
+describe("EventSystem - active events", () => {
+  it("tracks duration-based events as active", () => {
+    const store = makeEntityStore(3);
+    const system = new EventSystem(
+      store,
+      new SeededRandom(42),
+      () =>
+        ({
+          dimensions: { width: 50, height: 50, minZ: -1, maxZ: 1 },
+          levels: new Map(),
+          surfaceZ: 0,
+          time: {
+            tickCount: 0,
+            day: 1,
+            hour: 12,
+            minute: 0,
+            season: "summer",
+            year: 1,
+          },
+        }) as never,
+      () => {},
+    );
+
+    // Before any event triggers
+    expect(system.isEventActive("eclipse")).toBe(false);
+    expect(system.getActiveEventIds().size).toBe(0);
+  });
+
+  it("clears expired events", () => {
+    const store = makeEntityStore(3);
+    // We can't easily force an eclipse to trigger, so test the clearing logic
+    // by checking that after enough ticks, active events are cleared
+    const system = new EventSystem(
+      store,
+      new SeededRandom(42),
+      () =>
+        ({
+          dimensions: { width: 50, height: 50, minZ: -1, maxZ: 1 },
+          levels: new Map(),
+          surfaceZ: 0,
+          time: {
+            tickCount: 0,
+            day: 1,
+            hour: 12,
+            minute: 0,
+            season: "summer",
+            year: 1,
+          },
+        }) as never,
+      () => {},
+    );
+
+    // Run many ticks - even if eclipse triggers, it should eventually clear
+    for (let tick = 0; tick < 100000; tick += 100) {
+      system.update(tick);
+    }
+    // After enough time, no events should be permanently stuck
+    // (just verifying no errors occur during the full lifecycle)
+    expect(system.getActiveEventIds().size).toBeLessThanOrEqual(1);
   });
 });

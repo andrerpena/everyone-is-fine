@@ -14,6 +14,9 @@ export { NeedSatisfactionSystem } from "./behaviors/need-satisfaction-system";
 export { EntityStore, entityStore } from "./entity-store";
 export {
   ALL_EVENTS,
+  ECLIPSE_CHANCE,
+  ECLIPSE_COOLDOWN_TICKS,
+  ECLIPSE_DURATION_TICKS,
   type EventContext,
   type EventDefinition,
   WANDERER_CHANCE,

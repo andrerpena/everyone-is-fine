@@ -267,8 +267,8 @@
 - [ ] 207. Add raid event (hostile pawns attack the colony)
 - [ ] 208. Create manhunter animal pack event
 - [ ] 209. Add solar flare event (disables all electrical devices)
-- [ ] 210. Create eclipse event (extended darkness)
-- [ ] 211. Add wanderer joins event (free colonist)
+- [x] 210. Create eclipse event (extended darkness)
+- [x] 211. Add wanderer joins event (free colonist) <!-- Done in ticket 0093 as part of event system framework -->
 - [ ] 212. Create refugee chased event (accept refugee, fight pursuers)
 - [ ] 213. Add trade caravan arrival event
 - [ ] 214. Create infestation event (insectoids spawn in dark, warm areas)

@@ -40,7 +40,8 @@ export type ThoughtId =
   | "was_insulted"
   | "social_fight"
   | "got_married"
-  | "attended_wedding";
+  | "attended_wedding"
+  | "eclipse";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -289,6 +290,14 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     description: "Witnessed a beautiful ceremony between two colonists.",
     moodEffect: 0.08,
     durationSeconds: 86400, // 24 hours
+  },
+  // Event thoughts (timed)
+  {
+    id: "eclipse",
+    label: "Eclipse",
+    description: "An eerie darkness covers the land.",
+    moodEffect: -0.05,
+    durationSeconds: 3600, // matches eclipse event duration in ticks / TPS
   },
 ] as const;
 

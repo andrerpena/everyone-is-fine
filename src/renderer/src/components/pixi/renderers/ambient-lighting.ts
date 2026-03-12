@@ -79,9 +79,16 @@ export function getAmbientLighting(hour: number): AmbientLighting {
   return HOUR_LIGHTING[clamped];
 }
 
+/** Eclipse overlay: dark blue tint at high alpha */
+const ECLIPSE_LIGHTING: AmbientLighting = {
+  color: 0x0a0a28,
+  alpha: 0.4,
+};
+
 /**
  * Update an ambient overlay Graphics object for the given hour.
  * Redraws the full-world rectangle with the appropriate color and alpha.
+ * When eclipseActive is true, applies a dark overlay regardless of time.
  * Returns true if the overlay is visible (alpha > 0), false otherwise.
  */
 export function updateAmbientOverlay(
@@ -89,8 +96,15 @@ export function updateAmbientOverlay(
   worldWidth: number,
   worldHeight: number,
   hour: number,
+  eclipseActive = false,
 ): boolean {
-  const lighting = getAmbientLighting(hour);
+  const baseLighting = getAmbientLighting(hour);
+  const lighting = eclipseActive
+    ? {
+        color: ECLIPSE_LIGHTING.color,
+        alpha: Math.max(baseLighting.alpha, ECLIPSE_LIGHTING.alpha),
+      }
+    : baseLighting;
 
   graphics.clear();
 

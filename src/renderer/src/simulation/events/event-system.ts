@@ -2,7 +2,7 @@
 // EVENT SYSTEM
 // =============================================================================
 // Periodically evaluates event definitions and triggers those whose conditions
-// are met. Tracks per-event cooldowns to prevent rapid re-firing.
+// are met. Tracks per-event cooldowns and active durations.
 
 import { useLogStore } from "../../lib/log-store";
 import type { SeededRandom } from "../../world/factories/world-factory";
@@ -24,6 +24,9 @@ export class EventSystem {
   /** Tracks the last tick each event was evaluated */
   private lastEvaluated = new Map<string, number>();
 
+  /** Tracks currently active duration-based events: event id → end tick */
+  private activeEvents = new Map<string, number>();
+
   constructor(
     entityStore: EntityStore,
     rng: SeededRandom,
@@ -40,6 +43,19 @@ export class EventSystem {
     const world = this.getWorld();
     if (!world) return;
 
+    // Clear expired active events
+    for (const [id, endTick] of this.activeEvents) {
+      if (tick >= endTick) {
+        this.activeEvents.delete(id);
+        useLogStore
+          .getState()
+          .addEntry("info", `The ${id.replace("_", " ")} has ended.`, [
+            "event",
+            id,
+          ]);
+      }
+    }
+
     const ctx: EventContext = {
       entityStore: this.entityStore,
       world,
@@ -54,6 +70,9 @@ export class EventSystem {
   }
 
   private evaluateEvent(event: EventDefinition, ctx: EventContext): void {
+    // Don't evaluate if this event is currently active
+    if (this.activeEvents.has(event.id)) return;
+
     const lastTick = this.lastEvaluated.get(event.id) ?? 0;
     if (ctx.tick - lastTick < event.cooldownTicks) return;
 
@@ -63,5 +82,20 @@ export class EventSystem {
 
     const message = event.execute(ctx);
     useLogStore.getState().addEntry("info", message, ["event", event.id]);
+
+    // Track duration-based events
+    if (event.durationTicks > 0) {
+      this.activeEvents.set(event.id, ctx.tick + event.durationTicks);
+    }
+  }
+
+  /** Check if a specific event is currently active */
+  isEventActive(eventId: string): boolean {
+    return this.activeEvents.has(eventId);
+  }
+
+  /** Get all currently active event IDs */
+  getActiveEventIds(): ReadonlySet<string> {
+    return new Set(this.activeEvents.keys());
   }
 }
