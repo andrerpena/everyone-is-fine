@@ -188,7 +188,7 @@
 
 ## Phase 11 — Social System
 
-- [ ] 146. Implement social interaction system (colonists chat when near each other)
+- [x] 146. Implement social interaction system (colonists chat when near each other)
 - [x] 147. Create opinion/relationship tracker between colonist pairs
 - [ ] 148. Add social thought generation from interactions
 - [ ] 149. Implement friendship formation (high opinion over time)

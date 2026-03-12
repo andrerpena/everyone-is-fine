@@ -132,6 +132,8 @@ export {
   type SkillId,
   xpForNextLevel,
 } from "./skills";
+// Social Interactions
+export { SocialInteractionSystem } from "./social-interaction-system";
 // Thoughts
 export {
   type ActiveThought,

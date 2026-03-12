@@ -28,6 +28,7 @@ import {
   PlantGrowthSystem,
   RoomDetectionSystem,
   SnowAccumulationSystem,
+  SocialInteractionSystem,
   SowingSystem,
   simulationLoop,
   VisionSystem,
@@ -757,6 +758,7 @@ const roomDetection = new RoomDetectionSystem(
 );
 const itemDeterioration = new ItemDeteriorationSystem();
 const filthSystem = new FilthSystem(entityStore);
+const socialInteractionSystem = new SocialInteractionSystem(entityStore);
 const snowAccumulation = new SnowAccumulationSystem();
 const plantGrowth = new PlantGrowthSystem();
 const weatherSystem = new WeatherSystem();
@@ -844,6 +846,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
 
   // Assign idle behaviors (wander) before job processing
   idleBehavior.update();
+
+  // Ambient social interactions (adjacent colonist chats)
+  socialInteractionSystem.update();
 
   // Update job processor (advances work steps, initiates moves)
   jobProcessor.update(deltaTime);
