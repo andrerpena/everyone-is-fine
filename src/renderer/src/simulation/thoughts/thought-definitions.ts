@@ -44,7 +44,11 @@ export type ThoughtId =
   | "eclipse"
   | "psychic_drone"
   | "toxic_fallout"
-  | "volcanic_winter";
+  | "volcanic_winter"
+  | "freezing"
+  | "cold"
+  | "hot"
+  | "sweltering";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -323,6 +327,35 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
       "Ash clouds block the sun, plunging the world into bitter cold.",
     moodEffect: -0.06,
     durationSeconds: 14400, // matches volcanic winter event duration in ticks / TPS
+  },
+  // Temperature condition-based thoughts
+  {
+    id: "freezing",
+    label: "Freezing",
+    description: "It's dangerously cold. Risk of hypothermia.",
+    moodEffect: -0.15,
+    durationSeconds: 0,
+  },
+  {
+    id: "cold",
+    label: "Cold",
+    description: "It's uncomfortably cold here.",
+    moodEffect: -0.06,
+    durationSeconds: 0,
+  },
+  {
+    id: "hot",
+    label: "Hot",
+    description: "It's uncomfortably hot here.",
+    moodEffect: -0.06,
+    durationSeconds: 0,
+  },
+  {
+    id: "sweltering",
+    label: "Sweltering",
+    description: "It's dangerously hot. Risk of heatstroke.",
+    moodEffect: -0.15,
+    durationSeconds: 0,
   },
 ] as const;
 

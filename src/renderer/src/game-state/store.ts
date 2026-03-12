@@ -835,7 +835,7 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
   needsSystem.update(deltaTime);
 
   // Evaluate thoughts and compute mood from them
-  moodThoughtSystem.update(tick);
+  moodThoughtSystem.update(tick, world?.weather.temperature);
 
   // Check for mental break triggers/recovery
   mentalBreakSystem.update(tick);

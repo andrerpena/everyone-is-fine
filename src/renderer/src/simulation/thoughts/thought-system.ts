@@ -19,6 +19,8 @@ export interface EnvironmentContext {
   roomBeauty: number | null;
   /** Composite impressiveness score (null = outdoors or no room) */
   roomImpressiveness: number | null;
+  /** Temperature at the character's position in °C (null = unknown) */
+  temperature: number | null;
 }
 
 /** Function to look up a room at a position */
@@ -63,6 +65,19 @@ export function computeMoodFromThoughts(thoughts: ActiveThought[]): number {
 // =============================================================================
 // CONDITION EVALUATION
 // =============================================================================
+
+// =============================================================================
+// TEMPERATURE THRESHOLDS (°C)
+// =============================================================================
+
+/** Below this: freezing thought (severe) */
+export const FREEZING_THRESHOLD = -10;
+/** Below this: cold thought (mild) */
+export const COLD_THRESHOLD = 5;
+/** Above this: hot thought (mild) */
+export const HOT_THRESHOLD = 35;
+/** Above this: sweltering thought (severe) */
+export const SWELTERING_THRESHOLD = 45;
 
 /** Social context for evaluating relationship-based thoughts */
 export interface SocialContext {
@@ -151,6 +166,23 @@ export function evaluateConditionThoughts(
     thoughts.add("in_relationship");
   }
 
+  // --- Temperature thoughts ---
+  if (
+    envContext?.temperature !== null &&
+    envContext?.temperature !== undefined
+  ) {
+    const temp = envContext.temperature;
+    if (temp < FREEZING_THRESHOLD) {
+      thoughts.add("freezing");
+    } else if (temp < COLD_THRESHOLD) {
+      thoughts.add("cold");
+    } else if (temp > SWELTERING_THRESHOLD) {
+      thoughts.add("sweltering");
+    } else if (temp > HOT_THRESHOLD) {
+      thoughts.add("hot");
+    }
+  }
+
   // --- Environment/beauty thoughts ---
   if (envContext) {
     const { roomBeauty, roomImpressiveness } = envContext;
@@ -195,12 +227,14 @@ export class MoodThoughtSystem {
   /**
    * Update thoughts and mood for all characters.
    * @param currentTick - Current simulation tick number
+   * @param outdoorTemperature - Current outdoor temperature in °C
    */
-  update(currentTick: number): void {
+  update(currentTick: number, outdoorTemperature?: number): void {
     for (const character of this.entityStore.values()) {
       const updatedThoughts = this.updateCharacterThoughts(
         character,
         currentTick,
+        outdoorTemperature,
       );
       const mood = computeMoodFromThoughts(updatedThoughts);
 
@@ -223,20 +257,39 @@ export class MoodThoughtSystem {
 
   private getEnvironmentContext(
     character: Character,
+    outdoorTemperature?: number,
   ): EnvironmentContext | undefined {
-    if (!this.getRoomAt) return undefined;
     const { x, y, z } = character.position;
-    const room = this.getRoomAt(x, y, z);
-    if (!room || room.isOutdoors || !room.stats) return undefined;
-    return {
-      roomBeauty: room.stats.beauty,
-      roomImpressiveness: room.stats.impressiveness,
-    };
+    const room = this.getRoomAt?.(x, y, z) ?? null;
+
+    // Compute temperature: indoor rooms use room.temperature, otherwise outdoor
+    const temperature =
+      room && !room.isOutdoors && room.temperature !== null
+        ? room.temperature
+        : (outdoorTemperature ?? null);
+
+    // Beauty/impressiveness only available for indoor rooms with stats
+    const roomBeauty =
+      room && !room.isOutdoors && room.stats ? room.stats.beauty : null;
+    const roomImpressiveness =
+      room && !room.isOutdoors && room.stats ? room.stats.impressiveness : null;
+
+    // Return context if we have any useful data
+    if (
+      roomBeauty === null &&
+      roomImpressiveness === null &&
+      temperature === null
+    ) {
+      return undefined;
+    }
+
+    return { roomBeauty, roomImpressiveness, temperature };
   }
 
   private updateCharacterThoughts(
     character: Character,
     currentTick: number,
+    outdoorTemperature?: number,
   ): ActiveThought[] {
     // 1. Remove expired timed thoughts
     const surviving = character.thoughts.filter(
@@ -244,7 +297,10 @@ export class MoodThoughtSystem {
     );
 
     // 2. Evaluate which condition-based thoughts should be active
-    const envContext = this.getEnvironmentContext(character);
+    const envContext = this.getEnvironmentContext(
+      character,
+      outdoorTemperature,
+    );
     const socialContext: SocialContext = {
       totalColonists: this.entityStore.size,
     };
