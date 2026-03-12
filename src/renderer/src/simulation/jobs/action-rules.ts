@@ -13,6 +13,8 @@ import {
   createMineJob,
   createMineTerrainJob,
   createMoveJob,
+  createSmoothJob,
+  isSmoothable,
 } from "./job-factory";
 import type { ActionRule } from "./types";
 
@@ -77,6 +79,17 @@ export const ACTION_RULES: ActionRule[] = [
     },
     createJob: (characterId, target, tile) =>
       createMineTerrainJob(characterId, target, tile.terrain.type),
+  },
+  {
+    id: "smooth",
+    label: "Smooth",
+    priority: 7,
+    matches: (tile) =>
+      isSmoothable(tile.terrain.type) &&
+      tile.floor === null &&
+      tile.structure === null,
+    createJob: (characterId, target, tile) =>
+      createSmoothJob(characterId, target, tile.terrain.type),
   },
   {
     id: "deconstruct",

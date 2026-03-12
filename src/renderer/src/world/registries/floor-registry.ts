@@ -57,6 +57,12 @@ export const FLOOR_REGISTRY: Record<FloorType, FloorProperties> = {
   },
   carpet: { type: "carpet", movementCost: 0.85, beauty: 2, baseValue: 10 },
   concrete: { type: "concrete", movementCost: 0.75, beauty: 0, baseValue: 5 },
+  stone_smooth: {
+    type: "stone_smooth",
+    movementCost: 0.7,
+    beauty: 2,
+    baseValue: 10,
+  },
 };
 
 /**

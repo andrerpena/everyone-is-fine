@@ -726,6 +726,67 @@ export function createHaulJob(
   };
 }
 
+/** Terrain types that can be smoothed */
+const SMOOTHABLE_TERRAIN: ReadonlySet<TerrainType> = new Set([
+  "rock",
+  "granite",
+  "limestone",
+  "marble",
+  "obsidian",
+]);
+
+/** Base work ticks for smoothing (scaled by hardness) */
+const SMOOTH_BASE_TICKS = 240;
+
+/**
+ * Check if a terrain type can be smoothed.
+ */
+export function isSmoothable(terrainType: TerrainType): boolean {
+  return SMOOTHABLE_TERRAIN.has(terrainType);
+}
+
+/**
+ * Create a "smooth stone" job.
+ * Polishes rough rock terrain into a smooth stone floor.
+ * No materials required — just work time that scales with hardness.
+ * Steps: move adjacent → work → place stone_smooth floor
+ */
+export function createSmoothJob(
+  characterId: EntityId,
+  target: Position3D,
+  terrainType: TerrainType,
+): Job {
+  const terrainProps = TERRAIN_REGISTRY[terrainType];
+  const workTicks = Math.round(
+    SMOOTH_BASE_TICKS * (0.5 + terrainProps.hardness),
+  );
+
+  return {
+    id: generateJobId(),
+    type: "smooth",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      { type: "move", destination: target, adjacent: true, status: "pending" },
+      {
+        type: "work",
+        totalTicks: workTicks,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "place_floor",
+        position: target,
+        floorType: "stone_smooth",
+        status: "pending",
+      },
+    ],
+  };
+}
+
 /**
  * Create a "build floor" job.
  * Steps: move to tile → work (based on floor type) → place floor

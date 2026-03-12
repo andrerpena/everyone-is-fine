@@ -27,7 +27,9 @@ export {
   createMineTerrainJob,
   createMoveJob,
   createSleepJob,
+  createSmoothJob,
   createSowJob,
+  isSmoothable,
 } from "./job-factory";
 // Job processor
 export { JobProcessor } from "./job-processor";

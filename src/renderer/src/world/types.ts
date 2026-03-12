@@ -71,7 +71,8 @@ export type FloorType =
   | "metal_grate"
   | "carpet"
   | "concrete"
-  | "dirt_path"; // Compacted path
+  | "dirt_path" // Compacted path
+  | "stone_smooth"; // Smoothed natural rock
 
 /** Floor layer data */
 export interface FloorData {
