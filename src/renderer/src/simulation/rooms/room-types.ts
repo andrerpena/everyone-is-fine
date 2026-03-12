@@ -33,6 +33,8 @@ export interface Room {
   tiles: Set<string>;
   /** True if the room touches the map edge (effectively outdoors) */
   isOutdoors: boolean;
+  /** True if the room has a roof (indoor rooms are automatically roofed) */
+  isRoofed: boolean;
   /** Computed stats, null until calculated */
   stats: RoomStats | null;
   /** Functional role based on room contents */

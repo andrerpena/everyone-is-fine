@@ -60,6 +60,7 @@ export interface AgentTileInfo {
   floor: string | null;
   structure: string | null;
   isPassable: boolean;
+  isRoofed: boolean;
   items: Array<{ type: string; quantity: number }>;
   door?: { isOpen: boolean; isLocked: boolean };
 }

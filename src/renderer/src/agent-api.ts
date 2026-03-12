@@ -10,7 +10,7 @@ import type {
   GameAgentApi,
 } from "./agent-api.types";
 import { commandRegistry } from "./commands";
-import { useGameStore } from "./game-state";
+import { roomDetection, useGameStore } from "./game-state";
 import { entityStore } from "./simulation";
 import {
   createChopJob,
@@ -483,11 +483,13 @@ function createAgentApi(): GameAgentApi {
       const tile = getWorldTileAt(world, pos.x, pos.y, state.currentZLevel);
       if (!tile) return null;
 
+      const room = roomDetection.getRoomAt(pos.x, pos.y, state.currentZLevel);
       const info: AgentTileInfo = {
         terrain: tile.terrain.type,
         floor: tile.floor?.type ?? null,
         structure: tile.structure?.type ?? null,
         isPassable: tile.pathfinding.isPassable,
+        isRoofed: room?.isRoofed ?? false,
         items: tile.items.map((item) => ({
           type: item.type,
           quantity: item.quantity,

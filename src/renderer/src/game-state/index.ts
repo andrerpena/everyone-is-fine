@@ -56,7 +56,7 @@ export {
 } from "./hooks/useWorld";
 
 // Store
-export { useGameStore } from "./store";
+export { roomDetection, useGameStore } from "./store";
 // Types
 export type {
   EntitySelection,

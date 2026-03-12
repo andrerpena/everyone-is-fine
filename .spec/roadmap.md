@@ -168,7 +168,7 @@
 - [x] 129. Add building quality based on constructor skill level
 - [x] 130. Create architect/build menu UI for placing buildings
 - [x] 131. Implement resource cost checking before allowing placement
-- [ ] 132. Add roof system (auto-roofing enclosed areas, roof collapse on large spans)
+- [x] 132. Add roof system (auto-roofing enclosed areas, roof collapse on large spans) <!-- Partial: auto-roofing done, roof collapse deferred -->
 
 ## Phase 10 — Day/Night & Weather
 

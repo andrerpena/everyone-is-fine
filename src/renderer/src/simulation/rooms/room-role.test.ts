@@ -35,6 +35,7 @@ function makeRoom(tileKeys: string[], isOutdoors = false): Room {
     zLevel: 0,
     tiles: new Set(tileKeys),
     isOutdoors,
+    isRoofed: !isOutdoors,
     stats: null,
     role: "generic",
   };

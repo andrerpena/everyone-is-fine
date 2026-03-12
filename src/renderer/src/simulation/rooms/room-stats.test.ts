@@ -35,6 +35,7 @@ function makeRoom(tileKeys: string[]): Room {
     zLevel: 0,
     tiles: new Set(tileKeys),
     isOutdoors: false,
+    isRoofed: true,
     stats: null,
     role: "generic",
   };
@@ -88,6 +89,7 @@ describe("calculateRoomStats", () => {
       zLevel: 0,
       tiles: new Set(),
       isOutdoors: false,
+      isRoofed: true,
       stats: null,
       role: "generic",
     };

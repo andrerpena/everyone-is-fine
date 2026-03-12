@@ -81,6 +81,7 @@ describe("detectRoomsForLevel", () => {
 
     expect(rooms).toHaveLength(1);
     expect(rooms[0].isOutdoors).toBe(true);
+    expect(rooms[0].isRoofed).toBe(false);
     expect(rooms[0].tiles.size).toBe(9);
   });
 
@@ -104,6 +105,8 @@ describe("detectRoomsForLevel", () => {
 
     expect(indoor).toBeDefined();
     expect(outdoor).toBeDefined();
+    expect(indoor!.isRoofed).toBe(true);
+    expect(outdoor!.isRoofed).toBe(false);
     expect(indoor!.tiles.size).toBe(4); // 2x2 interior
     expect(indoor!.tiles.has("2,2")).toBe(true);
     expect(indoor!.tiles.has("3,2")).toBe(true);
@@ -145,6 +148,9 @@ describe("detectRoomsForLevel", () => {
 
     expect(indoors).toHaveLength(2);
     expect(outdoor).toBeDefined();
+    expect(indoors[0].isRoofed).toBe(true);
+    expect(indoors[1].isRoofed).toBe(true);
+    expect(outdoor!.isRoofed).toBe(false);
     expect(indoors[0].tiles.size).toBe(1); // 1x1 interior each
     expect(indoors[1].tiles.size).toBe(1);
   });

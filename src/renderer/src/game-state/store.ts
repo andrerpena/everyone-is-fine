@@ -761,7 +761,7 @@ const gameNotifications = new GameNotifications(entityStore, jobProcessor);
 // =============================================================================
 
 const visionSystem = new VisionSystem(entityStore);
-const roomDetection = new RoomDetectionSystem(
+export const roomDetection = new RoomDetectionSystem(
   () => useGameStore.getState().world,
 );
 const itemDeterioration = new ItemDeteriorationSystem();

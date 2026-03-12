@@ -94,6 +94,7 @@ export function detectRoomsForLevel(level: ZLevel): Room[] {
         zLevel: level.z,
         tiles: roomTiles,
         isOutdoors: touchesEdge,
+        isRoofed: !touchesEdge,
         stats: null,
         role: "generic",
       });
