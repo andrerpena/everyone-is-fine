@@ -21,6 +21,10 @@ import {
   removeItemFromTile,
 } from "../../world/utils/tile-utils";
 import type { EntityStore } from "../entity-store";
+import {
+  FOOD_POISONING_DURATION_TICKS,
+  rollFoodPoisoning,
+} from "../food-poisoning";
 import type { MovementSystem } from "../movement";
 import { findPath } from "../pathfinding";
 import { CROP_REGISTRY } from "../plants/crop-registry";
@@ -31,6 +35,7 @@ import {
   grantExperience,
   JOB_SKILL_MAP,
 } from "../skills";
+import type { ActiveThought } from "../thoughts";
 import { createMoveCommand, type EntityId } from "../types";
 import { ReservationSystem } from "./reservation-system";
 import type {
@@ -816,6 +821,21 @@ export class JobProcessor {
     this.entityStore.update(characterId, {
       needs: { ...needs, [step.needId]: newValue },
     });
+
+    // Check for food poisoning on food items
+    if (props.category === "food" && carried.quality < 1) {
+      if (rollFoodPoisoning(carried.quality)) {
+        const currentTick = this.getWorld()?.time.tickCount ?? 0;
+        const poisonThought: ActiveThought = {
+          thoughtId: "food_poisoning",
+          addedAtTick: currentTick,
+          expiresAtTick: currentTick + FOOD_POISONING_DURATION_TICKS,
+        };
+        this.entityStore.update(characterId, {
+          thoughts: [...character.thoughts, poisonThought],
+        });
+      }
+    }
 
     // Item is consumed — remove from carried items
     this.carriedItems.delete(characterId);

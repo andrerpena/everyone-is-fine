@@ -27,7 +27,8 @@ export type ThoughtId =
   | "environment_pleasant"
   | "environment_ugly"
   | "environment_hideous"
-  | "environment_impressive";
+  | "environment_impressive"
+  | "food_poisoning";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -182,6 +183,14 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     description: "This room is truly impressive",
     moodEffect: 0.05,
     durationSeconds: 0,
+  },
+  // Event-based timed thoughts
+  {
+    id: "food_poisoning",
+    label: "Food Poisoning",
+    description: "Feeling sick after eating a poorly prepared meal",
+    moodEffect: -0.15,
+    durationSeconds: 21600, // 6 hours
   },
 ] as const;
 
