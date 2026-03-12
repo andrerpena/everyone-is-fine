@@ -27,6 +27,7 @@ const ZONE_TYPE_LABELS: Record<ZoneType, string> = {
   stockpile: "Stockpile",
   growing: "Growing",
   dumping: "Dumping",
+  allowed_area: "Allowed Area",
 };
 
 /** Color indicators for zone types */
@@ -34,6 +35,7 @@ const ZONE_TYPE_COLORS: Record<ZoneType, string> = {
   stockpile: "bg-yellow-500",
   growing: "bg-green-500",
   dumping: "bg-red-500",
+  allowed_area: "bg-blue-500",
 };
 
 /** Priority display colors */

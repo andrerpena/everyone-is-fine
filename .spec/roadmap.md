@@ -122,7 +122,7 @@
 - [x] 89. Create stockpile zone type with item filter configuration <!-- Ticket 0035 -->
 - [x] 90. Add growing zone type (designate crop planting areas) <!-- Done: growing zones with cropType in zone-store, sowing system auto-plants -->
 - [x] 91. Create dumping zone type (for unwanted items)
-- [ ] 92. Implement allowed area zones (restrict colonist movement)
+- [x] 92. Implement allowed area zones (restrict colonist movement)
 - [x] 93. Add zone rendering overlay with color-coding <!-- Ticket 0034: basic overlay -->
 - [x] 94. Create zone management panel (list, rename, delete, configure zones)
 - [x] 95. Implement stockpile priority system (preferred, normal, low)

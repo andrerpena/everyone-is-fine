@@ -55,6 +55,8 @@ export interface PathfinderOptions {
   maxNodes?: number;
   /** Heuristic weight for A* (default: 1.0) */
   heuristicWeight?: number;
+  /** If set, only tiles whose "x,y" key is in this set are considered passable (allowed area restriction) */
+  allowedTiles?: ReadonlySet<string>;
 }
 
 // =============================================================================

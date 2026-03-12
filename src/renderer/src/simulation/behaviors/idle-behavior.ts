@@ -5,6 +5,7 @@
 
 import type { World } from "../../world/types";
 import { getWorldTileAt } from "../../world/utils/tile-utils";
+import { getAllowedTilesForCharacter } from "../../zones";
 import type { EntityStore } from "../entity-store";
 import type { JobProcessor } from "../jobs";
 import type { Job, MoveStep } from "../jobs/types";
@@ -132,11 +133,18 @@ export class IdleBehaviorSystem {
       return;
     }
 
+    // Check allowed area — skip target if outside allowed tiles
+    const allowedTiles = getAllowedTilesForCharacter(character.allowedAreaId);
+    if (allowedTiles && !allowedTiles.has(`${targetX},${targetY}`)) {
+      this.cooldowns.set(characterId, this.randomCooldown(characterId));
+      return;
+    }
+
     // Find path
     const level = world.levels.get(position.z);
     if (!level) return;
 
-    const result = findPath(level, position, target);
+    const result = findPath(level, position, target, { allowedTiles });
     if (!result.found) {
       this.cooldowns.set(characterId, this.randomCooldown(characterId));
       return;

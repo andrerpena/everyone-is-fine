@@ -134,10 +134,15 @@ class BinaryHeap<T> {
  */
 export class AStarPathfinder {
   private level: ZLevel;
-  private options: Required<PathfinderOptions>;
+  private options: Required<
+    Pick<PathfinderOptions, "allowDiagonal" | "maxNodes" | "heuristicWeight">
+  >;
+
+  private allowedTiles: ReadonlySet<string> | undefined;
 
   constructor(level: ZLevel, options: PathfinderOptions = {}) {
     this.level = level;
+    this.allowedTiles = options.allowedTiles;
     this.options = {
       allowDiagonal: options.allowDiagonal ?? true,
       maxNodes: options.maxNodes ?? 10000,
@@ -362,7 +367,12 @@ export class AStarPathfinder {
   private isPassable(pos: Position3D): boolean {
     const index = pos.y * this.level.width + pos.x;
     const tile = this.level.tiles[index];
-    return tile?.pathfinding?.isPassable ?? false;
+    if (!(tile?.pathfinding?.isPassable ?? false)) return false;
+    // Check allowed area restriction
+    if (this.allowedTiles && !this.allowedTiles.has(`${pos.x},${pos.y}`)) {
+      return false;
+    }
+    return true;
   }
 
   /**

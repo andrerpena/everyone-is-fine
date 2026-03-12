@@ -51,6 +51,7 @@ export interface AgentCharacterInfo {
   isDrafted: boolean;
   workPriorities: Record<string, number>;
   schedule: string[];
+  allowedAreaId: string | null;
 }
 
 /** Tile info exposed to agents */
@@ -78,6 +79,7 @@ export interface AgentWorldInfo {
   weather: {
     type: string;
     temperature: number;
+    forecast: string;
   };
 }
 
@@ -86,6 +88,7 @@ export interface AgentSimulationInfo {
   isPlaying: boolean;
   speed: number;
   currentTick: number;
+  activeEvents: string[];
 }
 
 /** Partial tile specification for world-building */
@@ -126,6 +129,8 @@ export interface GameAgentApi {
   getSchedule: (name: string) => string[] | null;
   draftCharacter: (name: string) => AgentCharacterInfo | null;
   undraftCharacter: (name: string) => AgentCharacterInfo | null;
+  setAllowedArea: (name: string, zoneId: string) => string;
+  clearAllowedArea: (name: string) => string;
 
   // State queries
   characters: AgentCharacterInfo[];

@@ -123,6 +123,7 @@ function toAgentCharacter(char: Character): AgentCharacterInfo {
     isDrafted: char.control.mode === "drafted",
     workPriorities: { ...char.workPriorities },
     schedule: [...char.schedule],
+    allowedAreaId: char.allowedAreaId,
   };
 }
 
@@ -432,6 +433,28 @@ function createAgentApi(): GameAgentApi {
       return [...char.schedule];
     },
 
+    setAllowedArea(name: string, zoneId: string) {
+      const char = findCharacterByName(name);
+      if (!char) return `Character "${name}" not found`;
+      const zone = useZoneStore.getState().zones.get(zoneId);
+      if (!zone || zone.type !== "allowed_area") {
+        return `Zone "${zoneId}" not found or not an allowed_area zone`;
+      }
+      useGameStore.getState().updateCharacter(char.id, {
+        allowedAreaId: zoneId,
+      });
+      return "ok";
+    },
+
+    clearAllowedArea(name: string) {
+      const char = findCharacterByName(name);
+      if (!char) return `Character "${name}" not found`;
+      useGameStore.getState().updateCharacter(char.id, {
+        allowedAreaId: null,
+      });
+      return "ok";
+    },
+
     // =========================================================================
     // STATE QUERIES (getters via Object.defineProperty below)
     // =========================================================================
@@ -440,7 +463,12 @@ function createAgentApi(): GameAgentApi {
     characters: [],
     selectedCharacter: null,
     world: null,
-    simulation: { isPlaying: false, speed: 1, currentTick: 0 },
+    simulation: {
+      isPlaying: false,
+      speed: 1,
+      currentTick: 0,
+      activeEvents: [],
+    },
 
     getCharacter(name: string) {
       const char = findCharacterByName(name);

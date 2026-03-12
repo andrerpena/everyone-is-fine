@@ -6,7 +6,7 @@ import type { CropType } from "../world/types";
 import type { StockpileFilter } from "./stockpile-filter";
 
 /** Types of zones that can be designated */
-export type ZoneType = "stockpile" | "growing" | "dumping";
+export type ZoneType = "stockpile" | "growing" | "dumping" | "allowed_area";
 
 /** Stockpile priority levels (lower value = higher priority) */
 export type ZonePriority = 1 | 2 | 3;
@@ -42,6 +42,7 @@ export const ZONE_COLORS: Record<ZoneType, number> = {
   stockpile: 0xf5c542, // Yellow
   growing: 0x42f554, // Green
   dumping: 0xf54242, // Red
+  allowed_area: 0x42b4f5, // Blue
 };
 
 /** Zone overlay alpha */

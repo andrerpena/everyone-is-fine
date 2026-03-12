@@ -49,6 +49,7 @@ import type {
 import { SeededRandom } from "../world/factories/world-factory";
 import type { Position2D, Position3D, Tile, World } from "../world/types";
 import { getTileAt, setTileAt } from "../world/utils/tile-utils";
+import { getAllowedTilesForCharacter } from "../zones";
 import type {
   GameStore,
   InteractionMode,
@@ -565,7 +566,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (!moveCmd.path) {
         const start: Position3D = { ...character.position };
         const goal: Position3D = { ...moveCmd.destination, z: currentZLevel };
-        const result = findPath(level, start, goal);
+        const allowedTiles = getAllowedTilesForCharacter(
+          character.allowedAreaId,
+        );
+        const result = findPath(level, start, goal, { allowedTiles });
 
         if (!result.found) {
           logger.warn(

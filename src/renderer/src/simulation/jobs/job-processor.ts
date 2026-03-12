@@ -21,6 +21,7 @@ import {
   getWorldTileAt,
   removeItemFromTile,
 } from "../../world/utils/tile-utils";
+import { getAllowedTilesForCharacter } from "../../zones";
 import type { EntityStore } from "../entity-store";
 import {
   FOOD_POISONING_DURATION_TICKS,
@@ -353,7 +354,10 @@ export class JobProcessor {
       return;
     }
 
-    const result = findPath(level, character.position, destination);
+    const allowedTiles = getAllowedTilesForCharacter(character.allowedAreaId);
+    const result = findPath(level, character.position, destination, {
+      allowedTiles,
+    });
     if (!result.found) {
       this.failJob(
         characterId,

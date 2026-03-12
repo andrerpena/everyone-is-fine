@@ -128,6 +128,8 @@ export interface Character extends Entity {
   workPriorities: WorkPriorities;
   /** 24-hour activity schedule */
   schedule: Schedule;
+  /** ID of the allowed area zone restricting this colonist's movement (null = unrestricted) */
+  allowedAreaId: string | null;
 }
 
 // =============================================================================
@@ -327,6 +329,7 @@ export function createCharacter(
     mentalBreak: null,
     workPriorities: createDefaultWorkPriorities(),
     schedule: createDefaultSchedule(),
+    allowedAreaId: null,
     ...options,
   };
 }
