@@ -1118,6 +1118,7 @@ function createAgentApi(): GameAgentApi {
         weather: {
           type: world.weather.type,
           temperature: world.weather.temperature,
+          forecast: world.weather.forecast,
         },
       };
     },
@@ -1131,6 +1132,7 @@ function createAgentApi(): GameAgentApi {
         isPlaying: sim.isPlaying,
         speed: sim.speed,
         currentTick: sim.currentTick,
+        activeEvents: Array.from(sim.activeEvents),
       };
     },
     enumerable: true,
