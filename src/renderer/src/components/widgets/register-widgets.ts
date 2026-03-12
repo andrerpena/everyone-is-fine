@@ -2,6 +2,7 @@ import {
   architectWidget,
   charactersWidget,
   colonistInfoWidget,
+  colonyOverviewWidget,
   layersWidget,
   logsWidget,
   miniMapWidget,
@@ -32,4 +33,5 @@ export function registerBuiltInWidgets(): void {
   widgetRegistry.register(miniMapWidget);
   widgetRegistry.register(workPrioritiesWidget);
   widgetRegistry.register(zonesWidget);
+  widgetRegistry.register(colonyOverviewWidget);
 }

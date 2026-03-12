@@ -1,6 +1,7 @@
 export { architectWidget } from "./ArchitectWidget";
 export { charactersWidget } from "./CharactersWidget";
 export { colonistInfoWidget } from "./ColonistInfoWidget";
+export { colonyOverviewWidget } from "./ColonyOverviewWidget";
 export { layersWidget } from "./LayersWidget";
 export { logsWidget } from "./LogsWidget";
 export { miniMapWidget } from "./MiniMapWidget";

@@ -376,4 +376,4 @@
 - [ ] 292. Create scenario system (different starting conditions)
 - [ ] 293. Add storyteller selection (Cassandra, Phoebe, Randy equivalents)
 - [ ] 294. Implement colonist gear management UI (assign outfits, equipment)
-- [ ] 295. Create colony overview panel (summary of all colonists, resources, threats)
+- [x] 295. Create colony overview panel (summary of all colonists, resources, threats)

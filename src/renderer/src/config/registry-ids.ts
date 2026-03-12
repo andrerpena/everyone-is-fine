@@ -24,6 +24,7 @@ export const WIDGET_IDS = [
   "mini-map",
   "work-priorities",
   "zones",
+  "colony-overview",
 ] as const;
 
 export const STATUS_BAR_IDS = [
