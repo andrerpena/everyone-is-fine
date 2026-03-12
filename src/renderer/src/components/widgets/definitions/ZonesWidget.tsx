@@ -1,5 +1,18 @@
-import { MapPin, Trash2 } from "lucide-react";
-import { useCallback } from "react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Filter,
+  MapPin,
+  Trash2,
+} from "lucide-react";
+import { useCallback, useState } from "react";
+import { ITEM_REGISTRY } from "../../../world/registries/item-registry";
+import type { ItemCategory, ItemType } from "../../../world/types";
+import {
+  ALL_CATEGORIES,
+  CATEGORY_ITEMS,
+  type StockpileFilter,
+} from "../../../zones/stockpile-filter";
 import {
   ZONE_PRIORITY_LABELS,
   type ZoneData,
@@ -30,6 +43,17 @@ const PRIORITY_COLORS: Record<ZonePriority, string> = {
   3: "text-orange-400",
 };
 
+/** Human-readable category labels */
+const CATEGORY_LABELS: Record<ItemCategory, string> = {
+  resource: "Resources",
+  food: "Food",
+  weapon: "Weapons",
+  apparel: "Apparel",
+  medicine: "Medicine",
+  tool: "Tools",
+  artifact: "Artifacts",
+};
+
 function ZonesWidget(_props: WidgetComponentProps) {
   const zones = useZoneStore((s) => s.getAllZones());
   const deleteZone = useZoneStore((s) => s.deleteZone);
@@ -44,6 +68,9 @@ function ZonesWidget(_props: WidgetComponentProps) {
     },
     [setZonePriority],
   );
+
+  /** Track which zone's filter panel is open */
+  const [filterOpenId, setFilterOpenId] = useState<string | null>(null);
 
   if (zones.length === 0) {
     return (
@@ -75,38 +102,16 @@ function ZonesWidget(_props: WidgetComponentProps) {
         </thead>
         <tbody>
           {zones.map((zone) => (
-            <tr
+            <ZoneRow
               key={zone.id}
-              className="border-b border-neutral-800 hover:bg-neutral-800/50"
-            >
-              <td className="p-1.5 pl-2">
-                <span className="inline-flex items-center gap-1.5">
-                  <span
-                    className={`w-2 h-2 rounded-full ${ZONE_TYPE_COLORS[zone.type]}`}
-                  />
-                  <span className="text-neutral-300">
-                    {ZONE_TYPE_LABELS[zone.type]}
-                  </span>
-                </span>
-              </td>
-              <td className="p-1.5 text-neutral-200">{zone.name}</td>
-              <td className="p-1.5 text-center text-neutral-400">
-                {zone.tiles.size}
-              </td>
-              <td className="p-1.5 text-center">
-                <ZoneConfig zone={zone} onCyclePriority={cyclePriority} />
-              </td>
-              <td className="p-0.5 text-center">
-                <button
-                  type="button"
-                  className="p-1 text-neutral-500 hover:text-red-400 cursor-pointer"
-                  onClick={() => deleteZone(zone.id)}
-                  title={`Delete ${zone.name}`}
-                >
-                  <Trash2 size={12} />
-                </button>
-              </td>
-            </tr>
+              zone={zone}
+              filterOpen={filterOpenId === zone.id}
+              onToggleFilter={() =>
+                setFilterOpenId((prev) => (prev === zone.id ? null : zone.id))
+              }
+              onCyclePriority={cyclePriority}
+              onDelete={deleteZone}
+            />
           ))}
         </tbody>
       </table>
@@ -114,24 +119,98 @@ function ZonesWidget(_props: WidgetComponentProps) {
   );
 }
 
+function ZoneRow({
+  zone,
+  filterOpen,
+  onToggleFilter,
+  onCyclePriority,
+  onDelete,
+}: {
+  zone: ZoneData;
+  filterOpen: boolean;
+  onToggleFilter: () => void;
+  onCyclePriority: (zone: ZoneData) => void;
+  onDelete: (id: string) => void;
+}) {
+  return (
+    <>
+      <tr className="border-b border-neutral-800 hover:bg-neutral-800/50">
+        <td className="p-1.5 pl-2">
+          <span className="inline-flex items-center gap-1.5">
+            <span
+              className={`w-2 h-2 rounded-full ${ZONE_TYPE_COLORS[zone.type]}`}
+            />
+            <span className="text-neutral-300">
+              {ZONE_TYPE_LABELS[zone.type]}
+            </span>
+          </span>
+        </td>
+        <td className="p-1.5 text-neutral-200">{zone.name}</td>
+        <td className="p-1.5 text-center text-neutral-400">
+          {zone.tiles.size}
+        </td>
+        <td className="p-1.5 text-center">
+          <ZoneConfig
+            zone={zone}
+            onCyclePriority={onCyclePriority}
+            onToggleFilter={onToggleFilter}
+            filterOpen={filterOpen}
+          />
+        </td>
+        <td className="p-0.5 text-center">
+          <button
+            type="button"
+            className="p-1 text-neutral-500 hover:text-red-400 cursor-pointer"
+            onClick={() => onDelete(zone.id)}
+            title={`Delete ${zone.name}`}
+          >
+            <Trash2 size={12} />
+          </button>
+        </td>
+      </tr>
+      {filterOpen && zone.type === "stockpile" && zone.filter && (
+        <tr>
+          <td colSpan={5} className="p-0">
+            <StockpileFilterPanel zoneId={zone.id} filter={zone.filter} />
+          </td>
+        </tr>
+      )}
+    </>
+  );
+}
+
 function ZoneConfig({
   zone,
   onCyclePriority,
+  onToggleFilter,
+  filterOpen,
 }: {
   zone: ZoneData;
   onCyclePriority: (zone: ZoneData) => void;
+  onToggleFilter: () => void;
+  filterOpen: boolean;
 }) {
   if (zone.type === "stockpile") {
     const priority = zone.priority ?? 2;
     return (
-      <button
-        type="button"
-        className={`cursor-pointer hover:underline font-medium ${PRIORITY_COLORS[priority]}`}
-        onClick={() => onCyclePriority(zone)}
-        title="Click to cycle priority"
-      >
-        {ZONE_PRIORITY_LABELS[priority]}
-      </button>
+      <span className="inline-flex items-center gap-1.5">
+        <button
+          type="button"
+          className={`cursor-pointer hover:underline font-medium ${PRIORITY_COLORS[priority]}`}
+          onClick={() => onCyclePriority(zone)}
+          title="Click to cycle priority"
+        >
+          {ZONE_PRIORITY_LABELS[priority]}
+        </button>
+        <button
+          type="button"
+          className={`cursor-pointer p-0.5 rounded ${filterOpen ? "text-yellow-400" : "text-neutral-500 hover:text-neutral-300"}`}
+          onClick={onToggleFilter}
+          title="Toggle item filter"
+        >
+          <Filter size={11} />
+        </button>
+      </span>
     );
   }
 
@@ -140,6 +219,127 @@ function ZoneConfig({
   }
 
   return <span className="text-neutral-500">—</span>;
+}
+
+/** Panel showing category checkboxes and per-item toggles for a stockpile */
+function StockpileFilterPanel({
+  zoneId,
+  filter,
+}: {
+  zoneId: string;
+  filter: StockpileFilter;
+}) {
+  const setStockpileFilter = useZoneStore((s) => s.setStockpileFilter);
+  const [expandedCat, setExpandedCat] = useState<ItemCategory | null>(null);
+
+  const toggleCategory = useCallback(
+    (category: ItemCategory) => {
+      const newAllowed = new Set(filter.allowedCategories);
+      if (newAllowed.has(category)) {
+        newAllowed.delete(category);
+      } else {
+        newAllowed.add(category);
+      }
+      setStockpileFilter(zoneId, {
+        allowedCategories: newAllowed,
+        disallowedTypes: new Set(filter.disallowedTypes),
+      });
+    },
+    [zoneId, filter, setStockpileFilter],
+  );
+
+  const toggleItem = useCallback(
+    (itemType: ItemType) => {
+      const newDisallowed = new Set(filter.disallowedTypes);
+      if (newDisallowed.has(itemType)) {
+        newDisallowed.delete(itemType);
+      } else {
+        newDisallowed.add(itemType);
+      }
+      setStockpileFilter(zoneId, {
+        allowedCategories: new Set(filter.allowedCategories),
+        disallowedTypes: newDisallowed,
+      });
+    },
+    [zoneId, filter, setStockpileFilter],
+  );
+
+  return (
+    <div className="bg-neutral-900/80 border-t border-neutral-700 px-3 py-2 space-y-1">
+      <div className="text-[10px] text-neutral-500 uppercase tracking-wider mb-1">
+        Item Filter
+      </div>
+      {ALL_CATEGORIES.map((cat) => {
+        const items = CATEGORY_ITEMS.get(cat);
+        if (!items || items.size === 0) return null;
+        const catEnabled = filter.allowedCategories.has(cat);
+        const isExpanded = expandedCat === cat;
+
+        return (
+          <div key={cat}>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                className="text-neutral-500 hover:text-neutral-300 cursor-pointer p-0.5"
+                onClick={() => setExpandedCat(isExpanded ? null : cat)}
+              >
+                {isExpanded ? (
+                  <ChevronDown size={10} />
+                ) : (
+                  <ChevronRight size={10} />
+                )}
+              </button>
+              <label className="flex items-center gap-1.5 cursor-pointer text-xs">
+                <input
+                  type="checkbox"
+                  checked={catEnabled}
+                  onChange={() => toggleCategory(cat)}
+                  className="accent-yellow-500"
+                />
+                <span
+                  className={
+                    catEnabled ? "text-neutral-200" : "text-neutral-500"
+                  }
+                >
+                  {CATEGORY_LABELS[cat]}
+                </span>
+              </label>
+            </div>
+            {isExpanded && catEnabled && (
+              <div className="ml-6 space-y-0.5 mt-0.5">
+                {Array.from(items).map((itemType) => {
+                  const excluded = filter.disallowedTypes.has(itemType);
+                  const label =
+                    ITEM_REGISTRY[itemType as keyof typeof ITEM_REGISTRY]
+                      ?.label ?? itemType;
+                  return (
+                    <label
+                      key={itemType}
+                      className="flex items-center gap-1.5 cursor-pointer text-xs"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={!excluded}
+                        onChange={() => toggleItem(itemType)}
+                        className="accent-yellow-500"
+                      />
+                      <span
+                        className={
+                          excluded ? "text-neutral-500" : "text-neutral-300"
+                        }
+                      >
+                        {label}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export const zonesWidget: WidgetDefinition = {
