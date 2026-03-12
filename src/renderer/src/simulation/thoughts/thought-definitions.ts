@@ -28,7 +28,8 @@ export type ThoughtId =
   | "environment_ugly"
   | "environment_hideous"
   | "environment_impressive"
-  | "food_poisoning";
+  | "food_poisoning"
+  | "ate_nutrient_paste";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -191,6 +192,13 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     description: "Feeling sick after eating a poorly prepared meal",
     moodEffect: -0.15,
     durationSeconds: 21600, // 6 hours
+  },
+  {
+    id: "ate_nutrient_paste",
+    label: "Ate Nutrient Paste",
+    description: "That paste was awful, but at least it was filling",
+    moodEffect: -0.08,
+    durationSeconds: 14400, // 4 hours
   },
 ] as const;
 

@@ -74,6 +74,7 @@ export const defaultGameColors: GameColors = {
     table: "#d2691e",
     workbench: "#808000",
     campfire: "#ff6600",
+    nutrient_paste_dispenser: "#7b8a7b",
     chest: "#654321",
     shelf: "#bc8f8f",
     stockpile_zone: "#000000",

@@ -7,13 +7,14 @@ import { FLOOR_REGISTRY } from "../../world/registries/floor-registry";
 import { ITEM_REGISTRY } from "../../world/registries/item-registry";
 import { STRUCTURE_REGISTRY } from "../../world/registries/structure-registry";
 import { TERRAIN_REGISTRY } from "../../world/registries/terrain-registry";
-import type {
-  ItemData,
-  ItemType,
-  Position2D,
-  Position3D,
-  Tile,
-  World,
+import {
+  type ItemData,
+  type ItemType,
+  type Position2D,
+  type Position3D,
+  TICKS_PER_HOUR,
+  type Tile,
+  type World,
 } from "../../world/types";
 import {
   addItemToTile,
@@ -823,16 +824,35 @@ export class JobProcessor {
     });
 
     // Check for food poisoning on food items
+    const currentTick = this.getWorld()?.time.tickCount ?? 0;
     if (props.category === "food" && carried.quality < 1) {
       if (rollFoodPoisoning(carried.quality)) {
-        const currentTick = this.getWorld()?.time.tickCount ?? 0;
         const poisonThought: ActiveThought = {
           thoughtId: "food_poisoning",
           addedAtTick: currentTick,
           expiresAtTick: currentTick + FOOD_POISONING_DURATION_TICKS,
         };
+        // Re-read character since needs were just updated
+        const updated = this.entityStore.get(characterId);
+        if (updated) {
+          this.entityStore.update(characterId, {
+            thoughts: [...updated.thoughts, poisonThought],
+          });
+        }
+      }
+    }
+
+    // Nutrient paste mood penalty
+    if (carried.type === "nutrient_paste") {
+      const pasteThought: ActiveThought = {
+        thoughtId: "ate_nutrient_paste",
+        addedAtTick: currentTick,
+        expiresAtTick: currentTick + TICKS_PER_HOUR * 4,
+      };
+      const updated = this.entityStore.get(characterId);
+      if (updated) {
         this.entityStore.update(characterId, {
-          thoughts: [...character.thoughts, poisonThought],
+          thoughts: [...updated.thoughts, pasteThought],
         });
       }
     }

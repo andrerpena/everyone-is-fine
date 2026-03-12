@@ -111,6 +111,7 @@ export type StructureType =
   | "table"
   | "workbench"
   | "campfire"
+  | "nutrient_paste_dispenser"
   // Containers
   | "chest"
   | "shelf"

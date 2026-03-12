@@ -84,6 +84,13 @@ export const CONSTRUCTION_REGISTRY: Partial<
     ],
     workTicks: 120,
   },
+  nutrient_paste_dispenser: {
+    materials: [
+      { type: "iron", quantity: 5 },
+      { type: "stone", quantity: 3 },
+    ],
+    workTicks: 600,
+  },
 
   // Containers
   chest: {

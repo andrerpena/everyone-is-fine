@@ -364,6 +364,46 @@ export function createCookJob(
 }
 
 /**
+ * Create a "dispense nutrient paste" job.
+ * No raw food required — the dispenser produces paste from nothing.
+ * Steps: move adjacent to dispenser → work 60 ticks → spawn nutrient_paste
+ */
+export function createDispenserJob(
+  characterId: EntityId,
+  dispenserPos: Position3D,
+): Job {
+  return {
+    id: generateJobId(),
+    type: "dispense",
+    characterId,
+    targetPosition: dispenserPos,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: dispenserPos,
+        adjacent: true,
+        status: "pending",
+      },
+      {
+        type: "work",
+        totalTicks: 60,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "spawn_items",
+        position: dispenserPos,
+        items: [{ type: "nutrient_paste", quantity: 1 }],
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/**
  * Create a simple "move" job.
  * Steps: move to destination
  */

@@ -13,7 +13,7 @@ import {
 import type { EntityStore } from "../entity-store";
 import type { EntityId } from "../types";
 import { pickBestCharacter } from "../work-priorities";
-import { createCookJob } from "./job-factory";
+import { createCookJob, createDispenserJob } from "./job-factory";
 import type { JobProcessor } from "./job-processor";
 
 // =============================================================================
@@ -103,6 +103,29 @@ export class CookingSystem {
       assignedCharacters.add(charId);
       jobsAssigned++;
     }
+
+    // Assign nutrient paste dispenser jobs (no raw food needed)
+    const dispensers = this.findDispensers(world);
+    for (const dispenserPos of dispensers) {
+      if (jobsAssigned >= MAX_JOBS_PER_SCAN) break;
+
+      if (this.jobProcessor.reservations.isReserved(dispenserPos)) continue;
+
+      const charId = pickBestCharacter(
+        this.entityStore.values(),
+        "cooking",
+        dispenserPos,
+        (id) =>
+          assignedCharacters.has(id) ||
+          this.jobProcessor.getJob(id) !== undefined,
+      );
+      if (!charId) continue;
+
+      const job = createDispenserJob(charId, dispenserPos);
+      this.jobProcessor.assignJob(job);
+      assignedCharacters.add(charId);
+      jobsAssigned++;
+    }
   }
 
   /**
@@ -123,6 +146,26 @@ export class CookingSystem {
     }
 
     return campfires;
+  }
+
+  /**
+   * Find all nutrient paste dispenser positions in the world.
+   */
+  private findDispensers(world: World): Position3D[] {
+    const dispensers: Position3D[] = [];
+
+    for (const [z, level] of world.levels) {
+      for (let y = 0; y < level.height; y++) {
+        for (let x = 0; x < level.width; x++) {
+          const tile = level.tiles[y * level.width + x];
+          if (tile?.structure?.type === "nutrient_paste_dispenser") {
+            dispensers.push({ x, y, z });
+          }
+        }
+      }
+    }
+
+    return dispensers;
   }
 
   /**

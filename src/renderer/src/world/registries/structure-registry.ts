@@ -144,6 +144,17 @@ export const STRUCTURE_REGISTRY: Record<StructureType, StructureProperties> = {
     beauty: 0,
     baseValue: 20,
   },
+  nutrient_paste_dispenser: {
+    type: "nutrient_paste_dispenser",
+    category: "machine",
+    blocksMovement: false,
+    blocksVision: false,
+    isInteractable: true,
+    maxHealth: 200,
+    flammability: 0,
+    beauty: -2,
+    baseValue: 200,
+  },
   chest: {
     type: "chest",
     category: "container",
