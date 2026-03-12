@@ -18,6 +18,7 @@ export {
   createBuildFloorJob,
   createBuildJob,
   createChopJob,
+  createCleanJob,
   createCookJob,
   createDeconstructJob,
   createForageJob,
@@ -44,6 +45,7 @@ export { SowingSystem } from "./sowing-system";
 export type {
   Action,
   ActionRule,
+  CleanTileStep,
   DropItemStep,
   HarvestCropStep,
   Job,

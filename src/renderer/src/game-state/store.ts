@@ -12,6 +12,7 @@ import {
   ConstructionSystem,
   CookingSystem,
   entityStore,
+  FilthSystem,
   findPath,
   GameNotifications,
   getOutdoorTemperature,
@@ -755,6 +756,7 @@ const roomDetection = new RoomDetectionSystem(
   () => useGameStore.getState().world,
 );
 const itemDeterioration = new ItemDeteriorationSystem();
+const filthSystem = new FilthSystem(entityStore);
 const snowAccumulation = new SnowAccumulationSystem();
 const plantGrowth = new PlantGrowthSystem();
 const weatherSystem = new WeatherSystem();
@@ -801,6 +803,8 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
     plantGrowth.update(() => world);
     // Degrade items on ground tiles
     itemDeterioration.update(() => world);
+    // Generate filth on tiles where colonists stand
+    filthSystem.update(() => world);
     // Update tile visibility based on colonist positions
     visionSystem.update(() => world);
   }

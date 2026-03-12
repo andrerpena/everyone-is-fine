@@ -12,6 +12,8 @@ export {
 export { NeedSatisfactionSystem } from "./behaviors/need-satisfaction-system";
 // Entity Store
 export { EntityStore, entityStore } from "./entity-store";
+// Filth
+export { FilthSystem } from "./filth-system";
 // Game Notifications
 export { GameNotifications } from "./game-notifications";
 // Items

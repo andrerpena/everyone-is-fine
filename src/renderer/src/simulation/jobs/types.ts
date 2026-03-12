@@ -170,6 +170,13 @@ export interface RepairStructureStep {
   status: StepStatus;
 }
 
+export interface CleanTileStep {
+  type: "clean_tile";
+  /** Tile to clean */
+  position: Position3D;
+  status: StepStatus;
+}
+
 export type JobStep =
   | MoveStep
   | WorkStep
@@ -183,7 +190,8 @@ export type JobStep =
   | ConsumeItemStep
   | PlaceStructureStep
   | PlaceFloorStep
-  | RepairStructureStep;
+  | RepairStructureStep
+  | CleanTileStep;
 
 // =============================================================================
 // ACTION RULES - Declarative matching for tile → actions

@@ -40,6 +40,7 @@ function makeTile(
     pathfinding: { isPassable: true, movementCost: 1, lastUpdated: 0 },
     visibility: { explored: false, visible: false, lightLevel: 0 },
     snowDepth: 0,
+    filth: 0,
     crop,
     blueprint: null,
   };

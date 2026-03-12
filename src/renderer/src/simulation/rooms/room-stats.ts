@@ -24,6 +24,7 @@ export function calculateRoomStats(room: Room, level: ZLevel): RoomStats {
 
   let totalBeauty = 0;
   let totalWealth = 0;
+  let totalFilth = 0;
 
   for (const tileKey of room.tiles) {
     const [xStr, yStr] = tileKey.split(",");
@@ -53,9 +54,15 @@ export function calculateRoomStats(room: Room, level: ZLevel): RoomStats {
       const itemProps = ITEM_REGISTRY[item.type];
       totalWealth += itemProps.baseValue * item.quantity;
     }
+
+    // Filth penalty
+    totalFilth += tile.filth;
   }
 
-  const beauty = Math.round((totalBeauty / size) * 100) / 100;
+  // Filth reduces average beauty (3 beauty points per filth point)
+  const averageFilth = totalFilth / size;
+  const beauty =
+    Math.round(((totalBeauty - averageFilth * 3) / size) * 100) / 100;
   const impressiveness = calculateImpressiveness(size, beauty, totalWealth);
 
   return { size, beauty, wealth: totalWealth, impressiveness };

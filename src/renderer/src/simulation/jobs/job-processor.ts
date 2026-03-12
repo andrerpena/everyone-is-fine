@@ -40,6 +40,7 @@ import type { ActiveThought } from "../thoughts";
 import { createMoveCommand, type EntityId } from "../types";
 import { ReservationSystem } from "./reservation-system";
 import type {
+  CleanTileStep,
   ConsumeItemStep,
   DropItemStep,
   HarvestCropStep,
@@ -293,6 +294,10 @@ export class JobProcessor {
 
       case "repair_structure":
         this.executeRepairStructure(characterId, job, step);
+        break;
+
+      case "clean_tile":
+        this.executeCleanTile(characterId, job, step);
         break;
     }
   }
@@ -820,6 +825,45 @@ export class JobProcessor {
 
     const props = STRUCTURE_REGISTRY[tile.structure.type];
     tile.structure.health = props.maxHealth;
+
+    // Notify store so rendering updates
+    this.updateTile(
+      { x: step.position.x, y: step.position.y },
+      step.position.z,
+      {},
+    );
+
+    step.status = "completed";
+    this.advanceToNextStep(characterId, job);
+  }
+
+  // ===========================================================================
+  // CLEAN TILE STEP
+  // ===========================================================================
+
+  private executeCleanTile(
+    characterId: EntityId,
+    job: Job,
+    step: CleanTileStep,
+  ): void {
+    const world = this.getWorld();
+    if (!world) {
+      this.failJob(characterId, job, "World not initialized");
+      return;
+    }
+
+    const tile = getWorldTileAt(
+      world,
+      step.position.x,
+      step.position.y,
+      step.position.z,
+    );
+    if (!tile) {
+      this.failJob(characterId, job, "Tile not found");
+      return;
+    }
+
+    tile.filth = 0;
 
     // Notify store so rendering updates
     this.updateTile(

@@ -874,3 +874,51 @@ export function createBuildFloorJob(
     ],
   };
 }
+
+/** Base work ticks for cleaning a tile */
+const CLEAN_BASE_TICKS = 120;
+
+/**
+ * Create a "clean tile" job.
+ * Removes filth from a dirty tile. Work time scales with filth level.
+ * Steps: move to tile → work → clean_tile
+ */
+export function createCleanJob(
+  characterId: EntityId,
+  target: Position3D,
+  filthLevel: number,
+): Job {
+  const workTicks = Math.max(
+    60,
+    Math.round(CLEAN_BASE_TICKS * Math.min(filthLevel, 5)),
+  );
+
+  return {
+    id: generateJobId(),
+    type: "clean",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      {
+        type: "move",
+        destination: target,
+        adjacent: false,
+        status: "pending",
+      },
+      {
+        type: "work",
+        totalTicks: workTicks,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "clean_tile",
+        position: target,
+        status: "pending",
+      },
+    ],
+  };
+}

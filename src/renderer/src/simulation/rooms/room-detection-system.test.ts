@@ -19,6 +19,7 @@ function makeTile(structure: StructureData | null = null): Tile {
     },
     visibility: { explored: false, visible: false, lightLevel: 0 },
     snowDepth: 0,
+    filth: 0,
     crop: null,
     blueprint: null,
   };

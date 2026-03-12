@@ -17,6 +17,7 @@ function makeTile(): Tile {
     pathfinding: { isPassable: true, movementCost: 1, lastUpdated: 0 },
     visibility: { explored: false, visible: false, lightLevel: 0 },
     snowDepth: 0,
+    filth: 0,
     crop: null,
     blueprint: null,
   };

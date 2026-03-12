@@ -319,6 +319,9 @@ export interface Tile {
   /** Snow depth on this tile (0 = none, 1 = fully covered) */
   snowDepth: number;
 
+  /** Filth level on this tile (0 = clean, higher = dirtier) */
+  filth: number;
+
   /** Crop planted on this tile (null = no crop) */
   crop: CropData | null;
 
@@ -483,6 +486,7 @@ export const DEFAULT_TILE: Tile = {
     lightLevel: 0,
   },
   snowDepth: 0,
+  filth: 0,
   crop: null,
   blueprint: null,
 };

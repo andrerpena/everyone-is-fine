@@ -8,6 +8,7 @@ import { TERRAIN_REGISTRY } from "../../world/registries/terrain-registry";
 import {
   createBuildJob,
   createChopJob,
+  createCleanJob,
   createDeconstructJob,
   createForageJob,
   createMineJob,
@@ -112,6 +113,14 @@ export const ACTION_RULES: ActionRule[] = [
         tile.structure!.type,
         tile.structure!.health,
       ),
+  },
+  {
+    id: "clean",
+    label: "Clean",
+    priority: 4,
+    matches: (tile) => tile.filth > 0,
+    createJob: (characterId, target, tile) =>
+      createCleanJob(characterId, target, tile.filth),
   },
   {
     id: "deconstruct",
