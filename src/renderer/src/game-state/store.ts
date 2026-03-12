@@ -11,6 +11,7 @@ import {
   advanceTime,
   ConstructionSystem,
   CookingSystem,
+  EventSystem,
   entityStore,
   FilthSystem,
   findPath,
@@ -44,6 +45,7 @@ import type {
   MoveCommand,
   SimulationSpeed,
 } from "../simulation/types";
+import { SeededRandom } from "../world/factories/world-factory";
 import type { Position2D, Position3D, Tile, World } from "../world/types";
 import { getTileAt, setTileAt } from "../world/utils/tile-utils";
 import type {
@@ -772,6 +774,12 @@ const mentalBreakSystem = new MentalBreakSystem(
   movementSystem,
   () => useGameStore.getState().world,
 );
+const eventSystem = new EventSystem(
+  entityStore,
+  new SeededRandom(2000),
+  () => useGameStore.getState().world,
+  (character) => useGameStore.getState().addCharacter(character),
+);
 
 // =============================================================================
 // SIMULATION LOOP SETUP
@@ -849,6 +857,9 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
 
   // Ambient social interactions (adjacent colonist chats)
   socialInteractionSystem.update();
+
+  // Evaluate periodic colony events (wanderers, etc.)
+  eventSystem.update(tick);
 
   // Update job processor (advances work steps, initiates moves)
   jobProcessor.update(deltaTime);

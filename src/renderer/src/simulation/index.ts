@@ -12,6 +12,15 @@ export {
 export { NeedSatisfactionSystem } from "./behaviors/need-satisfaction-system";
 // Entity Store
 export { EntityStore, entityStore } from "./entity-store";
+export {
+  ALL_EVENTS,
+  type EventContext,
+  type EventDefinition,
+  WANDERER_CHANCE,
+  WANDERER_MAX_COLONY_SIZE,
+} from "./events/event-definitions";
+// Events
+export { EventSystem } from "./events/event-system";
 // Filth
 export { FilthSystem } from "./filth-system";
 // Game Notifications

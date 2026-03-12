@@ -262,7 +262,7 @@
 
 ## Phase 16 — Events & Storyteller
 
-- [ ] 205. Implement event system framework (trigger, conditions, effects)
+- [x] 205. Implement event system framework (trigger, conditions, effects)
 - [ ] 206. Create storyteller AI that selects events based on colony state
 - [ ] 207. Add raid event (hostile pawns attack the colony)
 - [ ] 208. Create manhunter animal pack event
