@@ -3,6 +3,8 @@
 // =============================================================================
 
 import type { Position2D, Position3D } from "../world/types";
+import type { BodyPartsState } from "./health/body-parts";
+import { createDefaultBodyParts } from "./health/body-parts";
 import type { Schedule } from "./schedule";
 import { createDefaultSchedule } from "./schedule";
 import type { CharacterSkills } from "./skills";
@@ -130,6 +132,8 @@ export interface Character extends Entity {
   schedule: Schedule;
   /** ID of the allowed area zone restricting this colonist's movement (null = unrestricted) */
   allowedAreaId: string | null;
+  /** Body part health state */
+  bodyParts: BodyPartsState;
 }
 
 // =============================================================================
@@ -330,6 +334,7 @@ export function createCharacter(
     workPriorities: createDefaultWorkPriorities(),
     schedule: createDefaultSchedule(),
     allowedAreaId: null,
+    bodyParts: createDefaultBodyParts(),
     ...options,
   };
 }

@@ -52,7 +52,14 @@ function makeWorld(
   } as ZLevel;
 
   return {
-    metadata: { id: "test", name: "test", seed: 0, createdAt: 0, version: "1.0", tickCount: 0 },
+    metadata: {
+      id: "test",
+      name: "test",
+      seed: 0,
+      createdAt: 0,
+      version: "1.0",
+      tickCount: 0,
+    },
     dimensions: { width, height, minZ: 0, maxZ: 0 },
     levels: new Map([[0, level]]),
     surfaceZ: 0,

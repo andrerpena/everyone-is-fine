@@ -12,6 +12,7 @@ import type {
 import { commandRegistry } from "./commands";
 import { roomDetection, useGameStore } from "./game-state";
 import { entityStore } from "./simulation";
+import { BODY_PART_DEFINITIONS } from "./simulation/health/body-parts";
 import {
   createChopJob,
   createMineJob,
@@ -124,6 +125,12 @@ function toAgentCharacter(char: Character): AgentCharacterInfo {
     workPriorities: { ...char.workPriorities },
     schedule: [...char.schedule],
     allowedAreaId: char.allowedAreaId,
+    bodyParts: BODY_PART_DEFINITIONS.map((def) => ({
+      id: def.id,
+      label: def.label,
+      health: char.bodyParts[def.id].health,
+      maxHealth: char.bodyParts[def.id].maxHealth,
+    })),
   };
 }
 

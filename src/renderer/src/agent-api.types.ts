@@ -52,6 +52,15 @@ export interface AgentCharacterInfo {
   workPriorities: Record<string, number>;
   schedule: string[];
   allowedAreaId: string | null;
+  bodyParts: AgentBodyPartInfo[];
+}
+
+/** Body part info exposed to agents */
+export interface AgentBodyPartInfo {
+  id: string;
+  label: string;
+  health: number;
+  maxHealth: number;
 }
 
 /** Tile info exposed to agents */

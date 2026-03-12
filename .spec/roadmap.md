@@ -203,7 +203,7 @@
 
 ## Phase 12 — Health System
 
-- [ ] 158. Implement body part system (head, torso, arms, legs, fingers, etc.)
+- [x] 158. Implement body part system (head, torso, arms, legs, fingers, etc.)
 - [ ] 159. Create injury types (cuts, bruises, gunshots, burns, bites)
 - [ ] 160. Add injury effects on capabilities (damaged leg = slow movement)
 - [ ] 161. Implement bleeding and blood loss system
