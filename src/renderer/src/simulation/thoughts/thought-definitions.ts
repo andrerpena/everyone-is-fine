@@ -43,7 +43,8 @@ export type ThoughtId =
   | "attended_wedding"
   | "eclipse"
   | "psychic_drone"
-  | "toxic_fallout";
+  | "toxic_fallout"
+  | "volcanic_winter";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -314,6 +315,14 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     description: "Poisonous particles fill the air, making everyone uneasy.",
     moodEffect: -0.08,
     durationSeconds: 10800, // matches toxic fallout event duration in ticks / TPS
+  },
+  {
+    id: "volcanic_winter",
+    label: "Volcanic Winter",
+    description:
+      "Ash clouds block the sun, plunging the world into bitter cold.",
+    moodEffect: -0.06,
+    durationSeconds: 14400, // matches volcanic winter event duration in ticks / TPS
   },
 ] as const;
 

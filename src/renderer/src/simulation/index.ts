@@ -20,6 +20,7 @@ export {
   type EventCategory,
   type EventContext,
   type EventDefinition,
+  VOLCANIC_WINTER_TEMP_OFFSET,
   WANDERER_CHANCE,
   WANDERER_MAX_COLONY_SIZE,
 } from "./events/event-definitions";

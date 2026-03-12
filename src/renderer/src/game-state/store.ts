@@ -33,6 +33,7 @@ import {
   SowingSystem,
   simulationLoop,
   VisionSystem,
+  VOLCANIC_WINTER_TEMP_OFFSET,
   WEATHER_TEMP_MODIFIERS,
   WeatherSystem,
 } from "../simulation";
@@ -804,10 +805,13 @@ simulationLoop.setTickCallback((deltaTime, tick) => {
     world.time = advanceTime(world.time);
     // Evaluate weather transitions based on season
     weatherSystem.update(world.weather, world.time.season);
-    // Compute temperature from season + hour + weather modifier
+    // Compute temperature from season + hour + weather modifier + event offsets
     world.weather.temperature =
       getOutdoorTemperature(world.time.season, world.time.hour) +
-      WEATHER_TEMP_MODIFIERS[world.weather.type];
+      WEATHER_TEMP_MODIFIERS[world.weather.type] +
+      (eventSystem.isEventActive("volcanic_winter")
+        ? VOLCANIC_WINTER_TEMP_OFFSET
+        : 0);
     // Accumulate/melt snow on tiles based on weather
     snowAccumulation.update(() => world);
     // Advance plant growth on tiles

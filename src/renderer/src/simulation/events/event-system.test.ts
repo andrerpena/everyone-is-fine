@@ -16,6 +16,11 @@ import {
   TOXIC_FALLOUT_COOLDOWN_TICKS,
   TOXIC_FALLOUT_DURATION_TICKS,
   toxicFalloutEvent,
+  VOLCANIC_WINTER_CHANCE,
+  VOLCANIC_WINTER_COOLDOWN_TICKS,
+  VOLCANIC_WINTER_DURATION_TICKS,
+  VOLCANIC_WINTER_TEMP_OFFSET,
+  volcanicWinterEvent,
   WANDERER_CHANCE,
   WANDERER_MAX_COLONY_SIZE,
   wandererJoinsEvent,
@@ -603,5 +608,88 @@ describe("Toxic Fallout - execute", () => {
 
     const message = toxicFalloutEvent.execute(ctx);
     expect(message).toContain("Toxic fallout");
+  });
+});
+
+describe("Volcanic Winter - constants", () => {
+  it("volcanic winter chance is 0.03", () => {
+    expect(VOLCANIC_WINTER_CHANCE).toBe(0.03);
+  });
+
+  it("volcanic winter duration is 14400 ticks", () => {
+    expect(VOLCANIC_WINTER_DURATION_TICKS).toBe(14400);
+  });
+
+  it("volcanic winter cooldown is 36000 ticks", () => {
+    expect(VOLCANIC_WINTER_COOLDOWN_TICKS).toBe(36000);
+  });
+
+  it("volcanic winter is categorized as negative", () => {
+    expect(volcanicWinterEvent.category).toBe("negative");
+  });
+
+  it("volcanic winter temperature offset is -15", () => {
+    expect(VOLCANIC_WINTER_TEMP_OFFSET).toBe(-15);
+  });
+});
+
+describe("Volcanic Winter - canTrigger", () => {
+  it("can trigger based on RNG chance", () => {
+    let triggered = false;
+    for (let seed = 0; seed < 200; seed++) {
+      const ctx = makeContext({ rng: new SeededRandom(seed) });
+      if (volcanicWinterEvent.canTrigger(ctx)) {
+        triggered = true;
+        break;
+      }
+    }
+    expect(triggered).toBe(true);
+  });
+
+  it("can fail to trigger based on RNG chance", () => {
+    let notTriggered = false;
+    for (let seed = 0; seed < 200; seed++) {
+      const ctx = makeContext({ rng: new SeededRandom(seed) });
+      if (!volcanicWinterEvent.canTrigger(ctx)) {
+        notTriggered = true;
+        break;
+      }
+    }
+    expect(notTriggered).toBe(true);
+  });
+});
+
+describe("Volcanic Winter - execute", () => {
+  it("applies volcanic_winter thought to all colonists", () => {
+    const store = makeEntityStore(4);
+    const ctx = makeContext({
+      entityStore: store,
+      rng: new SeededRandom(42),
+      tick: 1000,
+    });
+
+    volcanicWinterEvent.execute(ctx);
+
+    let affectedCount = 0;
+    for (const [, character] of store) {
+      const hasWinter = character.thoughts.some(
+        (t) => t.thoughtId === "volcanic_winter",
+      );
+      if (hasWinter) affectedCount++;
+    }
+
+    expect(affectedCount).toBe(4);
+  });
+
+  it("returns a descriptive message", () => {
+    const store = makeEntityStore(2);
+    const ctx = makeContext({
+      entityStore: store,
+      rng: new SeededRandom(42),
+      tick: 1000,
+    });
+
+    const message = volcanicWinterEvent.execute(ctx);
+    expect(message).toContain("volcanic winter");
   });
 });

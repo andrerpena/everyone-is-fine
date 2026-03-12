@@ -82,6 +82,18 @@ export const TOXIC_FALLOUT_DURATION_TICKS = 10800;
 /** Toxic fallout cooldown in ticks (~10 minutes at 60 TPS) */
 export const TOXIC_FALLOUT_COOLDOWN_TICKS = 36000;
 
+/** Per-evaluation chance that a volcanic winter fires (when eligible) */
+export const VOLCANIC_WINTER_CHANCE = 0.03;
+
+/** Volcanic winter duration in ticks (~4 minutes at 60 TPS) */
+export const VOLCANIC_WINTER_DURATION_TICKS = 14400;
+
+/** Volcanic winter cooldown in ticks (~10 minutes at 60 TPS) */
+export const VOLCANIC_WINTER_COOLDOWN_TICKS = 36000;
+
+/** Temperature offset applied during volcanic winter (°C) */
+export const VOLCANIC_WINTER_TEMP_OFFSET = -15;
+
 // =============================================================================
 // HELPER: ADD TIMED THOUGHT TO ALL COLONISTS
 // =============================================================================
@@ -259,6 +271,29 @@ export const toxicFalloutEvent: EventDefinition = {
 };
 
 // =============================================================================
+// VOLCANIC WINTER EVENT
+// =============================================================================
+
+export const volcanicWinterEvent: EventDefinition = {
+  id: "volcanic_winter",
+  label: "Volcanic Winter",
+  description:
+    "A distant volcanic eruption fills the sky with ash, dropping temperatures dramatically.",
+  category: "negative",
+  cooldownTicks: VOLCANIC_WINTER_COOLDOWN_TICKS,
+  durationTicks: VOLCANIC_WINTER_DURATION_TICKS,
+
+  canTrigger(ctx: EventContext): boolean {
+    return ctx.rng.chance(VOLCANIC_WINTER_CHANCE);
+  },
+
+  execute(ctx: EventContext): string {
+    addThoughtToAllColonists(ctx.entityStore, "volcanic_winter", ctx.tick);
+    return "A volcanic winter has begun! Temperatures are plummeting!";
+  },
+};
+
+// =============================================================================
 // EVENT REGISTRY
 // =============================================================================
 
@@ -267,4 +302,5 @@ export const ALL_EVENTS: readonly EventDefinition[] = [
   eclipseEvent,
   psychicDroneEvent,
   toxicFalloutEvent,
+  volcanicWinterEvent,
 ];

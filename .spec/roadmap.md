@@ -273,7 +273,7 @@
 - [ ] 213. Add trade caravan arrival event
 - [ ] 214. Create infestation event (insectoids spawn in dark, warm areas)
 - [x] 215. Add toxic fallout event (outdoor toxicity, need to stay indoors)
-- [ ] 216. Create volcanic winter event (reduced temperature and plant growth)
+- [x] 216. Create volcanic winter event (reduced temperature and plant growth)
 - [x] 217. Add psychic drone event (mood penalty to specific gender)
 - [ ] 218. Create transport pod crash event (rescue the survivor)
 - [ ] 219. Implement event difficulty scaling with colony wealth and time
