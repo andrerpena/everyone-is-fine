@@ -13,6 +13,7 @@ import {
   createMineJob,
   createMineTerrainJob,
   createMoveJob,
+  createRepairJob,
   createSmoothJob,
   isSmoothable,
 } from "./job-factory";
@@ -90,6 +91,27 @@ export const ACTION_RULES: ActionRule[] = [
       tile.structure === null,
     createJob: (characterId, target, tile) =>
       createSmoothJob(characterId, target, tile.terrain.type),
+  },
+  {
+    id: "repair",
+    label: "Repair",
+    priority: 6,
+    matches: (tile) => {
+      if (!tile.structure) return false;
+      const props = STRUCTURE_REGISTRY[tile.structure.type];
+      return (
+        props.category !== "natural" &&
+        tile.structure.type !== "none" &&
+        tile.structure.health < props.maxHealth
+      );
+    },
+    createJob: (characterId, target, tile) =>
+      createRepairJob(
+        characterId,
+        target,
+        tile.structure!.type,
+        tile.structure!.health,
+      ),
   },
   {
     id: "deconstruct",

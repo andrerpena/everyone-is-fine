@@ -164,7 +164,7 @@
 - [x] 125. Implement building deconstruction and material recovery
 - [x] 126. Add mining job (dig into rock tiles, yield stone chunks and ores)
 - [x] 127. Create smoothing job (smooth rough stone floors and walls)
-- [ ] 128. Implement building repair system
+- [x] 128. Implement building repair system
 - [x] 129. Add building quality based on constructor skill level
 - [ ] 130. Create architect/build menu UI for placing buildings
 - [x] 131. Implement resource cost checking before allowing placement

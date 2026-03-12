@@ -4,6 +4,7 @@
 
 import { getConstructionCost } from "../../world/registries/construction-registry";
 import { getFloorConstructionCost } from "../../world/registries/floor-registry";
+import { STRUCTURE_REGISTRY } from "../../world/registries/structure-registry";
 import { TERRAIN_REGISTRY } from "../../world/registries/terrain-registry";
 import type {
   CropType,
@@ -720,6 +721,50 @@ export function createHaulJob(
       {
         type: "drop_item",
         position: destPos,
+        status: "pending",
+      },
+    ],
+  };
+}
+
+/** Base work ticks per health point of damage to repair */
+const REPAIR_TICKS_PER_HP = 0.5;
+
+/**
+ * Create a "repair structure" job.
+ * Restores a damaged structure to full health. No materials required.
+ * Work time is proportional to the amount of damage.
+ * Steps: move adjacent → work → repair_structure
+ */
+export function createRepairJob(
+  characterId: EntityId,
+  target: Position3D,
+  structureType: StructureType,
+  currentHealth: number,
+): Job {
+  const props = STRUCTURE_REGISTRY[structureType];
+  const damage = props.maxHealth - currentHealth;
+  const workTicks = Math.max(60, Math.round(damage * REPAIR_TICKS_PER_HP));
+
+  return {
+    id: generateJobId(),
+    type: "repair",
+    characterId,
+    targetPosition: target,
+    currentStepIndex: 0,
+    status: "pending",
+    createdAt: Date.now(),
+    steps: [
+      { type: "move", destination: target, adjacent: true, status: "pending" },
+      {
+        type: "work",
+        totalTicks: workTicks,
+        ticksWorked: 0,
+        status: "pending",
+      },
+      {
+        type: "repair_structure",
+        position: target,
         status: "pending",
       },
     ],

@@ -50,6 +50,7 @@ import type {
   PlaceFloorStep,
   PlaceStructureStep,
   PlantCropStep,
+  RepairStructureStep,
   RestoreNeedStep,
   SpawnItemsStep,
   TransformTileStep,
@@ -288,6 +289,10 @@ export class JobProcessor {
 
       case "place_floor":
         this.executePlaceFloor(characterId, job, step);
+        break;
+
+      case "repair_structure":
+        this.executeRepairStructure(characterId, job, step);
         break;
     }
   }
@@ -775,6 +780,46 @@ export class JobProcessor {
       movementCost: floorProps.movementCost,
       lastUpdated: Date.now(),
     };
+
+    // Notify store so rendering updates
+    this.updateTile(
+      { x: step.position.x, y: step.position.y },
+      step.position.z,
+      {},
+    );
+
+    step.status = "completed";
+    this.advanceToNextStep(characterId, job);
+  }
+
+  // ===========================================================================
+  // REPAIR STRUCTURE STEP
+  // ===========================================================================
+
+  private executeRepairStructure(
+    characterId: EntityId,
+    job: Job,
+    step: RepairStructureStep,
+  ): void {
+    const world = this.getWorld();
+    if (!world) {
+      this.failJob(characterId, job, "World not initialized");
+      return;
+    }
+
+    const tile = getWorldTileAt(
+      world,
+      step.position.x,
+      step.position.y,
+      step.position.z,
+    );
+    if (!tile?.structure) {
+      this.failJob(characterId, job, "No structure to repair");
+      return;
+    }
+
+    const props = STRUCTURE_REGISTRY[tile.structure.type];
+    tile.structure.health = props.maxHealth;
 
     // Notify store so rendering updates
     this.updateTile(
