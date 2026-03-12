@@ -2,6 +2,7 @@
 // ZONE MODULE EXPORTS
 // =============================================================================
 
+export { computeHomeZoneTiles, HOME_ZONE_RADIUS } from "./home-zone";
 export type { StockpileFilter } from "./stockpile-filter";
 export {
   ALL_CATEGORIES,

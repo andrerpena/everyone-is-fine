@@ -127,7 +127,7 @@
 - [x] 94. Create zone management panel (list, rename, delete, configure zones)
 - [x] 95. Implement stockpile priority system (preferred, normal, low)
 - [x] 96. Add item filter UI for stockpiles (category tree with checkboxes)
-- [ ] 97. Create home zone (auto-expands around buildings, used for cleaning/firefighting)
+- [x] 97. Create home zone (auto-expands around buildings, used for cleaning/firefighting)
 - [ ] 98. Implement animal zone for restricting tamed animals
 
 ## Phase 8 — Food Production Chain

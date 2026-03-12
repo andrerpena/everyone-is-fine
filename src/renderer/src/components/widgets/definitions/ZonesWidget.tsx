@@ -74,7 +74,9 @@ function ZonesWidget(_props: WidgetComponentProps) {
   /** Track which zone's filter panel is open */
   const [filterOpenId, setFilterOpenId] = useState<string | null>(null);
 
-  if (zones.length === 0) {
+  const homeZoneTileCount = useZoneStore((s) => s.homeZoneTiles.size);
+
+  if (zones.length === 0 && homeZoneTileCount === 0) {
     return (
       <div className="p-4 text-sm text-neutral-400">
         No zones designated yet.
@@ -103,6 +105,24 @@ function ZonesWidget(_props: WidgetComponentProps) {
           </tr>
         </thead>
         <tbody>
+          {homeZoneTileCount > 0 && (
+            <tr className="border-b border-neutral-800 hover:bg-neutral-800/50">
+              <td className="p-1.5 pl-2">
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-lime-500" />
+                  <span className="text-neutral-300">Home</span>
+                </span>
+              </td>
+              <td className="p-1.5 text-neutral-400 italic">Auto</td>
+              <td className="p-1.5 text-center text-neutral-400">
+                {homeZoneTileCount}
+              </td>
+              <td className="p-1.5 text-center">
+                <span className="text-neutral-500">—</span>
+              </td>
+              <td className="p-0.5" />
+            </tr>
+          )}
           {zones.map((zone) => (
             <ZoneRow
               key={zone.id}

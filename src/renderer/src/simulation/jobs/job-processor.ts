@@ -22,6 +22,7 @@ import {
   removeItemFromTile,
 } from "../../world/utils/tile-utils";
 import { getAllowedTilesForCharacter } from "../../zones";
+import { useZoneStore } from "../../zones/zone-store";
 import type { EntityStore } from "../entity-store";
 import {
   FOOD_POISONING_DURATION_TICKS,
@@ -421,6 +422,14 @@ export class JobProcessor {
         updates,
       );
     }
+
+    // Rebuild home zone after structure removal (deconstruction)
+    if (step.removeStructure) {
+      const worldForHomeZone = this.getWorld();
+      if (worldForHomeZone) {
+        useZoneStore.getState().rebuildHomeZone(worldForHomeZone);
+      }
+    }
   }
 
   // ===========================================================================
@@ -746,6 +755,12 @@ export class JobProcessor {
       step.position.z,
       {},
     );
+
+    // Rebuild home zone after structure placement
+    const worldForHomeZone = this.getWorld();
+    if (worldForHomeZone) {
+      useZoneStore.getState().rebuildHomeZone(worldForHomeZone);
+    }
 
     step.status = "completed";
     this.advanceToNextStep(characterId, job);

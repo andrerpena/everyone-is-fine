@@ -50,6 +50,7 @@ import { SeededRandom } from "../world/factories/world-factory";
 import type { Position2D, Position3D, Tile, World } from "../world/types";
 import { getTileAt, setTileAt } from "../world/utils/tile-utils";
 import { getAllowedTilesForCharacter } from "../zones";
+import { useZoneStore } from "../zones/zone-store";
 import type {
   GameStore,
   InteractionMode,
@@ -140,6 +141,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         characters: new Map(),
       },
     });
+
+    // Build initial home zone from existing structures
+    useZoneStore.getState().rebuildHomeZone(world);
 
     // Auto-start the simulation when the world is loaded
     get().play();

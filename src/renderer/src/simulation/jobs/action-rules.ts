@@ -5,6 +5,7 @@
 
 import { STRUCTURE_REGISTRY } from "../../world/registries/structure-registry";
 import { TERRAIN_REGISTRY } from "../../world/registries/terrain-registry";
+import { useZoneStore } from "../../zones/zone-store";
 import {
   createBuildJob,
   createChopJob,
@@ -118,7 +119,13 @@ export const ACTION_RULES: ActionRule[] = [
     id: "clean",
     label: "Clean",
     priority: 4,
-    matches: (tile) => tile.filth > 0,
+    matches: (tile, position) => {
+      if (tile.filth <= 0) return false;
+      // Only clean tiles within the home zone
+      const homeZoneTiles = useZoneStore.getState().homeZoneTiles;
+      if (homeZoneTiles.size === 0) return true; // No home zone yet — allow all
+      return homeZoneTiles.has(`${position.x},${position.y}`);
+    },
     createJob: (characterId, target, tile) =>
       createCleanJob(characterId, target, tile.filth),
   },

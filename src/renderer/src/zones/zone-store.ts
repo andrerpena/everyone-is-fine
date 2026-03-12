@@ -4,6 +4,7 @@
 // Zustand store for managing zone designations (stockpile, growing, dumping).
 
 import { create } from "zustand";
+import { computeHomeZoneTiles } from "./home-zone";
 import { createDefaultFilter, type StockpileFilter } from "./stockpile-filter";
 import type { ZoneData, ZonePriority, ZoneTileKey, ZoneType } from "./types";
 
@@ -18,6 +19,8 @@ interface ZoneState {
   tileToZone: Map<ZoneTileKey, string>;
   /** Monotonically increasing counter for zone IDs */
   nextId: number;
+  /** Auto-computed home zone tiles (area around player-built structures) */
+  homeZoneTiles: Set<string>;
 }
 
 interface ZoneActions {
@@ -39,6 +42,8 @@ interface ZoneActions {
   setZonePriority: (zoneId: string, priority: ZonePriority) => void;
   /** Set the crop type for a growing zone */
   setGrowingZoneCrop: (zoneId: string, cropType: string) => void;
+  /** Recompute the home zone from the current world state */
+  rebuildHomeZone: (world: import("../world/types").World) => void;
   /** Clear all zones */
   clearAll: () => void;
 }
@@ -53,6 +58,7 @@ export const useZoneStore = create<ZoneStore>()((set, get) => ({
   zones: new Map(),
   tileToZone: new Map(),
   nextId: 1,
+  homeZoneTiles: new Set(),
 
   createZone: (type, name, zLevel) => {
     const { nextId } = get();
@@ -203,7 +209,16 @@ export const useZoneStore = create<ZoneStore>()((set, get) => ({
     });
   },
 
+  rebuildHomeZone: (world) => {
+    set({ homeZoneTiles: computeHomeZoneTiles(world) });
+  },
+
   clearAll: () => {
-    set({ zones: new Map(), tileToZone: new Map(), nextId: 1 });
+    set({
+      zones: new Map(),
+      tileToZone: new Map(),
+      nextId: 1,
+      homeZoneTiles: new Set(),
+    });
   },
 }));
