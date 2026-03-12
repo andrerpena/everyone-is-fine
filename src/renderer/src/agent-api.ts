@@ -809,6 +809,7 @@ function createAgentApi(): GameAgentApi {
           name: zone.name,
           zLevel: zone.zLevel,
           tileCount: zone.tiles.size,
+          priority: zone.priority,
         };
       },
       delete(zoneId: string): void {
@@ -839,6 +840,7 @@ function createAgentApi(): GameAgentApi {
             name: zone.name,
             zLevel: zone.zLevel,
             tileCount: zone.tiles.size,
+            priority: zone.priority,
           }));
       },
       get(zoneId: string): AgentZoneInfo | null {
@@ -850,6 +852,7 @@ function createAgentApi(): GameAgentApi {
           name: zone.name,
           zLevel: zone.zLevel,
           tileCount: zone.tiles.size,
+          priority: zone.priority,
         };
       },
       setFilter(

@@ -8,6 +8,16 @@ import type { StockpileFilter } from "./stockpile-filter";
 /** Types of zones that can be designated */
 export type ZoneType = "stockpile" | "growing" | "dumping";
 
+/** Stockpile priority levels (lower value = higher priority) */
+export type ZonePriority = 1 | 2 | 3;
+
+/** Human-readable labels for zone priorities */
+export const ZONE_PRIORITY_LABELS: Record<ZonePriority, string> = {
+  1: "Preferred",
+  2: "Normal",
+  3: "Low",
+};
+
 /** A tile key in "x,y" format */
 export type ZoneTileKey = string;
 
@@ -21,6 +31,8 @@ export interface ZoneData {
   tiles: Set<ZoneTileKey>;
   /** Item filter for stockpile zones (only meaningful when type === "stockpile") */
   filter?: StockpileFilter;
+  /** Priority for stockpile zones: 1=preferred, 2=normal, 3=low (only meaningful when type === "stockpile") */
+  priority?: ZonePriority;
   /** Crop type for growing zones (only meaningful when type === "growing") */
   cropType?: CropType;
 }
@@ -42,4 +54,5 @@ export interface AgentZoneInfo {
   name: string;
   zLevel: number;
   tileCount: number;
+  priority?: ZonePriority;
 }

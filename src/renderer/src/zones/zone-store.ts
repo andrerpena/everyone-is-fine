@@ -5,7 +5,7 @@
 
 import { create } from "zustand";
 import { createDefaultFilter, type StockpileFilter } from "./stockpile-filter";
-import type { ZoneData, ZoneTileKey, ZoneType } from "./types";
+import type { ZoneData, ZonePriority, ZoneTileKey, ZoneType } from "./types";
 
 // =============================================================================
 // TYPES
@@ -35,6 +35,8 @@ interface ZoneActions {
   getAllZones: () => ZoneData[];
   /** Update the stockpile filter for a zone */
   setStockpileFilter: (zoneId: string, filter: StockpileFilter) => void;
+  /** Set the priority for a stockpile zone */
+  setZonePriority: (zoneId: string, priority: ZonePriority) => void;
   /** Set the crop type for a growing zone */
   setGrowingZoneCrop: (zoneId: string, cropType: string) => void;
   /** Clear all zones */
@@ -61,7 +63,9 @@ export const useZoneStore = create<ZoneStore>()((set, get) => ({
       name,
       zLevel,
       tiles: new Set(),
-      ...(type === "stockpile" ? { filter: createDefaultFilter() } : {}),
+      ...(type === "stockpile"
+        ? { filter: createDefaultFilter(), priority: 2 as ZonePriority }
+        : {}),
       ...(type === "growing" ? { cropType: "potato" as const } : {}),
     };
 
@@ -168,6 +172,18 @@ export const useZoneStore = create<ZoneStore>()((set, get) => ({
     set((state) => {
       const newZones = new Map(state.zones);
       newZones.set(zoneId, { ...zone, filter });
+      return { zones: newZones };
+    });
+  },
+
+  setZonePriority: (zoneId, priority) => {
+    const { zones } = get();
+    const zone = zones.get(zoneId);
+    if (!zone || zone.type !== "stockpile") return;
+
+    set((state) => {
+      const newZones = new Map(state.zones);
+      newZones.set(zoneId, { ...zone, priority });
       return { zones: newZones };
     });
   },

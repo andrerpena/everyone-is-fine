@@ -125,7 +125,7 @@
 - [ ] 92. Implement allowed area zones (restrict colonist movement)
 - [x] 93. Add zone rendering overlay with color-coding <!-- Ticket 0034: basic overlay -->
 - [ ] 94. Create zone management panel (list, rename, delete, configure zones)
-- [ ] 95. Implement stockpile priority system (preferred, normal, low)
+- [x] 95. Implement stockpile priority system (preferred, normal, low)
 - [ ] 96. Add item filter UI for stockpiles (category tree with checkboxes)
 - [ ] 97. Create home zone (auto-expands around buildings, used for cleaning/firefighting)
 - [ ] 98. Implement animal zone for restricting tamed animals

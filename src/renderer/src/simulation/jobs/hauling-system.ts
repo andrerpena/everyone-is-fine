@@ -107,7 +107,8 @@ export class HaulingSystem {
     return useZoneStore
       .getState()
       .getAllZones()
-      .filter((z) => z.type === "stockpile");
+      .filter((z) => z.type === "stockpile")
+      .sort((a, b) => (a.priority ?? 2) - (b.priority ?? 2));
   }
 
   private findStockpileDestination(
