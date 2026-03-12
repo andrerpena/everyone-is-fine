@@ -263,7 +263,7 @@
 ## Phase 16 — Events & Storyteller
 
 - [x] 205. Implement event system framework (trigger, conditions, effects)
-- [ ] 206. Create storyteller AI that selects events based on colony state
+- [x] 206. Create storyteller AI that selects events based on colony state
 - [ ] 207. Add raid event (hostile pawns attack the colony)
 - [ ] 208. Create manhunter animal pack event
 - [ ] 209. Add solar flare event (disables all electrical devices)
@@ -362,11 +362,11 @@
 ## Phase 24 — UI Polish & Quality of Life
 
 - [x] 280. Create alert system (starvation warning, raid incoming, colonist idle)
-- [ ] 281. Implement notification history/log panel
+- [x] 281. ~~Implement notification history/log panel~~ (already exists: LogsWidget with search, tag filtering, level toggles)
 - [ ] 282. Add tooltip system with rich item/colonist information
 - [ ] 283. Create keyboard shortcut system for common actions
 - [ ] 284. Implement undo system for zone/building placement
-- [ ] 285. Add time controls UI (pause, speed buttons, date display)
+- [x] 285. ~~Add time controls UI (pause, speed buttons, date display)~~ (already exists: TimeControls HUD + GameTimeStatusBar)
 - [ ] 286. Create statistics/history panel (colony wealth over time, mood graphs)
 - [ ] 287. Implement auto-save at configurable intervals
 - [ ] 288. Add colony name and custom scenario selection at game start

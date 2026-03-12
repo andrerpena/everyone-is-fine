@@ -26,10 +26,14 @@ export interface EventContext {
   readonly addCharacter: (character: Character) => void;
 }
 
+export type EventCategory = "positive" | "negative" | "neutral";
+
 export interface EventDefinition {
   readonly id: string;
   readonly label: string;
   readonly description: string;
+  /** Whether this event is good, bad, or neither for the colony */
+  readonly category: EventCategory;
   /** Minimum ticks between evaluations of this event */
   readonly cooldownTicks: number;
   /** Duration in ticks for time-limited events. 0 = instant (one-shot). */
@@ -96,6 +100,7 @@ export const wandererJoinsEvent: EventDefinition = {
   label: "Wanderer Joins",
   description:
     "A wanderer appears at the edge of the map and joins the colony.",
+  category: "positive",
   cooldownTicks: 600,
   durationTicks: 0,
 
@@ -162,6 +167,7 @@ export const eclipseEvent: EventDefinition = {
   label: "Eclipse",
   description:
     "An eclipse darkens the sky, unsettling colonists and halting plant growth.",
+  category: "negative",
   cooldownTicks: ECLIPSE_COOLDOWN_TICKS,
   durationTicks: ECLIPSE_DURATION_TICKS,
 

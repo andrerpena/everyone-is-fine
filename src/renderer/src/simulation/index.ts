@@ -17,6 +17,7 @@ export {
   ECLIPSE_CHANCE,
   ECLIPSE_COOLDOWN_TICKS,
   ECLIPSE_DURATION_TICKS,
+  type EventCategory,
   type EventContext,
   type EventDefinition,
   WANDERER_CHANCE,
@@ -24,6 +25,12 @@ export {
 } from "./events/event-definitions";
 // Events
 export { EventSystem } from "./events/event-system";
+export {
+  GLOBAL_EVENT_COOLDOWN,
+  HIGH_MOOD_THRESHOLD,
+  LOW_MOOD_THRESHOLD,
+  Storyteller,
+} from "./events/storyteller";
 // Filth
 export { FilthSystem } from "./filth-system";
 // Game Notifications

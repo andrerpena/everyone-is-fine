@@ -2,7 +2,7 @@
 // EVENT SYSTEM
 // =============================================================================
 // Periodically evaluates event definitions and triggers those whose conditions
-// are met. Tracks per-event cooldowns and active durations.
+// are met. Uses a Storyteller to control pacing and event category selection.
 
 import { showToast } from "../../components/floating/toast/toastUtils";
 import { useLogStore } from "../../lib/log-store";
@@ -15,12 +15,14 @@ import {
   type EventContext,
   type EventDefinition,
 } from "./event-definitions";
+import { Storyteller } from "./storyteller";
 
 export class EventSystem {
   private readonly entityStore: EntityStore;
   private readonly rng: SeededRandom;
   private readonly getWorld: () => World | null;
   private readonly addCharacter: (character: Character) => void;
+  private readonly storyteller = new Storyteller();
 
   /** Tracks the last tick each event was evaluated */
   private lastEvaluated = new Map<string, number>();
@@ -63,21 +65,31 @@ export class EventSystem {
       addCharacter: this.addCharacter,
     };
 
-    for (const event of ALL_EVENTS) {
-      this.evaluateEvent(event, ctx);
+    // Ask the storyteller which events are eligible this tick
+    const eligibleEvents = this.storyteller.selectEligibleEvents(
+      ALL_EVENTS,
+      ctx,
+    );
+
+    for (const event of eligibleEvents) {
+      if (this.evaluateEvent(event, ctx)) {
+        // One event per tick — storyteller pacing
+        break;
+      }
     }
   }
 
-  private evaluateEvent(event: EventDefinition, ctx: EventContext): void {
+  /** Evaluate a single event. Returns true if the event fired. */
+  private evaluateEvent(event: EventDefinition, ctx: EventContext): boolean {
     // Don't evaluate if this event is currently active
-    if (this.activeEvents.has(event.id)) return;
+    if (this.activeEvents.has(event.id)) return false;
 
     const lastTick = this.lastEvaluated.get(event.id) ?? 0;
-    if (ctx.tick - lastTick < event.cooldownTicks) return;
+    if (ctx.tick - lastTick < event.cooldownTicks) return false;
 
     this.lastEvaluated.set(event.id, ctx.tick);
 
-    if (!event.canTrigger(ctx)) return;
+    if (!event.canTrigger(ctx)) return false;
 
     const message = event.execute(ctx);
     useLogStore.getState().addEntry("info", message, ["event", event.id]);
@@ -87,6 +99,11 @@ export class EventSystem {
     if (event.durationTicks > 0) {
       this.activeEvents.set(event.id, ctx.tick + event.durationTicks);
     }
+
+    // Notify storyteller that an event fired
+    this.storyteller.recordEventFired(ctx.tick);
+
+    return true;
   }
 
   /** Check if a specific event is currently active */
