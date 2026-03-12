@@ -47,7 +47,8 @@ export class HaulingSystem {
     if (!world) return;
 
     const stockpiles = this.getStockpileZones();
-    if (stockpiles.length === 0) return;
+    const dumpingZones = this.getDumpingZones();
+    if (stockpiles.length === 0 && dumpingZones.length === 0) return;
 
     let jobsAssigned = 0;
     const assignedCharacters = new Set<EntityId>();
@@ -65,10 +66,14 @@ export class HaulingSystem {
           const tile = level.tiles[y * level.width + x];
           if (tile.items.length === 0) continue;
 
-          // Skip tiles that are already inside a stockpile zone
+          // Skip tiles that are already inside a stockpile or dumping zone
           const tileKey = `${x},${y}`;
           const zoneAtTile = useZoneStore.getState().getZoneAtTile(tileKey);
-          if (zoneAtTile?.type === "stockpile") continue;
+          if (
+            zoneAtTile?.type === "stockpile" ||
+            zoneAtTile?.type === "dumping"
+          )
+            continue;
 
           // Try to haul each item on this tile
           for (const item of tile.items) {
@@ -78,8 +83,10 @@ export class HaulingSystem {
             const sourcePos: Position3D = { x, y, z: zLevel };
             if (this.jobProcessor.reservations.isReserved(sourcePos)) continue;
 
-            // Find a matching stockpile with an open tile
-            const dest = this.findStockpileDestination(item, stockpiles, world);
+            // Find a matching stockpile with an open tile, fall back to dumping zone
+            const dest =
+              this.findStockpileDestination(item, stockpiles, world) ??
+              this.findDumpingDestination(dumpingZones, world);
             if (!dest) continue;
 
             // Pick the best eligible character by priority, then distance
@@ -109,6 +116,35 @@ export class HaulingSystem {
       .getAllZones()
       .filter((z) => z.type === "stockpile")
       .sort((a, b) => (a.priority ?? 2) - (b.priority ?? 2));
+  }
+
+  private getDumpingZones(): ZoneData[] {
+    return useZoneStore
+      .getState()
+      .getAllZones()
+      .filter((z) => z.type === "dumping");
+  }
+
+  private findDumpingDestination(
+    dumpingZones: ZoneData[],
+    world: World,
+  ): Position3D | null {
+    for (const zone of dumpingZones) {
+      for (const tileKey of zone.tiles) {
+        const [xStr, yStr] = tileKey.split(",");
+        const x = Number(xStr);
+        const y = Number(yStr);
+        const pos: Position3D = { x, y, z: zone.zLevel };
+
+        if (this.jobProcessor.reservations.isReserved(pos)) continue;
+
+        const tile = getWorldTileAt(world, x, y, zone.zLevel);
+        if (!tile?.pathfinding.isPassable) continue;
+
+        return pos;
+      }
+    }
+    return null;
   }
 
   private findStockpileDestination(
