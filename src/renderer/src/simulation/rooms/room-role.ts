@@ -39,6 +39,9 @@ export function classifyRoom(room: Room, level: ZLevel): RoomRole {
         chairs++;
         break;
       case "workbench":
+      case "stonecutter_table":
+      case "tailoring_bench":
+      case "crafting_spot":
         workbenches++;
         break;
       case "chest":

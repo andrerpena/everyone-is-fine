@@ -77,6 +77,24 @@ export const CONSTRUCTION_REGISTRY: Partial<
     ],
     workTicks: 400,
   },
+  stonecutter_table: {
+    materials: [
+      { type: "stone", quantity: 5 },
+      { type: "iron", quantity: 2 },
+    ],
+    workTicks: 450,
+  },
+  tailoring_bench: {
+    materials: [
+      { type: "wood", quantity: 4 },
+      { type: "cloth", quantity: 3 },
+    ],
+    workTicks: 350,
+  },
+  crafting_spot: {
+    materials: [{ type: "wood", quantity: 2 }],
+    workTicks: 60,
+  },
   campfire: {
     materials: [
       { type: "wood", quantity: 5 },

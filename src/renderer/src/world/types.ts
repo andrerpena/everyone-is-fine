@@ -112,6 +112,9 @@ export type StructureType =
   | "workbench"
   | "campfire"
   | "nutrient_paste_dispenser"
+  | "stonecutter_table"
+  | "tailoring_bench"
+  | "crafting_spot"
   // Containers
   | "chest"
   | "shelf"

@@ -157,7 +157,7 @@
 - [x] 118. Create door building (allows movement, can be locked) <!-- Partial: door types exist and are buildable, but no locking mechanism -->
 - [x] 119. Implement floor/tile building (affects movement speed and beauty)
 - [x] 120. ~~Add furniture buildings~~ (bed, chair, table defined with construction costs)
-- [ ] 121. Create workstation buildings (crafting spot, stonecutter, tailoring bench) <!-- Partial: generic workbench exists but no specialized workstations -->
+- [x] 121. Create workstation buildings (crafting spot, stonecutter, tailoring bench)
 - [x] 122. Implement room detection system (enclosed areas become rooms)
 - [x] 123. Add room stats calculation (size, beauty, cleanliness, wealth, impressiveness)
 - [x] 124. Create room role assignment (bedroom, dining room, workshop, prison, hospital)
