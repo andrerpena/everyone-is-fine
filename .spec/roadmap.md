@@ -182,7 +182,7 @@
 - [x] 140. Create temperature-affected crop growth (growing season) <!-- Done: PlantGrowthSystem uses temperature factor, crops wilt outside viable range -->
 - [ ] 141. Implement indoor temperature (affected by walls, roofs, heaters, coolers)
 - [ ] 142. Add heatstroke and hypothermia health conditions
-- [ ] 143. Create weather forecast system (predict upcoming weather)
+- [x] 143. Create weather forecast system (predict upcoming weather)
 - [ ] 144. Implement lightning strikes during thunderstorms (chance to start fires)
 - [ ] 145. Add wind system affecting fire spread
 

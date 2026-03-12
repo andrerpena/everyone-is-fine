@@ -448,6 +448,8 @@ export interface WeatherState {
   temperature: number; // Celsius
   windSpeed: number;
   windDirection: number; // Degrees
+  /** Predicted next weather type based on season probabilities */
+  forecast: WeatherType;
 }
 
 export type WeatherType =

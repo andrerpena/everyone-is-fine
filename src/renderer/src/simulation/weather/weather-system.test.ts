@@ -13,6 +13,7 @@ function makeWeather(type = "clear" as const): WeatherState {
     temperature: 20,
     windSpeed: 5,
     windDirection: 0,
+    forecast: "clear",
   };
 }
 
@@ -121,7 +122,8 @@ describe("WeatherSystem", () => {
       if (callCount === 2) return 0.75; // pick snow in winter
       if (callCount === 3) return 0.5; // intensity: 0.3 + 0.5*0.7 = 0.65
       if (callCount === 4) return 0.5; // windSpeed: 10
-      return 0.5; // windDirection: 180
+      if (callCount === 5) return 0.5; // windDirection: 180
+      return 0.5; // forecast
     });
 
     for (let i = 0; i < 600; i++) {
@@ -131,6 +133,41 @@ describe("WeatherSystem", () => {
     expect(weather.type).toBe("snow");
     expect(weather.intensity).toBeGreaterThan(0);
     expect(weather.windSpeed).toBeGreaterThanOrEqual(0);
+
+    vi.restoreAllMocks();
+  });
+
+  it("sets forecast on weather transition", () => {
+    const system = new WeatherSystem();
+    const weather = makeWeather();
+
+    // Fast forward past min duration
+    vi.spyOn(Math, "random").mockReturnValue(0.99);
+    for (let i = 0; i < 1800; i++) {
+      system.update(weather, "summer");
+    }
+
+    // Trigger transition with known forecast roll
+    let callCount = 0;
+    vi.spyOn(Math, "random").mockImplementation(() => {
+      callCount++;
+      if (callCount === 1) return 0.01; // transition chance pass
+      if (callCount === 2) return 0.6; // pick a non-clear weather type
+      if (callCount === 3) return 0.5; // intensity
+      if (callCount === 4) return 0.5; // windSpeed
+      if (callCount === 5) return 0.5; // windDirection
+      if (callCount === 6) return 0.1; // forecast roll → clear in summer
+      return 0.5;
+    });
+
+    for (let i = 0; i < 600; i++) {
+      system.update(weather, "summer");
+    }
+
+    // Forecast should have been set (not the default "clear" anymore,
+    // it's been explicitly rolled)
+    expect(weather.forecast).toBeDefined();
+    expect(typeof weather.forecast).toBe("string");
 
     vi.restoreAllMocks();
   });

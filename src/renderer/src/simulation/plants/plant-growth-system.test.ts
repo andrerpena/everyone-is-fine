@@ -82,6 +82,7 @@ function makeWorld(tiles: Tile[], temperature: number): World {
       temperature,
       windSpeed: 5,
       windDirection: 180,
+      forecast: "clear",
     },
   };
 }

@@ -224,6 +224,7 @@ describe("RoomDetectionSystem", () => {
         temperature: 20,
         windSpeed: 0,
         windDirection: 0,
+        forecast: "clear" as const,
       },
     };
 

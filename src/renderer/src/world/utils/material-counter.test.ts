@@ -75,6 +75,7 @@ function makeWorld(levels: ZLevel[]): World {
       temperature: 20,
       windSpeed: 0,
       windDirection: 0,
+      forecast: "clear",
     },
   };
 }

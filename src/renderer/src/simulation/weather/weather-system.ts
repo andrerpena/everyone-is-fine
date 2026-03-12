@@ -146,6 +146,8 @@ export class WeatherSystem {
     weather.intensity = 0.3 + Math.random() * 0.7; // 0.3 - 1.0
     weather.windSpeed = Math.round(Math.random() * 20);
     weather.windDirection = Math.round(Math.random() * 360);
+    // Pre-roll the next weather type as a forecast
+    weather.forecast = pickWeatherType(season, Math.random());
     this.ticksSinceLastTransition = 0;
   }
 }

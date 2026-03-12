@@ -68,6 +68,7 @@ function makeWorld(
       temperature,
       windSpeed: 5,
       windDirection: 180,
+      forecast: "clear",
     },
   };
 }

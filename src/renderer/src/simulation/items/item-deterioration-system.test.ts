@@ -61,6 +61,7 @@ function makeWorld(items: ItemData[], temperature = 20): World {
       temperature,
       windSpeed: 0,
       windDirection: 0,
+      forecast: "clear",
     },
   };
 }

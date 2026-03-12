@@ -50,6 +50,7 @@ export function createWeatherState(): WeatherState {
     temperature: 20,
     windSpeed: 5,
     windDirection: 0,
+    forecast: "clear",
   };
 }
 

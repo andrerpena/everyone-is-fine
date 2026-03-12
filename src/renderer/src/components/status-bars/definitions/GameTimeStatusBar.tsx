@@ -22,7 +22,8 @@ function GameTimeStatusBarComponent(_props: StatusBarItemProps) {
     void state.simulation.currentTick;
     const temp = state.world.weather.temperature;
     const weatherLabel = WEATHER_LABELS[state.world.weather.type];
-    return `${formatGameTime(state.world.time)} | ${weatherLabel} ${temp}°C`;
+    const forecastLabel = WEATHER_LABELS[state.world.weather.forecast];
+    return `${formatGameTime(state.world.time)} | ${weatherLabel} ${temp}°C → ${forecastLabel}`;
   });
 
   if (!timeText) {
