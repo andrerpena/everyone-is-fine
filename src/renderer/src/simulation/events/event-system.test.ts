@@ -8,6 +8,10 @@ import {
   ECLIPSE_DURATION_TICKS,
   type EventContext,
   eclipseEvent,
+  PSYCHIC_DRONE_CHANCE,
+  PSYCHIC_DRONE_COOLDOWN_TICKS,
+  PSYCHIC_DRONE_DURATION_TICKS,
+  psychicDroneEvent,
   WANDERER_CHANCE,
   WANDERER_MAX_COLONY_SIZE,
   wandererJoinsEvent,
@@ -21,6 +25,41 @@ function makeEntityStore(count: number): EntityStore {
       createCharacter({
         name: `Colonist ${i}`,
         position: { x: i, y: 0, z: 0 },
+      }),
+    );
+  }
+  return store;
+}
+
+function makeGenderedEntityStore(males: number, females: number): EntityStore {
+  const store = new EntityStore();
+  for (let i = 0; i < males; i++) {
+    store.add(
+      createCharacter({
+        name: `Male ${i}`,
+        position: { x: i, y: 0, z: 0 },
+        biography: {
+          firstName: `Male ${i}`,
+          nickname: null,
+          lastName: "",
+          age: 25,
+          gender: "male",
+        },
+      }),
+    );
+  }
+  for (let i = 0; i < females; i++) {
+    store.add(
+      createCharacter({
+        name: `Female ${i}`,
+        position: { x: males + i, y: 0, z: 0 },
+        biography: {
+          firstName: `Female ${i}`,
+          nickname: null,
+          lastName: "",
+          age: 25,
+          gender: "female",
+        },
       }),
     );
   }
@@ -324,5 +363,162 @@ describe("EventSystem - active events", () => {
     // After enough time, no events should be permanently stuck
     // (just verifying no errors occur during the full lifecycle)
     expect(system.getActiveEventIds().size).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("Psychic Drone - constants", () => {
+  it("psychic drone chance is 0.04", () => {
+    expect(PSYCHIC_DRONE_CHANCE).toBe(0.04);
+  });
+
+  it("psychic drone duration is 5400 ticks", () => {
+    expect(PSYCHIC_DRONE_DURATION_TICKS).toBe(5400);
+  });
+
+  it("psychic drone cooldown is 18000 ticks", () => {
+    expect(PSYCHIC_DRONE_COOLDOWN_TICKS).toBe(18000);
+  });
+
+  it("psychic drone is categorized as negative", () => {
+    expect(psychicDroneEvent.category).toBe("negative");
+  });
+});
+
+describe("Psychic Drone - canTrigger", () => {
+  it("can trigger based on RNG chance", () => {
+    let triggered = false;
+    for (let seed = 0; seed < 200; seed++) {
+      const ctx = makeContext({ rng: new SeededRandom(seed) });
+      if (psychicDroneEvent.canTrigger(ctx)) {
+        triggered = true;
+        break;
+      }
+    }
+    expect(triggered).toBe(true);
+  });
+
+  it("can fail to trigger based on RNG chance", () => {
+    let notTriggered = false;
+    for (let seed = 0; seed < 200; seed++) {
+      const ctx = makeContext({ rng: new SeededRandom(seed) });
+      if (!psychicDroneEvent.canTrigger(ctx)) {
+        notTriggered = true;
+        break;
+      }
+    }
+    expect(notTriggered).toBe(true);
+  });
+});
+
+describe("Psychic Drone - execute (gender filtering)", () => {
+  it("only applies thought to one gender", () => {
+    const store = makeGenderedEntityStore(3, 3);
+    const ctx = makeContext({
+      entityStore: store,
+      rng: new SeededRandom(42),
+      tick: 1000,
+    });
+
+    psychicDroneEvent.execute(ctx);
+
+    let maleAffected = 0;
+    let femaleAffected = 0;
+    for (const [, character] of store) {
+      const hasDrone = character.thoughts.some(
+        (t) => t.thoughtId === "psychic_drone",
+      );
+      if (hasDrone) {
+        if (character.biography.gender === "male") maleAffected++;
+        else femaleAffected++;
+      }
+    }
+
+    // Exactly one gender should be affected
+    const oneGenderOnly =
+      (maleAffected > 0 && femaleAffected === 0) ||
+      (femaleAffected > 0 && maleAffected === 0);
+    expect(oneGenderOnly).toBe(true);
+  });
+
+  it("affects all colonists of the selected gender", () => {
+    const store = makeGenderedEntityStore(3, 3);
+    const ctx = makeContext({
+      entityStore: store,
+      rng: new SeededRandom(42),
+      tick: 1000,
+    });
+
+    psychicDroneEvent.execute(ctx);
+
+    let maleAffected = 0;
+    let femaleAffected = 0;
+    let maleTotal = 0;
+    let femaleTotal = 0;
+    for (const [, character] of store) {
+      if (character.biography.gender === "male") maleTotal++;
+      else femaleTotal++;
+      const hasDrone = character.thoughts.some(
+        (t) => t.thoughtId === "psychic_drone",
+      );
+      if (hasDrone) {
+        if (character.biography.gender === "male") maleAffected++;
+        else femaleAffected++;
+      }
+    }
+
+    // All colonists of the affected gender should have the thought
+    if (maleAffected > 0) {
+      expect(maleAffected).toBe(maleTotal);
+    } else {
+      expect(femaleAffected).toBe(femaleTotal);
+    }
+  });
+
+  it("returns a message indicating the affected gender", () => {
+    const store = makeGenderedEntityStore(2, 2);
+    const ctx = makeContext({
+      entityStore: store,
+      rng: new SeededRandom(42),
+      tick: 1000,
+    });
+
+    const message = psychicDroneEvent.execute(ctx);
+    expect(message.includes("male") || message.includes("female")).toBe(true);
+    expect(message).toContain("psychic drone");
+  });
+
+  it("can select either gender depending on RNG seed", () => {
+    let maleSelected = false;
+    let femaleSelected = false;
+
+    for (let seed = 0; seed < 100; seed++) {
+      const store = makeGenderedEntityStore(2, 2);
+      // Need 2 RNG calls: canTrigger uses one, execute uses another
+      // But we're calling execute directly, so the RNG starts fresh
+      const rng = new SeededRandom(seed);
+      const ctx = makeContext({
+        entityStore: store,
+        rng,
+        tick: 1000,
+      });
+
+      psychicDroneEvent.execute(ctx);
+
+      for (const [, character] of store) {
+        const hasDrone = character.thoughts.some(
+          (t) => t.thoughtId === "psychic_drone",
+        );
+        if (hasDrone) {
+          if (character.biography.gender === "male") maleSelected = true;
+          else femaleSelected = true;
+          break;
+        }
+      }
+
+      if (maleSelected && femaleSelected) break;
+    }
+
+    expect(maleSelected).toBe(true);
+    expect(femaleSelected).toBe(true);
   });
 });

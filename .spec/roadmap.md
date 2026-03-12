@@ -274,7 +274,7 @@
 - [ ] 214. Create infestation event (insectoids spawn in dark, warm areas)
 - [ ] 215. Add toxic fallout event (outdoor toxicity, need to stay indoors)
 - [ ] 216. Create volcanic winter event (reduced temperature and plant growth)
-- [ ] 217. Add psychic drone event (mood penalty to specific gender)
+- [x] 217. Add psychic drone event (mood penalty to specific gender)
 - [ ] 218. Create transport pod crash event (rescue the survivor)
 - [ ] 219. Implement event difficulty scaling with colony wealth and time
 - [x] 220. Add event notification/letter system with UI

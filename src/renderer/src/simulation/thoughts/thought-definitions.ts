@@ -41,7 +41,8 @@ export type ThoughtId =
   | "social_fight"
   | "got_married"
   | "attended_wedding"
-  | "eclipse";
+  | "eclipse"
+  | "psychic_drone";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -298,6 +299,13 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     description: "An eerie darkness covers the land.",
     moodEffect: -0.05,
     durationSeconds: 3600, // matches eclipse event duration in ticks / TPS
+  },
+  {
+    id: "psychic_drone",
+    label: "Psychic Drone",
+    description: "A strange psychic hum clouds the mind.",
+    moodEffect: -0.12,
+    durationSeconds: 5400, // matches psychic drone event duration in ticks / TPS
   },
 ] as const;
 

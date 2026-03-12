@@ -10,9 +10,10 @@ import type { World } from "../../world/types";
 import { generateColonistIdentity } from "../colonist-generator";
 import type { EntityStore } from "../entity-store";
 import { TICKS_PER_SECOND } from "../simulation-loop";
+import type { ThoughtId } from "../thoughts/thought-definitions";
 import { THOUGHT_MAP } from "../thoughts/thought-definitions";
 import type { ActiveThought } from "../thoughts/thought-system";
-import { type Character, createCharacter } from "../types";
+import { type Character, createCharacter, type Gender } from "../types";
 
 // =============================================================================
 // TYPES
@@ -63,14 +64,24 @@ export const ECLIPSE_DURATION_TICKS = 3600;
 /** Eclipse cooldown in ticks (~5 minutes at 60 TPS) */
 export const ECLIPSE_COOLDOWN_TICKS = 18000;
 
+/** Per-evaluation chance that a psychic drone fires (when eligible) */
+export const PSYCHIC_DRONE_CHANCE = 0.04;
+
+/** Psychic drone duration in ticks (~90 seconds at 60 TPS) */
+export const PSYCHIC_DRONE_DURATION_TICKS = 5400;
+
+/** Psychic drone cooldown in ticks (~5 minutes at 60 TPS) */
+export const PSYCHIC_DRONE_COOLDOWN_TICKS = 18000;
+
 // =============================================================================
 // HELPER: ADD TIMED THOUGHT TO ALL COLONISTS
 // =============================================================================
 
 function addThoughtToAllColonists(
   entityStore: EntityStore,
-  thoughtId: "eclipse",
+  thoughtId: ThoughtId,
   tick: number,
+  genderFilter?: Gender,
 ): void {
   const def = THOUGHT_MAP.get(thoughtId);
   if (!def) return;
@@ -78,6 +89,8 @@ function addThoughtToAllColonists(
   const expiresAtTick = tick + def.durationSeconds * TICKS_PER_SECOND;
 
   for (const [, character] of entityStore) {
+    if (genderFilter && character.biography.gender !== genderFilter) continue;
+
     const filtered = character.thoughts.filter(
       (t) => t.thoughtId !== thoughtId,
     );
@@ -185,10 +198,40 @@ export const eclipseEvent: EventDefinition = {
 };
 
 // =============================================================================
+// PSYCHIC DRONE EVENT
+// =============================================================================
+
+export const psychicDroneEvent: EventDefinition = {
+  id: "psychic_drone",
+  label: "Psychic Drone",
+  description:
+    "A low psychic drone fills the air, affecting the minds of colonists.",
+  category: "negative",
+  cooldownTicks: PSYCHIC_DRONE_COOLDOWN_TICKS,
+  durationTicks: PSYCHIC_DRONE_DURATION_TICKS,
+
+  canTrigger(ctx: EventContext): boolean {
+    return ctx.rng.chance(PSYCHIC_DRONE_CHANCE);
+  },
+
+  execute(ctx: EventContext): string {
+    const gender: Gender = ctx.rng.chance(0.5) ? "male" : "female";
+    addThoughtToAllColonists(
+      ctx.entityStore,
+      "psychic_drone",
+      ctx.tick,
+      gender,
+    );
+    return `A psychic drone is affecting all ${gender} colonists!`;
+  },
+};
+
+// =============================================================================
 // EVENT REGISTRY
 // =============================================================================
 
 export const ALL_EVENTS: readonly EventDefinition[] = [
   wandererJoinsEvent,
   eclipseEvent,
+  psychicDroneEvent,
 ];
