@@ -4,6 +4,7 @@
 // Periodically evaluates event definitions and triggers those whose conditions
 // are met. Tracks per-event cooldowns and active durations.
 
+import { showToast } from "../../components/floating/toast/toastUtils";
 import { useLogStore } from "../../lib/log-store";
 import type { SeededRandom } from "../../world/factories/world-factory";
 import type { World } from "../../world/types";
@@ -47,12 +48,10 @@ export class EventSystem {
     for (const [id, endTick] of this.activeEvents) {
       if (tick >= endTick) {
         this.activeEvents.delete(id);
-        useLogStore
-          .getState()
-          .addEntry("info", `The ${id.replace("_", " ")} has ended.`, [
-            "event",
-            id,
-          ]);
+        const label = ALL_EVENTS.find((e) => e.id === id)?.label ?? id;
+        const endMessage = `${label} has ended.`;
+        useLogStore.getState().addEntry("info", endMessage, ["event", id]);
+        showToast(endMessage, "default", { duration: 4000 });
       }
     }
 
@@ -82,6 +81,7 @@ export class EventSystem {
 
     const message = event.execute(ctx);
     useLogStore.getState().addEntry("info", message, ["event", event.id]);
+    showToast(message, "default", { duration: 5000 });
 
     // Track duration-based events
     if (event.durationTicks > 0) {

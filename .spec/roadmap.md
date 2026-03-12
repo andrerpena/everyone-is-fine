@@ -277,7 +277,7 @@
 - [ ] 217. Add psychic drone event (mood penalty to specific gender)
 - [ ] 218. Create transport pod crash event (rescue the survivor)
 - [ ] 219. Implement event difficulty scaling with colony wealth and time
-- [ ] 220. Add event notification/letter system with UI
+- [x] 220. Add event notification/letter system with UI
 
 ## Phase 17 — Animals
 
