@@ -4,7 +4,7 @@
 // Pure functions for managing opinion scores between colonist pairs.
 // Opinion ranges from -100 (hostile) to +100 (best friend).
 
-import type { EntityId } from "./types";
+import type { Character, EntityId } from "./types";
 
 // =============================================================================
 // CONSTANTS
@@ -19,6 +19,9 @@ export const OPINION_MAX = 100;
 /** Opinion change from a successful social interaction */
 export const SOCIALIZE_OPINION_GAIN = 5;
 
+/** Minimum mutual opinion for romance to form */
+export const ROMANCE_OPINION_THRESHOLD = 75;
+
 // =============================================================================
 // RELATIONSHIP LABELS
 // =============================================================================
@@ -29,7 +32,8 @@ export type RelationshipLabel =
   | "neutral"
   | "acquaintance"
   | "friend"
-  | "close friend";
+  | "close friend"
+  | "lover";
 
 /** Thresholds for relationship labels (opinion >= threshold) */
 const LABEL_THRESHOLDS: Array<{ min: number; label: RelationshipLabel }> = [
@@ -68,9 +72,24 @@ export function adjustOpinion(
 }
 
 /** Get a human-readable label for an opinion value */
-export function getRelationshipLabel(opinion: number): RelationshipLabel {
+export function getRelationshipLabel(
+  opinion: number,
+  isPartner = false,
+): RelationshipLabel {
+  if (isPartner) return "lover";
   for (const { min, label } of LABEL_THRESHOLDS) {
     if (opinion >= min) return label;
   }
   return "rival";
+}
+
+/** Check if two characters can form a romance */
+export function canFormRomance(a: Character, b: Character): boolean {
+  if (a.partner !== null || b.partner !== null) return false;
+  const aOpinion = getOpinion(a.relationships, b.id);
+  const bOpinion = getOpinion(b.relationships, a.id);
+  return (
+    aOpinion >= ROMANCE_OPINION_THRESHOLD &&
+    bOpinion >= ROMANCE_OPINION_THRESHOLD
+  );
 }

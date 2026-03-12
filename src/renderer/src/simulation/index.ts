@@ -94,11 +94,13 @@ export { PlantGrowthSystem } from "./plants/plant-growth-system";
 // Relationships
 export {
   adjustOpinion,
+  canFormRomance,
   getOpinion,
   getRelationshipLabel,
   OPINION_MAX,
   OPINION_MIN,
   type RelationshipLabel,
+  ROMANCE_OPINION_THRESHOLD,
   SOCIALIZE_OPINION_GAIN,
 } from "./relationships";
 // Rooms

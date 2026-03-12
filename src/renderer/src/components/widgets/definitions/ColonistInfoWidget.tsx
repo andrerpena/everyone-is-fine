@@ -55,6 +55,7 @@ function getActivityDescription(
 function formatRelationships(
   relationships: Record<string, number>,
   allCharacters: Map<string, Character>,
+  partnerId: string | null,
 ): string {
   const entries = Object.entries(relationships);
   if (entries.length === 0) return "No relationships";
@@ -63,7 +64,7 @@ function formatRelationships(
     .sort(([, a], [, b]) => b - a)
     .map(([id, opinion]) => {
       const name = allCharacters.get(id)?.name ?? "Unknown";
-      const label = getRelationshipLabel(opinion);
+      const label = getRelationshipLabel(opinion, id === partnerId);
       return `${name}: ${label} (${opinion > 0 ? "+" : ""}${opinion})`;
     })
     .join(", ");
@@ -124,7 +125,11 @@ function ColonistInfoWidget(_props: WidgetComponentProps) {
             .map((t) => getThoughtDefinition(t.thoughtId)?.label ?? t.thoughtId)
             .join(", ")
         : "None",
-    relationships: formatRelationships(relationships, allCharacters),
+    relationships: formatRelationships(
+      relationships,
+      allCharacters,
+      character.partner,
+    ),
   };
 
   return (

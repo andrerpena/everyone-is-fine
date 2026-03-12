@@ -5,7 +5,7 @@
 // are near each other. Restores small social need and nudges opinions.
 
 import type { EntityStore } from "./entity-store";
-import { adjustOpinion, getOpinion } from "./relationships";
+import { adjustOpinion, canFormRomance, getOpinion } from "./relationships";
 import { TICKS_PER_SECOND } from "./simulation-loop";
 import { THOUGHT_MAP } from "./thoughts/thought-definitions";
 import type { ActiveThought } from "./thoughts/thought-system";
@@ -141,15 +141,22 @@ export class SocialInteractionSystem {
       getOpinion(bRelationships, a.id),
     );
 
+    // Check for romance formation using updated opinions
+    const updatedA = { ...a, relationships: aRelationships };
+    const updatedB = { ...b, relationships: bRelationships };
+    const romanceFormed = canFormRomance(updatedA, updatedB);
+
     this.entityStore.update(a.id, {
       needs: aNeeds,
       relationships: aRelationships,
       ...(aThoughts ? { thoughts: aThoughts } : {}),
+      ...(romanceFormed ? { partner: b.id } : {}),
     });
     this.entityStore.update(b.id, {
       needs: bNeeds,
       relationships: bRelationships,
       ...(bThoughts ? { thoughts: bThoughts } : {}),
+      ...(romanceFormed ? { partner: a.id } : {}),
     });
   }
 

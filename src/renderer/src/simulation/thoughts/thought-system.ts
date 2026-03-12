@@ -147,6 +147,9 @@ export function evaluateConditionThoughts(
   if (opinions.some((op) => op <= -60)) {
     thoughts.add("has_rival");
   }
+  if (character.partner !== null) {
+    thoughts.add("in_relationship");
+  }
 
   // --- Environment/beauty thoughts ---
   if (envContext) {

@@ -118,6 +118,8 @@ export interface Character extends Entity {
   thoughts: ActiveThought[];
   /** Opinion scores for other colonists (EntityId → opinion, -100 to +100) */
   relationships: Record<EntityId, number>;
+  /** Romantic partner, or null if single */
+  partner: EntityId | null;
   /** Active mental break, or null if not in a break */
   mentalBreak: MentalBreakState | null;
   /** Per-work-type priority (0 = disabled, 1 = highest, 4 = lowest) */
@@ -318,6 +320,7 @@ export function createCharacter(
     traits: [],
     thoughts: [],
     relationships: {},
+    partner: null,
     mentalBreak: null,
     workPriorities: createDefaultWorkPriorities(),
     schedule: createDefaultSchedule(),

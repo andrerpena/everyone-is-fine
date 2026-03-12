@@ -193,7 +193,7 @@
 - [x] 148. Add social thought generation from interactions
 - [x] 149. ~~Implement friendship formation~~ (done: opinion >= 30 → "friend" label + has_friends thought, formed naturally via social interactions)
 - [x] 150. ~~Add rivalry formation~~ (done: opinion <= -60 → "rival" label + has_rival thought, formed naturally via social interactions)
-- [ ] 151. Create romance system (colonists can become lovers)
+- [x] 151. Create romance system (colonists can become lovers)
 - [ ] 152. Implement marriage proposal and wedding ceremony event
 - [ ] 153. Add breakup mechanics and associated mood effects
 - [x] 154. Create social tab showing relationships for selected colonist
