@@ -38,6 +38,8 @@ export interface BodyPartState {
   health: number;
   /** Maximum health for this body part */
   maxHealth: number;
+  /** Active injuries on this body part */
+  injuries: import("./injuries").Injury[];
 }
 
 /** All body parts state for a character */
@@ -135,6 +137,7 @@ export function createDefaultBodyParts(): BodyPartsState {
     parts[def.id] = {
       health: def.maxHealth,
       maxHealth: def.maxHealth,
+      injuries: [],
     };
   }
   return parts;

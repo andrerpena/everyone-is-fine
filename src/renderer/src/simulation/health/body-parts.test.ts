@@ -62,6 +62,13 @@ describe("createDefaultBodyParts", () => {
     }
   });
 
+  it("initializes all parts with empty injuries", () => {
+    const parts = createDefaultBodyParts();
+    for (const def of BODY_PART_DEFINITIONS) {
+      expect(parts[def.id].injuries).toEqual([]);
+    }
+  });
+
   it("all max health values are positive", () => {
     const parts = createDefaultBodyParts();
     for (const def of BODY_PART_DEFINITIONS) {

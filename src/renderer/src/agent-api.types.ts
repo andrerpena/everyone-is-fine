@@ -61,6 +61,15 @@ export interface AgentBodyPartInfo {
   label: string;
   health: number;
   maxHealth: number;
+  injuries: AgentInjuryInfo[];
+}
+
+/** Injury info exposed to agents */
+export interface AgentInjuryInfo {
+  id: string;
+  type: string;
+  damage: number;
+  healProgress: number;
 }
 
 /** Tile info exposed to agents */

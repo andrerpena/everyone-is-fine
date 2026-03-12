@@ -130,6 +130,12 @@ function toAgentCharacter(char: Character): AgentCharacterInfo {
       label: def.label,
       health: char.bodyParts[def.id].health,
       maxHealth: char.bodyParts[def.id].maxHealth,
+      injuries: char.bodyParts[def.id].injuries.map((inj) => ({
+        id: inj.id,
+        type: inj.typeId,
+        damage: inj.damage,
+        healProgress: inj.healProgress,
+      })),
     })),
   };
 }
