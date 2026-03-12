@@ -338,11 +338,13 @@ export function createSocializeJob(
 /**
  * Create a "cook meal" job.
  * The CookingSystem removes raw food before assigning this job.
- * Steps: move adjacent to campfire → work 180 ticks → spawn meal_simple
+ * Steps: move adjacent to campfire → work → spawn meal
  */
 export function createCookJob(
   characterId: EntityId,
   campfirePos: Position3D,
+  outputItemType: ItemType = "meal_simple",
+  workTicks = 180,
 ): Job {
   return {
     id: generateJobId(),
@@ -361,14 +363,14 @@ export function createCookJob(
       },
       {
         type: "work",
-        totalTicks: 180,
+        totalTicks: workTicks,
         ticksWorked: 0,
         status: "pending",
       },
       {
         type: "spawn_items",
         position: campfirePos,
-        items: [{ type: "meal_simple", quantity: 1 }],
+        items: [{ type: outputItemType, quantity: 1 }],
         skillId: "cooking",
         status: "pending",
       },

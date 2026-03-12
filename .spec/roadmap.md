@@ -110,7 +110,7 @@
 - [x] 80. Implement job interruption and resumption <!-- Ticket 0026: critical need interruption; resumption deferred -->
 - [x] 81. Create hauling job type (move items from ground to stockpile) <!-- Ticket 0036 -->
 - [x] 82. Implement cleaning job type (remove filth from floors)
-- [ ] 83. Add bill/order system for crafting and cooking workstations
+- [x] 83. Add bill/order system for crafting and cooking workstations
 - [ ] 84. Create work tab UI for managing colonist job priorities
 - [x] 85. Implement "draft" mode (direct colonist control, overriding job AI) <!-- Ticket 0018 -->
 - [x] 86. Add job progress indicators (progress bars on in-world tasks) <!-- Done: JobProgressRenderer in pixi/renderers/ -->
@@ -198,7 +198,7 @@
 - [x] 153. Add breakup mechanics and associated mood effects
 - [x] 154. Create social tab showing relationships for selected colonist
 - [ ] 155. Implement social fight system (colonists with very low opinions may fight)
-- [ ] 156. Add conversation topics affected by traits and interests
+- [x] 156. Add conversation topics affected by traits and interests
 - [x] 157. Create insult and slight interaction types
 
 ## Phase 12 — Health System
