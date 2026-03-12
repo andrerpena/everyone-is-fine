@@ -7,6 +7,7 @@ import {
   performanceWidget,
   settingsWidget,
   tileInspectorWidget,
+  workPrioritiesWidget,
   worldWidget,
 } from "./definitions";
 import { widgetRegistry } from "./widget-registry";
@@ -26,4 +27,5 @@ export function registerBuiltInWidgets(): void {
   widgetRegistry.register(settingsWidget);
   widgetRegistry.register(tileInspectorWidget);
   widgetRegistry.register(miniMapWidget);
+  widgetRegistry.register(workPrioritiesWidget);
 }

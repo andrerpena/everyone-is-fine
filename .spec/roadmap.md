@@ -111,7 +111,7 @@
 - [x] 81. Create hauling job type (move items from ground to stockpile) <!-- Ticket 0036 -->
 - [x] 82. Implement cleaning job type (remove filth from floors)
 - [x] 83. Add bill/order system for crafting and cooking workstations
-- [ ] 84. Create work tab UI for managing colonist job priorities
+- [x] 84. Create work tab UI for managing colonist job priorities
 - [x] 85. Implement "draft" mode (direct colonist control, overriding job AI) <!-- Ticket 0018 -->
 - [x] 86. Add job progress indicators (progress bars on in-world tasks) <!-- Done: JobProgressRenderer in pixi/renderers/ -->
 - [x] 87. Create idle alert when colonists have no available work <!-- Ticket 0028 -->

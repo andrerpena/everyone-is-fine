@@ -6,6 +6,7 @@ export { miniMapWidget } from "./MiniMapWidget";
 export { performanceWidget } from "./PerformanceWidget";
 export { settingsWidget } from "./SettingsWidget";
 export { tileInspectorWidget } from "./TileInspectorWidget";
+export { workPrioritiesWidget } from "./WorkPrioritiesWidget";
 export { worldWidget } from "./WorldWidget";
 
 // Future widgets:
