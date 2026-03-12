@@ -38,6 +38,18 @@ export const CHAT_OPINION_DELTA = 1;
 /** Minimum ticks between chats for the same pair */
 export const CHAT_COOLDOWN = 600;
 
+/** Base probability of an insult during a chat */
+export const INSULT_BASE_CHANCE = 0.1;
+
+/** Extra insult chance for "abrasive" trait */
+export const INSULT_ABRASIVE_BONUS = 0.15;
+
+/** Reduced insult chance for "kind" trait */
+export const INSULT_KIND_REDUCTION = 0.08;
+
+/** Opinion penalty when insulted */
+export const INSULT_OPINION_DELTA = -3;
+
 // =============================================================================
 // HELPERS
 // =============================================================================
@@ -45,6 +57,18 @@ export const CHAT_COOLDOWN = 600;
 /** Create a consistent key for a pair of entity IDs (order-independent) */
 export function pairKey(a: EntityId, b: EntityId): string {
   return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+/** Calculate insult chance for a character based on traits */
+export function getInsultChance(character: Character): number {
+  let chance = INSULT_BASE_CHANCE;
+  if (character.traits.includes("abrasive")) {
+    chance += INSULT_ABRASIVE_BONUS;
+  }
+  if (character.traits.includes("kind")) {
+    chance -= INSULT_KIND_REDUCTION;
+  }
+  return Math.max(0, chance);
 }
 
 // =============================================================================
@@ -117,7 +141,7 @@ export class SocialInteractionSystem {
     // Record cooldown
     this.recentChats.set(key, this.currentTick);
 
-    // Restore social need for both
+    // Restore social need for both (even insults count as social contact)
     const aNeeds = {
       ...a.needs,
       social: Math.min(1, a.needs.social + CHAT_SOCIAL_RESTORE),
@@ -127,45 +151,80 @@ export class SocialInteractionSystem {
       social: Math.min(1, b.needs.social + CHAT_SOCIAL_RESTORE),
     };
 
-    // Adjust opinions
-    const aRelationships = adjustOpinion(
-      a.relationships,
-      b.id,
-      CHAT_OPINION_DELTA,
-    );
-    const bRelationships = adjustOpinion(
-      b.relationships,
-      a.id,
-      CHAT_OPINION_DELTA,
-    );
+    // Roll for insults — each character can independently insult the other
+    const aInsults = Math.random() < getInsultChance(a);
+    const bInsults = Math.random() < getInsultChance(b);
+
+    // Adjust opinions based on insult outcomes
+    // If A insulted B: B's opinion of A drops. A's opinion is unchanged.
+    // If neither insulted: normal positive chat for both.
+    const aOpinionDelta = bInsults ? INSULT_OPINION_DELTA : CHAT_OPINION_DELTA;
+    const bOpinionDelta = aInsults ? INSULT_OPINION_DELTA : CHAT_OPINION_DELTA;
+
+    const aRelationships = adjustOpinion(a.relationships, b.id, aOpinionDelta);
+    const bRelationships = adjustOpinion(b.relationships, a.id, bOpinionDelta);
 
     // Generate social thoughts based on post-chat opinions
-    const aThoughts = this.buildChatThoughts(
+    let aThoughtsUpdate = this.buildChatThoughts(
       a.thoughts,
       getOpinion(aRelationships, b.id),
     );
-    const bThoughts = this.buildChatThoughts(
+    let bThoughtsUpdate = this.buildChatThoughts(
       b.thoughts,
       getOpinion(bRelationships, a.id),
     );
 
-    // Check for romance formation using updated opinions
+    // Add insult thoughts to targets
+    if (bInsults) {
+      aThoughtsUpdate = this.addTimedThought(
+        aThoughtsUpdate ?? a.thoughts,
+        "was_insulted",
+      );
+    }
+    if (aInsults) {
+      bThoughtsUpdate = this.addTimedThought(
+        bThoughtsUpdate ?? b.thoughts,
+        "was_insulted",
+      );
+    }
+
+    // Check for romance formation using updated opinions (only if no insults)
     const updatedA = { ...a, relationships: aRelationships };
     const updatedB = { ...b, relationships: bRelationships };
-    const romanceFormed = canFormRomance(updatedA, updatedB);
+    const romanceFormed =
+      !aInsults && !bInsults && canFormRomance(updatedA, updatedB);
 
     this.entityStore.update(a.id, {
       needs: aNeeds,
       relationships: aRelationships,
-      ...(aThoughts ? { thoughts: aThoughts } : {}),
+      ...(aThoughtsUpdate ? { thoughts: aThoughtsUpdate } : {}),
       ...(romanceFormed ? { partner: b.id } : {}),
     });
     this.entityStore.update(b.id, {
       needs: bNeeds,
       relationships: bRelationships,
-      ...(bThoughts ? { thoughts: bThoughts } : {}),
+      ...(bThoughtsUpdate ? { thoughts: bThoughtsUpdate } : {}),
       ...(romanceFormed ? { partner: a.id } : {}),
     });
+  }
+
+  /** Add a timed thought to a thoughts array, replacing any existing one of the same type */
+  private addTimedThought(
+    existingThoughts: ActiveThought[],
+    thoughtId: "was_insulted" | "chatted_with_friend" | "chatted_with_rival",
+  ): ActiveThought[] {
+    const def = THOUGHT_MAP.get(thoughtId);
+    if (!def) return existingThoughts;
+
+    const filtered = existingThoughts.filter((t) => t.thoughtId !== thoughtId);
+    const expiresAtTick =
+      this.currentTick + def.durationSeconds * TICKS_PER_SECOND;
+    filtered.push({
+      thoughtId,
+      addedAtTick: this.currentTick,
+      expiresAtTick,
+    });
+    return filtered;
   }
 
   /**

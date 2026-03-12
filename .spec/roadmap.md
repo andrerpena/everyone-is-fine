@@ -199,7 +199,7 @@
 - [x] 154. Create social tab showing relationships for selected colonist
 - [ ] 155. Implement social fight system (colonists with very low opinions may fight)
 - [ ] 156. Add conversation topics affected by traits and interests
-- [ ] 157. Create insult and slight interaction types
+- [x] 157. Create insult and slight interaction types
 
 ## Phase 12 — Health System
 
