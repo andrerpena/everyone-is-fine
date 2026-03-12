@@ -9,6 +9,7 @@ import {
   tileInspectorWidget,
   workPrioritiesWidget,
   worldWidget,
+  zonesWidget,
 } from "./definitions";
 import { widgetRegistry } from "./widget-registry";
 
@@ -28,4 +29,5 @@ export function registerBuiltInWidgets(): void {
   widgetRegistry.register(tileInspectorWidget);
   widgetRegistry.register(miniMapWidget);
   widgetRegistry.register(workPrioritiesWidget);
+  widgetRegistry.register(zonesWidget);
 }

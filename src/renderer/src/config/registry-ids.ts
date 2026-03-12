@@ -22,6 +22,7 @@ export const WIDGET_IDS = [
   "tile-inspector",
   "mini-map",
   "work-priorities",
+  "zones",
 ] as const;
 
 export const STATUS_BAR_IDS = [

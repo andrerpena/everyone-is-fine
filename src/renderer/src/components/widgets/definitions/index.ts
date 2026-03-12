@@ -8,6 +8,7 @@ export { settingsWidget } from "./SettingsWidget";
 export { tileInspectorWidget } from "./TileInspectorWidget";
 export { workPrioritiesWidget } from "./WorkPrioritiesWidget";
 export { worldWidget } from "./WorldWidget";
+export { zonesWidget } from "./ZonesWidget";
 
 // Future widgets:
 // export { entityListWidget } from "./entity-list";
