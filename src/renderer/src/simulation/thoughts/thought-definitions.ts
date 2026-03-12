@@ -29,7 +29,12 @@ export type ThoughtId =
   | "environment_hideous"
   | "environment_impressive"
   | "food_poisoning"
-  | "ate_nutrient_paste";
+  | "ate_nutrient_paste"
+  | "chatted_with_friend"
+  | "chatted_with_rival"
+  | "has_friends"
+  | "no_friends"
+  | "has_rival";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -198,6 +203,43 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     label: "Ate Nutrient Paste",
     description: "That paste was awful, but at least it was filling",
     moodEffect: -0.08,
+    durationSeconds: 14400, // 4 hours
+  },
+  // Social thoughts (condition-based)
+  {
+    id: "has_friends",
+    label: "Has Friends",
+    description: "It's nice to have friends around",
+    moodEffect: 0.05,
+    durationSeconds: 0,
+  },
+  {
+    id: "no_friends",
+    label: "No Friends",
+    description: "Nobody here really knows me",
+    moodEffect: -0.05,
+    durationSeconds: 0,
+  },
+  {
+    id: "has_rival",
+    label: "Has a Rival",
+    description: "Someone here really gets on my nerves",
+    moodEffect: -0.03,
+    durationSeconds: 0,
+  },
+  // Social thoughts (timed)
+  {
+    id: "chatted_with_friend",
+    label: "Chatted with Friend",
+    description: "Had a nice chat with a friend",
+    moodEffect: 0.05,
+    durationSeconds: 14400, // 4 hours
+  },
+  {
+    id: "chatted_with_rival",
+    label: "Chatted with Rival",
+    description: "Had an unpleasant interaction with someone I dislike",
+    moodEffect: -0.05,
     durationSeconds: 14400, // 4 hours
   },
 ] as const;

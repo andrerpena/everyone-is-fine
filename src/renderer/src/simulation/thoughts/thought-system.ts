@@ -64,6 +64,12 @@ export function computeMoodFromThoughts(thoughts: ActiveThought[]): number {
 // CONDITION EVALUATION
 // =============================================================================
 
+/** Social context for evaluating relationship-based thoughts */
+export interface SocialContext {
+  /** Total number of colonists in the colony */
+  totalColonists: number;
+}
+
 /**
  * Evaluate what condition-based thoughts a character should have right now.
  * Returns a set of ThoughtIds that should be active.
@@ -71,6 +77,7 @@ export function computeMoodFromThoughts(thoughts: ActiveThought[]): number {
 export function evaluateConditionThoughts(
   character: Character,
   envContext?: EnvironmentContext,
+  socialContext?: SocialContext,
 ): Set<ThoughtId> {
   const thoughts = new Set<ThoughtId>();
   const { needs, traits } = character;
@@ -123,6 +130,22 @@ export function evaluateConditionThoughts(
   }
   if (traits.includes("brave")) {
     thoughts.add("feeling_brave");
+  }
+
+  // --- Social/relationship thoughts ---
+  const opinions = Object.values(character.relationships);
+  if (opinions.some((op) => op >= 30)) {
+    thoughts.add("has_friends");
+  }
+  if (
+    socialContext &&
+    socialContext.totalColonists >= 3 &&
+    !opinions.some((op) => op >= 10)
+  ) {
+    thoughts.add("no_friends");
+  }
+  if (opinions.some((op) => op <= -60)) {
+    thoughts.add("has_rival");
   }
 
   // --- Environment/beauty thoughts ---
@@ -219,7 +242,14 @@ export class MoodThoughtSystem {
 
     // 2. Evaluate which condition-based thoughts should be active
     const envContext = this.getEnvironmentContext(character);
-    const conditionThoughts = evaluateConditionThoughts(character, envContext);
+    const socialContext: SocialContext = {
+      totalColonists: this.entityStore.size,
+    };
+    const conditionThoughts = evaluateConditionThoughts(
+      character,
+      envContext,
+      socialContext,
+    );
 
     // 3. Identify condition-based thought IDs currently active
     const conditionBased = new Set<ThoughtId>();

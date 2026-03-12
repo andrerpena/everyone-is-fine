@@ -5,7 +5,10 @@
 // are near each other. Restores small social need and nudges opinions.
 
 import type { EntityStore } from "./entity-store";
-import { adjustOpinion } from "./relationships";
+import { adjustOpinion, getOpinion } from "./relationships";
+import { TICKS_PER_SECOND } from "./simulation-loop";
+import { THOUGHT_MAP } from "./thoughts/thought-definitions";
+import type { ActiveThought } from "./thoughts/thought-system";
 import type { Character, EntityId } from "./types";
 
 // =============================================================================
@@ -128,14 +131,57 @@ export class SocialInteractionSystem {
       CHAT_OPINION_DELTA,
     );
 
+    // Generate social thoughts based on post-chat opinions
+    const aThoughts = this.buildChatThoughts(
+      a.thoughts,
+      getOpinion(aRelationships, b.id),
+    );
+    const bThoughts = this.buildChatThoughts(
+      b.thoughts,
+      getOpinion(bRelationships, a.id),
+    );
+
     this.entityStore.update(a.id, {
       needs: aNeeds,
       relationships: aRelationships,
+      ...(aThoughts ? { thoughts: aThoughts } : {}),
     });
     this.entityStore.update(b.id, {
       needs: bNeeds,
       relationships: bRelationships,
+      ...(bThoughts ? { thoughts: bThoughts } : {}),
     });
+  }
+
+  /**
+   * Build updated thoughts array with a chat thought if opinion warrants it.
+   * Returns null if no thought should be added.
+   */
+  private buildChatThoughts(
+    existingThoughts: ActiveThought[],
+    opinionOfPartner: number,
+  ): ActiveThought[] | null {
+    let thoughtId: "chatted_with_friend" | "chatted_with_rival" | null = null;
+    if (opinionOfPartner >= 30) {
+      thoughtId = "chatted_with_friend";
+    } else if (opinionOfPartner <= -60) {
+      thoughtId = "chatted_with_rival";
+    }
+    if (!thoughtId) return null;
+
+    const def = THOUGHT_MAP.get(thoughtId);
+    if (!def) return null;
+
+    // Replace existing thought of the same type (reset timer) or add new
+    const filtered = existingThoughts.filter((t) => t.thoughtId !== thoughtId);
+    const expiresAtTick =
+      this.currentTick + def.durationSeconds * TICKS_PER_SECOND;
+    filtered.push({
+      thoughtId,
+      addedAtTick: this.currentTick,
+      expiresAtTick,
+    });
+    return filtered;
   }
 
   private cleanupCooldowns(): void {

@@ -190,7 +190,7 @@
 
 - [x] 146. Implement social interaction system (colonists chat when near each other)
 - [x] 147. Create opinion/relationship tracker between colonist pairs
-- [ ] 148. Add social thought generation from interactions
+- [x] 148. Add social thought generation from interactions
 - [ ] 149. Implement friendship formation (high opinion over time)
 - [ ] 150. Add rivalry formation (low opinion over time)
 - [ ] 151. Create romance system (colonists can become lovers)
