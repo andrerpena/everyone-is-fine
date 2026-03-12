@@ -94,6 +94,7 @@ export { PlantGrowthSystem } from "./plants/plant-growth-system";
 // Relationships
 export {
   adjustOpinion,
+  BREAKUP_OPINION_THRESHOLD,
   canFormRomance,
   getOpinion,
   getRelationshipLabel,
@@ -102,6 +103,7 @@ export {
   type RelationshipLabel,
   ROMANCE_OPINION_THRESHOLD,
   SOCIALIZE_OPINION_GAIN,
+  shouldBreakUp,
 } from "./relationships";
 // Rooms
 export { type Room, RoomDetectionSystem, type RoomStats } from "./rooms";

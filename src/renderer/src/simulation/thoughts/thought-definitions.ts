@@ -35,7 +35,8 @@ export type ThoughtId =
   | "has_friends"
   | "no_friends"
   | "has_rival"
-  | "in_relationship";
+  | "in_relationship"
+  | "broke_up";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -249,6 +250,13 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     description: "Life is better with someone special",
     moodEffect: 0.08,
     durationSeconds: 0,
+  },
+  {
+    id: "broke_up",
+    label: "Broke Up",
+    description: "The relationship ended. Everything feels empty.",
+    moodEffect: -0.15,
+    durationSeconds: 172800, // 48 hours
   },
 ] as const;
 

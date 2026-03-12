@@ -22,6 +22,9 @@ export const SOCIALIZE_OPINION_GAIN = 5;
 /** Minimum mutual opinion for romance to form */
 export const ROMANCE_OPINION_THRESHOLD = 75;
 
+/** Opinion below which a romantic relationship breaks */
+export const BREAKUP_OPINION_THRESHOLD = 20;
+
 // =============================================================================
 // RELATIONSHIP LABELS
 // =============================================================================
@@ -91,5 +94,14 @@ export function canFormRomance(a: Character, b: Character): boolean {
   return (
     aOpinion >= ROMANCE_OPINION_THRESHOLD &&
     bOpinion >= ROMANCE_OPINION_THRESHOLD
+  );
+}
+
+/** Check if a partnered character should break up (either opinion below threshold) */
+export function shouldBreakUp(a: Character, b: Character): boolean {
+  const aOpinion = getOpinion(a.relationships, b.id);
+  const bOpinion = getOpinion(b.relationships, a.id);
+  return (
+    aOpinion < BREAKUP_OPINION_THRESHOLD || bOpinion < BREAKUP_OPINION_THRESHOLD
   );
 }

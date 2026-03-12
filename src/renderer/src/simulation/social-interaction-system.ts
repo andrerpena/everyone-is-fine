@@ -5,7 +5,12 @@
 // are near each other. Restores small social need and nudges opinions.
 
 import type { EntityStore } from "./entity-store";
-import { adjustOpinion, canFormRomance, getOpinion } from "./relationships";
+import {
+  adjustOpinion,
+  canFormRomance,
+  getOpinion,
+  shouldBreakUp,
+} from "./relationships";
 import { TICKS_PER_SECOND } from "./simulation-loop";
 import { THOUGHT_MAP } from "./thoughts/thought-definitions";
 import type { ActiveThought } from "./thoughts/thought-system";
@@ -61,6 +66,9 @@ export class SocialInteractionSystem {
 
     // Clean up expired cooldowns periodically
     this.cleanupCooldowns();
+
+    // Check for breakups among partnered colonists
+    this.checkBreakups();
 
     const characters = this.entityStore.getAll();
     const chatted = new Set<EntityId>();
@@ -189,6 +197,54 @@ export class SocialInteractionSystem {
       expiresAtTick,
     });
     return filtered;
+  }
+
+  private checkBreakups(): void {
+    const processed = new Set<EntityId>();
+
+    for (const character of this.entityStore.values()) {
+      if (character.partner === null || processed.has(character.id)) continue;
+
+      const partner = this.entityStore.get(character.partner);
+
+      // Break up if partner no longer exists or opinion dropped too low
+      const shouldEnd = !partner || shouldBreakUp(character, partner);
+
+      if (shouldEnd) {
+        this.triggerBreakup(character.id, character.partner);
+        processed.add(character.id);
+        processed.add(character.partner);
+      }
+    }
+  }
+
+  private triggerBreakup(aId: EntityId, bId: EntityId): void {
+    const brokeUpDef = THOUGHT_MAP.get("broke_up");
+    const expiresAtTick = brokeUpDef
+      ? this.currentTick + brokeUpDef.durationSeconds * TICKS_PER_SECOND
+      : this.currentTick + 172800 * TICKS_PER_SECOND;
+
+    const brokeUpThought: ActiveThought = {
+      thoughtId: "broke_up",
+      addedAtTick: this.currentTick,
+      expiresAtTick,
+    };
+
+    // Clear partner and add breakup thought for A
+    const a = this.entityStore.get(aId);
+    if (a) {
+      const thoughts = a.thoughts.filter((t) => t.thoughtId !== "broke_up");
+      thoughts.push(brokeUpThought);
+      this.entityStore.update(aId, { partner: null, thoughts });
+    }
+
+    // Clear partner and add breakup thought for B
+    const b = this.entityStore.get(bId);
+    if (b) {
+      const thoughts = b.thoughts.filter((t) => t.thoughtId !== "broke_up");
+      thoughts.push(brokeUpThought);
+      this.entityStore.update(bId, { partner: null, thoughts });
+    }
   }
 
   private cleanupCooldowns(): void {
