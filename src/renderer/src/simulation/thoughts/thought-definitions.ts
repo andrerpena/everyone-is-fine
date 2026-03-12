@@ -42,7 +42,8 @@ export type ThoughtId =
   | "got_married"
   | "attended_wedding"
   | "eclipse"
-  | "psychic_drone";
+  | "psychic_drone"
+  | "toxic_fallout";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -306,6 +307,13 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     description: "A strange psychic hum clouds the mind.",
     moodEffect: -0.12,
     durationSeconds: 5400, // matches psychic drone event duration in ticks / TPS
+  },
+  {
+    id: "toxic_fallout",
+    label: "Toxic Fallout",
+    description: "Poisonous particles fill the air, making everyone uneasy.",
+    moodEffect: -0.08,
+    durationSeconds: 10800, // matches toxic fallout event duration in ticks / TPS
   },
 ] as const;
 

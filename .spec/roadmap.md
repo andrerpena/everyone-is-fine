@@ -272,7 +272,7 @@
 - [ ] 212. Create refugee chased event (accept refugee, fight pursuers)
 - [ ] 213. Add trade caravan arrival event
 - [ ] 214. Create infestation event (insectoids spawn in dark, warm areas)
-- [ ] 215. Add toxic fallout event (outdoor toxicity, need to stay indoors)
+- [x] 215. Add toxic fallout event (outdoor toxicity, need to stay indoors)
 - [ ] 216. Create volcanic winter event (reduced temperature and plant growth)
 - [x] 217. Add psychic drone event (mood penalty to specific gender)
 - [ ] 218. Create transport pod crash event (rescue the survivor)

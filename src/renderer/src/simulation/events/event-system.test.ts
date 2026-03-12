@@ -12,6 +12,10 @@ import {
   PSYCHIC_DRONE_COOLDOWN_TICKS,
   PSYCHIC_DRONE_DURATION_TICKS,
   psychicDroneEvent,
+  TOXIC_FALLOUT_CHANCE,
+  TOXIC_FALLOUT_COOLDOWN_TICKS,
+  TOXIC_FALLOUT_DURATION_TICKS,
+  toxicFalloutEvent,
   WANDERER_CHANCE,
   WANDERER_MAX_COLONY_SIZE,
   wandererJoinsEvent,
@@ -520,5 +524,84 @@ describe("Psychic Drone - execute (gender filtering)", () => {
 
     expect(maleSelected).toBe(true);
     expect(femaleSelected).toBe(true);
+  });
+});
+
+describe("Toxic Fallout - constants", () => {
+  it("toxic fallout chance is 0.03", () => {
+    expect(TOXIC_FALLOUT_CHANCE).toBe(0.03);
+  });
+
+  it("toxic fallout duration is 10800 ticks", () => {
+    expect(TOXIC_FALLOUT_DURATION_TICKS).toBe(10800);
+  });
+
+  it("toxic fallout cooldown is 36000 ticks", () => {
+    expect(TOXIC_FALLOUT_COOLDOWN_TICKS).toBe(36000);
+  });
+
+  it("toxic fallout is categorized as negative", () => {
+    expect(toxicFalloutEvent.category).toBe("negative");
+  });
+});
+
+describe("Toxic Fallout - canTrigger", () => {
+  it("can trigger based on RNG chance", () => {
+    let triggered = false;
+    for (let seed = 0; seed < 200; seed++) {
+      const ctx = makeContext({ rng: new SeededRandom(seed) });
+      if (toxicFalloutEvent.canTrigger(ctx)) {
+        triggered = true;
+        break;
+      }
+    }
+    expect(triggered).toBe(true);
+  });
+
+  it("can fail to trigger based on RNG chance", () => {
+    let notTriggered = false;
+    for (let seed = 0; seed < 200; seed++) {
+      const ctx = makeContext({ rng: new SeededRandom(seed) });
+      if (!toxicFalloutEvent.canTrigger(ctx)) {
+        notTriggered = true;
+        break;
+      }
+    }
+    expect(notTriggered).toBe(true);
+  });
+});
+
+describe("Toxic Fallout - execute", () => {
+  it("applies toxic_fallout thought to all colonists", () => {
+    const store = makeEntityStore(4);
+    const ctx = makeContext({
+      entityStore: store,
+      rng: new SeededRandom(42),
+      tick: 1000,
+    });
+
+    toxicFalloutEvent.execute(ctx);
+
+    let affectedCount = 0;
+    for (const [, character] of store) {
+      const hasFallout = character.thoughts.some(
+        (t) => t.thoughtId === "toxic_fallout",
+      );
+      if (hasFallout) affectedCount++;
+    }
+
+    expect(affectedCount).toBe(4);
+  });
+
+  it("returns a descriptive message", () => {
+    const store = makeEntityStore(2);
+    const ctx = makeContext({
+      entityStore: store,
+      rng: new SeededRandom(42),
+      tick: 1000,
+    });
+
+    const message = toxicFalloutEvent.execute(ctx);
+    expect(message).toContain("Toxic fallout");
   });
 });

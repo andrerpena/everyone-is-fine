@@ -73,6 +73,15 @@ export const PSYCHIC_DRONE_DURATION_TICKS = 5400;
 /** Psychic drone cooldown in ticks (~5 minutes at 60 TPS) */
 export const PSYCHIC_DRONE_COOLDOWN_TICKS = 18000;
 
+/** Per-evaluation chance that a toxic fallout fires (when eligible) */
+export const TOXIC_FALLOUT_CHANCE = 0.03;
+
+/** Toxic fallout duration in ticks (~3 minutes at 60 TPS) */
+export const TOXIC_FALLOUT_DURATION_TICKS = 10800;
+
+/** Toxic fallout cooldown in ticks (~10 minutes at 60 TPS) */
+export const TOXIC_FALLOUT_COOLDOWN_TICKS = 36000;
+
 // =============================================================================
 // HELPER: ADD TIMED THOUGHT TO ALL COLONISTS
 // =============================================================================
@@ -227,6 +236,29 @@ export const psychicDroneEvent: EventDefinition = {
 };
 
 // =============================================================================
+// TOXIC FALLOUT EVENT
+// =============================================================================
+
+export const toxicFalloutEvent: EventDefinition = {
+  id: "toxic_fallout",
+  label: "Toxic Fallout",
+  description:
+    "Toxic particles rain from the sky, poisoning the outdoors and unsettling colonists.",
+  category: "negative",
+  cooldownTicks: TOXIC_FALLOUT_COOLDOWN_TICKS,
+  durationTicks: TOXIC_FALLOUT_DURATION_TICKS,
+
+  canTrigger(ctx: EventContext): boolean {
+    return ctx.rng.chance(TOXIC_FALLOUT_CHANCE);
+  },
+
+  execute(ctx: EventContext): string {
+    addThoughtToAllColonists(ctx.entityStore, "toxic_fallout", ctx.tick);
+    return "Toxic fallout! Poisonous particles are raining from the sky!";
+  },
+};
+
+// =============================================================================
 // EVENT REGISTRY
 // =============================================================================
 
@@ -234,4 +266,5 @@ export const ALL_EVENTS: readonly EventDefinition[] = [
   wandererJoinsEvent,
   eclipseEvent,
   psychicDroneEvent,
+  toxicFalloutEvent,
 ];
