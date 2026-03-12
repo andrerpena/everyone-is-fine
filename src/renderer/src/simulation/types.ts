@@ -116,6 +116,8 @@ export interface Character extends Entity {
   traits: CharacterTraits;
   /** Active mood thoughts */
   thoughts: ActiveThought[];
+  /** Opinion scores for other colonists (EntityId → opinion, -100 to +100) */
+  relationships: Record<EntityId, number>;
   /** Active mental break, or null if not in a break */
   mentalBreak: MentalBreakState | null;
   /** Per-work-type priority (0 = disabled, 1 = highest, 4 = lowest) */
@@ -315,6 +317,7 @@ export function createCharacter(
     skills: createDefaultSkills(),
     traits: [],
     thoughts: [],
+    relationships: {},
     mentalBreak: null,
     workPriorities: createDefaultWorkPriorities(),
     schedule: createDefaultSchedule(),

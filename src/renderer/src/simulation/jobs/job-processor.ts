@@ -30,6 +30,7 @@ import type { MovementSystem } from "../movement";
 import { findPath } from "../pathfinding";
 import { CROP_REGISTRY } from "../plants/crop-registry";
 import { calculateQualityFromSkill } from "../quality";
+import { adjustOpinion, SOCIALIZE_OPINION_GAIN } from "../relationships";
 import {
   BASE_WORK_XP,
   getWorkSpeedMultiplier,
@@ -969,7 +970,43 @@ export class JobProcessor {
     this.activeJobs.delete(characterId);
     this.reservations.release(job.targetPosition);
 
+    // Adjust opinions after socializing
+    if (job.type === "socialize") {
+      this.adjustSocialOpinions(characterId, job.targetPosition);
+    }
+
     logger.debug(`Job completed: ${job.type} for ${characterId}`, ["jobs"]);
+  }
+
+  /** After a socialize job, nudge opinions between the two characters */
+  private adjustSocialOpinions(
+    characterId: EntityId,
+    targetPosition: Position3D,
+  ): void {
+    // Find the other character at or near the target position
+    const charsAtTile = this.entityStore.getAtTile(targetPosition);
+    const targetChar = charsAtTile.find((c) => c.id !== characterId);
+    if (!targetChar) return;
+
+    const character = this.entityStore.get(characterId);
+    if (!character) return;
+
+    // Both characters gain positive opinion of each other
+    this.entityStore.update(characterId, {
+      relationships: adjustOpinion(
+        character.relationships,
+        targetChar.id,
+        SOCIALIZE_OPINION_GAIN,
+      ),
+    });
+
+    this.entityStore.update(targetChar.id, {
+      relationships: adjustOpinion(
+        targetChar.relationships,
+        characterId,
+        SOCIALIZE_OPINION_GAIN,
+      ),
+    });
   }
 
   private failJob(characterId: EntityId, job: Job, reason: string): void {

@@ -91,6 +91,16 @@ export {
 // Plants
 export { CROP_REGISTRY } from "./plants/crop-registry";
 export { PlantGrowthSystem } from "./plants/plant-growth-system";
+// Relationships
+export {
+  adjustOpinion,
+  getOpinion,
+  getRelationshipLabel,
+  OPINION_MAX,
+  OPINION_MIN,
+  type RelationshipLabel,
+  SOCIALIZE_OPINION_GAIN,
+} from "./relationships";
 // Rooms
 export { type Room, RoomDetectionSystem, type RoomStats } from "./rooms";
 // Simulation Loop
