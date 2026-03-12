@@ -5,6 +5,7 @@ import {
   type ColonistInspectorData,
   colonistInspectorSchema,
 } from "../../../schemas";
+import { getRelationshipLabel } from "../../../simulation/relationships";
 import { formatSkillsSummary } from "../../../simulation/skills";
 import { getThoughtDefinition } from "../../../simulation/thoughts";
 import { formatTraitsSummary } from "../../../simulation/traits";
@@ -50,6 +51,24 @@ function getActivityDescription(
   return "Idle";
 }
 
+/** Format relationships map into a display string */
+function formatRelationships(
+  relationships: Record<string, number>,
+  allCharacters: Map<string, Character>,
+): string {
+  const entries = Object.entries(relationships);
+  if (entries.length === 0) return "No relationships";
+
+  return entries
+    .sort(([, a], [, b]) => b - a)
+    .map(([id, opinion]) => {
+      const name = allCharacters.get(id)?.name ?? "Unknown";
+      const label = getRelationshipLabel(opinion);
+      return `${name}: ${label} (${opinion > 0 ? "+" : ""}${opinion})`;
+    })
+    .join(", ");
+}
+
 /**
  * ColonistInfo widget component.
  * Displays detailed properties of the currently selected colonist.
@@ -61,6 +80,8 @@ function ColonistInfoWidget(_props: WidgetComponentProps) {
     if (!character) return null;
     return state.simulation.jobProgress.get(character.id)?.jobType ?? null;
   });
+
+  const allCharacters = useGameStore((state) => state.simulation.characters);
 
   if (!character) {
     return (
@@ -79,6 +100,7 @@ function ColonistInfoWidget(_props: WidgetComponentProps) {
     skills,
     traits,
     thoughts,
+    relationships,
   } = character;
 
   const data: ColonistInspectorData = {
@@ -102,6 +124,7 @@ function ColonistInfoWidget(_props: WidgetComponentProps) {
             .map((t) => getThoughtDefinition(t.thoughtId)?.label ?? t.thoughtId)
             .join(", ")
         : "None",
+    relationships: formatRelationships(relationships, allCharacters),
   };
 
   return (

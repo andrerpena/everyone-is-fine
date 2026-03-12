@@ -191,12 +191,12 @@
 - [x] 146. Implement social interaction system (colonists chat when near each other)
 - [x] 147. Create opinion/relationship tracker between colonist pairs
 - [x] 148. Add social thought generation from interactions
-- [ ] 149. Implement friendship formation (high opinion over time)
-- [ ] 150. Add rivalry formation (low opinion over time)
+- [x] 149. ~~Implement friendship formation~~ (done: opinion >= 30 → "friend" label + has_friends thought, formed naturally via social interactions)
+- [x] 150. ~~Add rivalry formation~~ (done: opinion <= -60 → "rival" label + has_rival thought, formed naturally via social interactions)
 - [ ] 151. Create romance system (colonists can become lovers)
 - [ ] 152. Implement marriage proposal and wedding ceremony event
 - [ ] 153. Add breakup mechanics and associated mood effects
-- [ ] 154. Create social tab showing relationships for selected colonist
+- [x] 154. Create social tab showing relationships for selected colonist
 - [ ] 155. Implement social fight system (colonists with very low opinions may fight)
 - [ ] 156. Add conversation topics affected by traits and interests
 - [ ] 157. Create insult and slight interaction types
