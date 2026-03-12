@@ -144,7 +144,7 @@
 - [x] 108. Add food poisoning chance based on cooking skill
 - [x] 109. Implement food spoilage system (food rots over time without refrigeration) <!-- Ticket 0041 -->
 - [x] 110. Create nutrient paste dispenser building (efficient but mood-negative meals)
-- [ ] 111. Add wild plant foraging (berry bushes, wild healroot) <!-- Partial: basic bush foraging exists via createForageJob, but no berry/healroot variety -->
+- [x] 111. Add wild plant foraging (berry bushes, wild healroot)
 - [ ] 112. Implement hunting job (colonists hunt wild animals for meat)
 - [ ] 113. Add butchering job and butcher table workstation
 

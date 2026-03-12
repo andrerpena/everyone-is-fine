@@ -120,6 +120,8 @@ export type StructureType =
   | "tree_oak"
   | "tree_pine"
   | "bush"
+  | "bush_berry"
+  | "bush_healroot"
   | "boulder"
   | "none";
 

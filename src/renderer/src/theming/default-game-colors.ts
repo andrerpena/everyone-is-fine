@@ -81,6 +81,8 @@ export const defaultGameColors: GameColors = {
     tree_oak: "#228b22",
     tree_pine: "#006400",
     bush: "#32cd32",
+    bush_berry: "#c23b76",
+    bush_healroot: "#3bac5c",
     boulder: "#5a5a5a",
   },
 

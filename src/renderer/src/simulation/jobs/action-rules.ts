@@ -38,8 +38,25 @@ export const ACTION_RULES: ActionRule[] = [
     id: "forage",
     label: "Forage",
     priority: 10,
-    matches: (tile) => tile.structure?.type === "bush",
-    createJob: (characterId, target) => createForageJob(characterId, target),
+    matches: (tile) =>
+      tile.structure?.type === "bush" ||
+      tile.structure?.type === "bush_berry" ||
+      tile.structure?.type === "bush_healroot",
+    createJob: (characterId, target, tile) => {
+      if (tile.structure?.type === "bush_berry") {
+        return createForageJob(characterId, target, {
+          type: "berries",
+          quantity: 3,
+        });
+      }
+      if (tile.structure?.type === "bush_healroot") {
+        return createForageJob(characterId, target, {
+          type: "medicine_herbal",
+          quantity: 1,
+        });
+      }
+      return createForageJob(characterId, target);
+    },
   },
   {
     id: "mine",

@@ -14,7 +14,7 @@ import type {
   TerrainType,
 } from "../../world/types";
 import type { EntityId } from "../types";
-import { generateJobId, type Job } from "./types";
+import { generateJobId, type Job, type JobStep } from "./types";
 
 /**
  * Create a "chop tree" job.
@@ -158,14 +158,31 @@ export function createMineTerrainJob(
 }
 
 /**
- * Create a "forage berry bush" job.
- * Steps: move adjacent → work 120 ticks (~2s at 60 TPS) → restore hunger 0.3
+ * Create a "forage" job.
+ * If yield is provided, spawns items at the bush location.
+ * Otherwise falls back to restoring hunger directly (generic bush).
  * Bush is NOT destroyed (renewable resource).
  */
 export function createForageJob(
   characterId: EntityId,
   target: Position3D,
+  yield_?: { type: ItemType; quantity: number },
 ): Job {
+  const completionStep: JobStep = yield_
+    ? {
+        type: "spawn_items",
+        position: target,
+        items: [{ type: yield_.type, quantity: yield_.quantity }],
+        skillId: "plants",
+        status: "pending",
+      }
+    : {
+        type: "restore_need",
+        needId: "hunger",
+        amount: 0.3,
+        status: "pending",
+      };
+
   return {
     id: generateJobId(),
     type: "forage",
@@ -182,12 +199,7 @@ export function createForageJob(
         ticksWorked: 0,
         status: "pending",
       },
-      {
-        type: "restore_need",
-        needId: "hunger",
-        amount: 0.3,
-        status: "pending",
-      },
+      completionStep,
     ],
   };
 }

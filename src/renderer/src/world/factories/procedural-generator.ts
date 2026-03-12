@@ -554,7 +554,15 @@ export function generateZLevel(
       // Bushes: spawn in bush zones or as forest understory
       if (isInBushZone || (isInForestZone && rng.chance(0.3))) {
         if (rng.chance(config.bushDensity)) {
-          tile.structure = createStructureData("bush", {
+          // 60% generic bush, 30% berry bush, 10% healroot
+          const bushRoll = rng.next();
+          const bushType =
+            bushRoll < 0.6
+              ? "bush"
+              : bushRoll < 0.9
+                ? "bush_berry"
+                : "bush_healroot";
+          tile.structure = createStructureData(bushType, {
             health: 30 + rng.nextInt(0, 20),
           });
           continue;
