@@ -12,6 +12,7 @@
  */
 
 export const WIDGET_IDS = [
+  "architect",
   "world",
   "characters",
   "colonist-info",

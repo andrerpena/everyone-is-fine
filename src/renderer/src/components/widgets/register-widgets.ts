@@ -1,4 +1,5 @@
 import {
+  architectWidget,
   charactersWidget,
   colonistInfoWidget,
   layersWidget,
@@ -20,6 +21,7 @@ import { widgetRegistry } from "./widget-registry";
  */
 export function registerBuiltInWidgets(): void {
   widgetRegistry.register(worldWidget);
+  widgetRegistry.register(architectWidget);
   widgetRegistry.register(charactersWidget);
   widgetRegistry.register(colonistInfoWidget);
   widgetRegistry.register(layersWidget);

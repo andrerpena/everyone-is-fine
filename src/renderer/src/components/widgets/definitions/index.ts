@@ -1,3 +1,4 @@
+export { architectWidget } from "./ArchitectWidget";
 export { charactersWidget } from "./CharactersWidget";
 export { colonistInfoWidget } from "./ColonistInfoWidget";
 export { layersWidget } from "./LayersWidget";
