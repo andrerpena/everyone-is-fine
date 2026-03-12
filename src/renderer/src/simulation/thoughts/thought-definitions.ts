@@ -37,7 +37,8 @@ export type ThoughtId =
   | "has_rival"
   | "in_relationship"
   | "broke_up"
-  | "was_insulted";
+  | "was_insulted"
+  | "social_fight";
 
 /** Definition for a thought type */
 export interface ThoughtDefinition {
@@ -265,6 +266,13 @@ export const THOUGHT_DEFINITIONS: readonly ThoughtDefinition[] = [
     description: "Someone said something hurtful",
     moodEffect: -0.05,
     durationSeconds: 28800, // 8 hours
+  },
+  {
+    id: "social_fight",
+    label: "Social Fight",
+    description: "Got into a physical fight with someone",
+    moodEffect: -0.1,
+    durationSeconds: 43200, // 12 hours
   },
 ] as const;
 

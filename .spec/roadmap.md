@@ -197,7 +197,7 @@
 - [ ] 152. Implement marriage proposal and wedding ceremony event
 - [x] 153. Add breakup mechanics and associated mood effects
 - [x] 154. Create social tab showing relationships for selected colonist
-- [ ] 155. Implement social fight system (colonists with very low opinions may fight)
+- [x] 155. Implement social fight system (colonists with very low opinions may fight)
 - [x] 156. Add conversation topics affected by traits and interests
 - [x] 157. Create insult and slight interaction types
 

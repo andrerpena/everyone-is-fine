@@ -4,6 +4,7 @@
 // Tick-based system that triggers ambient social interactions when colonists
 // are near each other. Restores small social need and nudges opinions.
 
+import { useLogStore } from "../lib/log-store";
 import type { EntityStore } from "./entity-store";
 import {
   adjustOpinion,
@@ -59,6 +60,18 @@ export const INSULT_KIND_REDUCTION = 0.08;
 /** Opinion penalty when insulted */
 export const INSULT_OPINION_DELTA = -3;
 
+/** Both colonists must have opinion <= this for a fight to be possible */
+export const FIGHT_OPINION_THRESHOLD = -50;
+
+/** Probability of a fight per eligible pair per social check */
+export const FIGHT_CHANCE = 0.04;
+
+/** Opinion penalty applied to both participants after a fight */
+export const FIGHT_OPINION_DELTA = -10;
+
+/** Minimum ticks between fights for the same pair */
+export const FIGHT_COOLDOWN = 3600;
+
 // =============================================================================
 // HELPERS
 // =============================================================================
@@ -106,6 +119,7 @@ export function getInsultChance(character: Character): number {
 export class SocialInteractionSystem {
   private ticksSinceLastCheck = 0;
   private recentChats: Map<string, number> = new Map();
+  private recentFights: Map<string, number> = new Map();
   private currentTick = 0;
 
   constructor(private entityStore: EntityStore) {}
@@ -121,6 +135,9 @@ export class SocialInteractionSystem {
 
     // Check for breakups among partnered colonists
     this.checkBreakups();
+
+    // Check for social fights
+    this.checkFights();
 
     const characters = this.entityStore.getAll();
     const chatted = new Set<EntityId>();
@@ -243,7 +260,11 @@ export class SocialInteractionSystem {
   /** Add a timed thought to a thoughts array, replacing any existing one of the same type */
   private addTimedThought(
     existingThoughts: ActiveThought[],
-    thoughtId: "was_insulted" | "chatted_with_friend" | "chatted_with_rival",
+    thoughtId:
+      | "was_insulted"
+      | "chatted_with_friend"
+      | "chatted_with_rival"
+      | "social_fight",
   ): ActiveThought[] {
     const def = THOUGHT_MAP.get(thoughtId);
     if (!def) return existingThoughts;
@@ -338,10 +359,95 @@ export class SocialInteractionSystem {
     }
   }
 
+  private checkFights(): void {
+    const characters = this.entityStore.getAll();
+
+    for (let i = 0; i < characters.length; i++) {
+      const a = characters[i];
+      if (a.mentalBreak !== null) continue;
+
+      for (let j = i + 1; j < characters.length; j++) {
+        const b = characters[j];
+        if (b.mentalBreak !== null) continue;
+
+        // Must be on same z-level and within proximity
+        if (a.position.z !== b.position.z) continue;
+        const dist =
+          Math.abs(a.position.x - b.position.x) +
+          Math.abs(a.position.y - b.position.y);
+        if (dist > CHAT_PROXIMITY) continue;
+
+        // Both must have very negative opinions
+        const aOpinion = getOpinion(a.relationships, b.id);
+        const bOpinion = getOpinion(b.relationships, a.id);
+        if (
+          aOpinion > FIGHT_OPINION_THRESHOLD ||
+          bOpinion > FIGHT_OPINION_THRESHOLD
+        )
+          continue;
+
+        // Check fight cooldown
+        const key = pairKey(a.id, b.id);
+        const lastFight = this.recentFights.get(key);
+        if (
+          lastFight !== undefined &&
+          this.currentTick - lastFight < FIGHT_COOLDOWN
+        )
+          continue;
+
+        // Roll for fight
+        if (Math.random() >= FIGHT_CHANCE) continue;
+
+        this.triggerFight(a, b, key);
+      }
+    }
+  }
+
+  private triggerFight(a: Character, b: Character, key: string): void {
+    this.recentFights.set(key, this.currentTick);
+
+    // Drop opinions further
+    const aRelationships = adjustOpinion(
+      a.relationships,
+      b.id,
+      FIGHT_OPINION_DELTA,
+    );
+    const bRelationships = adjustOpinion(
+      b.relationships,
+      a.id,
+      FIGHT_OPINION_DELTA,
+    );
+
+    // Add fight thought to both
+    const aThoughts = this.addTimedThought(a.thoughts, "social_fight");
+    const bThoughts = this.addTimedThought(b.thoughts, "social_fight");
+
+    this.entityStore.update(a.id, {
+      relationships: aRelationships,
+      thoughts: aThoughts,
+    });
+    this.entityStore.update(b.id, {
+      relationships: bRelationships,
+      thoughts: bThoughts,
+    });
+
+    // Log the event
+    useLogStore
+      .getState()
+      .addEntry("info", `${a.name} and ${b.name} got into a fight!`, [
+        "social",
+      ]);
+  }
+
   private cleanupCooldowns(): void {
     for (const [key, tick] of this.recentChats) {
       if (this.currentTick - tick >= CHAT_COOLDOWN) {
         this.recentChats.delete(key);
+      }
+    }
+    for (const [key, tick] of this.recentFights) {
+      if (this.currentTick - tick >= FIGHT_COOLDOWN) {
+        this.recentFights.delete(key);
       }
     }
   }
