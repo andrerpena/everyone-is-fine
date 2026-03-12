@@ -361,7 +361,7 @@
 
 ## Phase 24 — UI Polish & Quality of Life
 
-- [ ] 280. Create alert system (starvation warning, raid incoming, colonist idle)
+- [x] 280. Create alert system (starvation warning, raid incoming, colonist idle)
 - [ ] 281. Implement notification history/log panel
 - [ ] 282. Add tooltip system with rich item/colonist information
 - [ ] 283. Create keyboard shortcut system for common actions

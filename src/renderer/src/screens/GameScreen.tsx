@@ -1,4 +1,5 @@
 import { Dock } from "@renderer/components/dock/Dock";
+import { AlertOverlay } from "@renderer/components/floating/AlertOverlay";
 import { StatusBar } from "@renderer/components/status-bars";
 import { useIsSlotEmpty, WidgetSlot } from "@renderer/components/widgets";
 import { useEffect, useRef } from "react";
@@ -176,20 +177,27 @@ export const GameScreen: React.FC = () => {
   const isRightBottomEmpty = useIsSlotEmpty("right-bottom");
 
   return (
-    <Dock
-      leftTop={isLeftTopEmpty ? undefined : <WidgetSlot slotId="left-top" />}
-      leftBottom={
-        isLeftBottomEmpty ? undefined : <WidgetSlot slotId="left-bottom" />
-      }
-      center={<WidgetSlot slotId="center" variant="primary" keepMounted />}
-      centerBottom={
-        isCenterBottomEmpty ? undefined : <WidgetSlot slotId="center-bottom" />
-      }
-      rightTop={isRightTopEmpty ? undefined : <WidgetSlot slotId="right-top" />}
-      rightBottom={
-        isRightBottomEmpty ? undefined : <WidgetSlot slotId="right-bottom" />
-      }
-      bottom={<StatusBar />}
-    />
+    <>
+      <AlertOverlay />
+      <Dock
+        leftTop={isLeftTopEmpty ? undefined : <WidgetSlot slotId="left-top" />}
+        leftBottom={
+          isLeftBottomEmpty ? undefined : <WidgetSlot slotId="left-bottom" />
+        }
+        center={<WidgetSlot slotId="center" variant="primary" keepMounted />}
+        centerBottom={
+          isCenterBottomEmpty ? undefined : (
+            <WidgetSlot slotId="center-bottom" />
+          )
+        }
+        rightTop={
+          isRightTopEmpty ? undefined : <WidgetSlot slotId="right-top" />
+        }
+        rightBottom={
+          isRightBottomEmpty ? undefined : <WidgetSlot slotId="right-bottom" />
+        }
+        bottom={<StatusBar />}
+      />
+    </>
   );
 };
