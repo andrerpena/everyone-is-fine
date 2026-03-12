@@ -3,6 +3,11 @@
 // =============================================================================
 
 export {
+  DEFAULT_INSULATION,
+  getIndoorTemperature,
+  INDOOR_COMFORT_BASELINE,
+} from "./indoor-temperature";
+export {
   detectRoomsForLevel,
   ROOM_CHECK_INTERVAL,
   RoomDetectionSystem,

@@ -130,7 +130,14 @@ export {
   shouldBreakUp,
 } from "./relationships";
 // Rooms
-export { type Room, RoomDetectionSystem, type RoomStats } from "./rooms";
+export {
+  DEFAULT_INSULATION,
+  getIndoorTemperature,
+  INDOOR_COMFORT_BASELINE,
+  type Room,
+  RoomDetectionSystem,
+  type RoomStats,
+} from "./rooms";
 // Simulation Loop
 export {
   MS_PER_TICK,

@@ -35,6 +35,8 @@ export interface Room {
   isOutdoors: boolean;
   /** True if the room has a roof (indoor rooms are automatically roofed) */
   isRoofed: boolean;
+  /** Indoor temperature in °C (null for outdoor rooms or before calculation) */
+  temperature: number | null;
   /** Computed stats, null until calculated */
   stats: RoomStats | null;
   /** Functional role based on room contents */

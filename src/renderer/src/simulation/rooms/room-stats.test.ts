@@ -36,6 +36,7 @@ function makeRoom(tileKeys: string[]): Room {
     tiles: new Set(tileKeys),
     isOutdoors: false,
     isRoofed: true,
+    temperature: null,
     stats: null,
     role: "generic",
   };
@@ -90,6 +91,7 @@ describe("calculateRoomStats", () => {
       tiles: new Set(),
       isOutdoors: false,
       isRoofed: true,
+      temperature: null,
       stats: null,
       role: "generic",
     };

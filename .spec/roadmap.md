@@ -180,7 +180,7 @@
 - [x] 138. Implement rain weather with visual effects and ground moisture <!-- Ticket 0033: visual effects only, ground moisture deferred -->
 - [x] 139. Add snow weather with accumulation on tiles <!-- Ticket 0037 -->
 - [x] 140. Create temperature-affected crop growth (growing season) <!-- Done: PlantGrowthSystem uses temperature factor, crops wilt outside viable range -->
-- [ ] 141. Implement indoor temperature (affected by walls, roofs, heaters, coolers)
+- [x] 141. Implement indoor temperature (affected by walls, roofs, heaters, coolers) <!-- Partial: insulation-based indoor temp done, heaters/coolers deferred -->
 - [ ] 142. Add heatstroke and hypothermia health conditions
 - [x] 143. Create weather forecast system (predict upcoming weather)
 - [ ] 144. Implement lightning strikes during thunderstorms (chance to start fires)

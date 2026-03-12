@@ -36,6 +36,7 @@ function makeRoom(tileKeys: string[], isOutdoors = false): Room {
     tiles: new Set(tileKeys),
     isOutdoors,
     isRoofed: !isOutdoors,
+    temperature: null,
     stats: null,
     role: "generic",
   };

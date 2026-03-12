@@ -484,12 +484,14 @@ function createAgentApi(): GameAgentApi {
       if (!tile) return null;
 
       const room = roomDetection.getRoomAt(pos.x, pos.y, state.currentZLevel);
+      const outdoorTemp = world.weather.temperature;
       const info: AgentTileInfo = {
         terrain: tile.terrain.type,
         floor: tile.floor?.type ?? null,
         structure: tile.structure?.type ?? null,
         isPassable: tile.pathfinding.isPassable,
         isRoofed: room?.isRoofed ?? false,
+        temperature: room?.temperature ?? outdoorTemp,
         items: tile.items.map((item) => ({
           type: item.type,
           quantity: item.quantity,

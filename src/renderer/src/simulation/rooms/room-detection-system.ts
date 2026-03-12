@@ -6,6 +6,7 @@
 
 import { STRUCTURE_REGISTRY } from "../../world/registries/structure-registry";
 import type { World, ZLevel } from "../../world/types";
+import { getIndoorTemperature } from "./indoor-temperature";
 import { classifyRoom } from "./room-role";
 import { calculateRoomStats } from "./room-stats";
 import { generateRoomId, type Room } from "./room-types";
@@ -95,6 +96,7 @@ export function detectRoomsForLevel(level: ZLevel): Room[] {
         tiles: roomTiles,
         isOutdoors: touchesEdge,
         isRoofed: !touchesEdge,
+        temperature: null,
         stats: null,
         role: "generic",
       });
@@ -127,11 +129,15 @@ export class RoomDetectionSystem {
     for (const level of world.levels.values()) {
       const rooms = detectRoomsForLevel(level);
 
-      // Compute stats and classify indoor rooms (skip outdoors — too large and not meaningful)
+      // Compute stats, temperature, and classify indoor rooms
+      const outdoorTemp = world.weather.temperature;
       for (const room of rooms) {
         if (!room.isOutdoors) {
           room.stats = calculateRoomStats(room, level);
           room.role = classifyRoom(room, level);
+          room.temperature = room.isRoofed
+            ? getIndoorTemperature(outdoorTemp)
+            : null;
         }
       }
 
