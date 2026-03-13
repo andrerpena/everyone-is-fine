@@ -41,6 +41,18 @@ function generateTerrainImage(
         data[offset + 3] = sc[3];
       }
     }
+
+    // Apply fog of war
+    const { explored, visible } = tile.visibility;
+    if (!explored) {
+      data[offset] = 0;
+      data[offset + 1] = 0;
+      data[offset + 2] = 0;
+    } else if (!visible) {
+      data[offset] = data[offset] * 0.5;
+      data[offset + 1] = data[offset + 1] * 0.5;
+      data[offset + 2] = data[offset + 2] * 0.5;
+    }
   }
 
   return imageData;
@@ -163,9 +175,14 @@ function MiniMap() {
       update();
     });
 
+    // Periodic refresh to keep fog of war in sync with the vision system
+    // (visibility is mutated in-place, so world reference doesn't change)
+    const fogInterval = setInterval(update, 500);
+
     return () => {
       unsubGame();
       unsubColors();
+      clearInterval(fogInterval);
       bitmapRef.current?.close();
       bitmapRef.current = null;
     };
