@@ -8,6 +8,30 @@ import type { EntityStore } from "../entity-store";
 import type { Character, EntityId, MoveCommand } from "../types";
 
 // =============================================================================
+// HELPERS
+// =============================================================================
+
+/**
+ * Resolve the nearest tile a moving character should snap to.
+ * If progress >= 0.5, snap forward to the next waypoint; otherwise stay at current tile.
+ * Returns current position if the character isn't mid-movement.
+ */
+export function resolveSnappedPosition(character: Character): Position3D {
+  const { movement, position } = character;
+  if (!movement.isMoving || !movement.path) return { ...position };
+
+  const { path, pathIndex, progress } = movement;
+  if (pathIndex >= path.length - 1) return { ...position };
+
+  if (progress >= 0.5) {
+    const next = path[pathIndex + 1];
+    return { ...next };
+  }
+
+  return { ...position };
+}
+
+// =============================================================================
 // MOVEMENT SYSTEM CLASS
 // =============================================================================
 
@@ -164,6 +188,32 @@ export class MovementSystem {
   }
 
   /**
+   * Snap a moving character to the nearest tile (forward if progress >= 0.5).
+   * Clears movement state and visual offset. Returns the snapped position,
+   * or null if the character doesn't exist.
+   */
+  snapToNearestTile(characterId: EntityId): Position3D | null {
+    const character = this.entityStore.get(characterId);
+    if (!character) return null;
+
+    const snapped = resolveSnappedPosition(character);
+
+    this.entityStore.update(characterId, {
+      position: snapped,
+      visualOffset: { x: 0, y: 0 },
+      movement: {
+        ...character.movement,
+        path: null,
+        pathIndex: 0,
+        progress: 0,
+        isMoving: false,
+      },
+    });
+
+    return snapped;
+  }
+
+  /**
    * Start a character moving along a path.
    */
   startMovement(characterId: EntityId, path: Position3D[]): boolean {
@@ -189,13 +239,16 @@ export class MovementSystem {
   }
 
   /**
-   * Stop a character's movement immediately.
+   * Stop a character's movement immediately, snapping to the nearest tile.
    */
   stopMovement(characterId: EntityId): boolean {
     const character = this.entityStore.get(characterId);
     if (!character) return false;
 
+    const snapped = resolveSnappedPosition(character);
+
     this.entityStore.update(characterId, {
+      position: snapped,
       visualOffset: { x: 0, y: 0 },
       movement: {
         ...character.movement,
@@ -222,6 +275,7 @@ export class MovementSystem {
     }
 
     this.entityStore.update(characterId, {
+      visualOffset: { x: 0, y: 0 },
       control: {
         ...character.control,
         mode: "imperative",
@@ -250,9 +304,11 @@ export class MovementSystem {
     const character = this.entityStore.get(characterId);
     if (!character) return false;
 
+    const snapped = resolveSnappedPosition(character);
     const currentCommand = character.control.currentCommand;
 
     this.entityStore.update(characterId, {
+      position: snapped,
       visualOffset: { x: 0, y: 0 },
       movement: {
         ...character.movement,

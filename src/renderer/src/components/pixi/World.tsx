@@ -280,37 +280,10 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
 
   // Subscribe to selection, hover, character, and layer state changes
   useEffect(() => {
-    // Helper to update character, path, and job progress renderers
-    const updateCharacterAndPath = (
-      characters: Map<string, import("@renderer/simulation/types").Character>,
-      selection: ReturnType<typeof useGameStore.getState>["selection"],
-      shouldRenderCharacters: boolean,
+    // Helper to update job progress renderer from subscription
+    const updateJobProgress = (
       jobProgress?: Map<EntityId, JobProgressInfo>,
     ) => {
-      const selectedIds = new Set(getSelectedColonistIds(selection));
-
-      if (characterRendererRef.current) {
-        if (shouldRenderCharacters) {
-          characterRendererRef.current.update(
-            characters,
-            selectedIds,
-            zLevel,
-            jobProgress,
-          );
-        } else {
-          characterRendererRef.current.update(new Map(), new Set(), zLevel);
-        }
-      }
-
-      if (pathRendererRef.current) {
-        // For path rendering, show path for first selected character (or none if multiple)
-        const selectedCharacter =
-          selectedIds.size === 1 && shouldRenderCharacters
-            ? characters.get([...selectedIds][0])
-            : null;
-        pathRendererRef.current.update(selectedCharacter ?? null);
-      }
-
       if (jobProgressRendererRef.current && jobProgress) {
         jobProgressRendererRef.current.update(jobProgress);
       }
@@ -339,15 +312,8 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         );
       }
 
-      // Update characters, paths, and job progress
-      const layerVisibility = useLayerStore.getState().visibility;
-      const shouldRenderCharacters = layerVisibility.get("characters") ?? true;
-      updateCharacterAndPath(
-        state.simulation.characters,
-        state.selection,
-        shouldRenderCharacters,
-        state.simulation.jobProgress,
-      );
+      // Update job progress (characters & paths are updated per-frame via ticker)
+      updateJobProgress(state.simulation.jobProgress);
     });
 
     // Subscribe to time changes for ambient lighting (only redraws when hour changes)
@@ -531,15 +497,8 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         }
       }
 
-      // Update characters and paths based on visibility
-      const gameState = useGameStore.getState();
-      const shouldRenderCharacters = state.visibility.get("characters") ?? true;
-      updateCharacterAndPath(
-        gameState.simulation.characters,
-        gameState.selection,
-        shouldRenderCharacters,
-        gameState.simulation.jobProgress,
-      );
+      // Characters & paths are updated per-frame via ticker callback
+      // (layer visibility is read there too, so toggling takes effect immediately)
     });
 
     return () => {
@@ -769,6 +728,32 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       };
       app.ticker.add(weatherTickerCallback);
 
+      // Per-frame character spring tweener — runs every render frame for smooth movement
+      const characterTickerCallback = (ticker: { deltaTime: number }) => {
+        const dt = ticker.deltaTime / 60; // Pixi deltaTime is in frames at 60fps
+        const state = useGameStore.getState();
+        const chars = state.simulation.characters;
+        const selectedIds = new Set(getSelectedColonistIds(state.selection));
+        const layerVisibility = useLayerStore.getState().visibility;
+        const shouldRender = layerVisibility.get("characters") ?? true;
+        characterRendererRef.current?.update(
+          shouldRender ? chars : new Map(),
+          selectedIds,
+          zLevel,
+          state.simulation.jobProgress,
+          dt,
+        );
+        // Keep path renderer in sync
+        if (pathRendererRef.current) {
+          const selectedChar =
+            selectedIds.size === 1 && shouldRender
+              ? chars.get([...selectedIds][0])
+              : null;
+          pathRendererRef.current.update(selectedChar ?? null);
+        }
+      };
+      app.ticker.add(characterTickerCallback);
+
       // Create hover overlay (drawn first, below selection)
       const hoverGraphics = new Graphics();
       viewport.addChild(hoverGraphics);
@@ -895,6 +880,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         _configUnsubscribe?: () => void;
         _colorsUnsubscribe?: () => void;
         _weatherTickerCallback?: (ticker: { deltaTime: number }) => void;
+        _characterTickerCallback?: (ticker: { deltaTime: number }) => void;
       };
       appWithExtras._resizeObserver = resizeObserver;
       appWithExtras._resizeHandler = handleResize;
@@ -902,6 +888,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
       appWithExtras._configUnsubscribe = unsubscribeConfig;
       appWithExtras._colorsUnsubscribe = unsubscribeColors;
       appWithExtras._weatherTickerCallback = weatherTickerCallback;
+      appWithExtras._characterTickerCallback = characterTickerCallback;
 
       // Subscribe to tile updates for reactive rendering (tree removal, item spawning)
       tileUpdateUnsubRef.current = commandRegistry.on(
@@ -1011,6 +998,7 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
           _configUnsubscribe?: () => void;
           _colorsUnsubscribe?: () => void;
           _weatherTickerCallback?: (ticker: { deltaTime: number }) => void;
+          _characterTickerCallback?: (ticker: { deltaTime: number }) => void;
         };
         app._resizeObserver?.disconnect();
         if (app._resizeHandler) {
@@ -1021,6 +1009,9 @@ const World: React.FC<WorldProps> = ({ world, zLevel }) => {
         }
         if (app._weatherTickerCallback) {
           app.ticker.remove(app._weatherTickerCallback);
+        }
+        if (app._characterTickerCallback) {
+          app.ticker.remove(app._characterTickerCallback);
         }
         app._configUnsubscribe?.();
         app._colorsUnsubscribe?.();

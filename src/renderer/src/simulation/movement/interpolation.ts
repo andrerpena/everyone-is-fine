@@ -54,6 +54,19 @@ export function getCharacterCenterPosition(
 }
 
 /**
+ * Exponential-decay spring interpolation (frame-rate independent).
+ * Smoothly chases a target value, closing `rate` fraction of the gap per second.
+ */
+export function springLerp(
+  current: number,
+  target: number,
+  rate: number,
+  dt: number,
+): number {
+  return current + (target - current) * (1 - Math.exp(-rate * dt));
+}
+
+/**
  * Linear interpolation between two values.
  */
 export function lerp(a: number, b: number, t: number): number {

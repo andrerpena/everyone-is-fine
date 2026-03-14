@@ -10,9 +10,11 @@ import {
   type Direction,
   getCharacterCenterPosition,
   getCharacterDirection,
+  springLerp,
 } from "../../../simulation/movement";
 import type { Character, EntityId } from "../../../simulation/types";
 import type { ResolvedGameColors } from "../../../theming/game-color-store";
+import type { Position2D } from "../../../world/types";
 
 // =============================================================================
 // CONSTANTS
@@ -26,6 +28,9 @@ const DIRECTION_INDICATOR_LENGTH = 8;
 
 /** Selection ring padding */
 const SELECTION_PADDING = 4;
+
+/** Spring rate for render-frame position smoothing (higher = snappier) */
+const SPRING_RATE = 12.0;
 
 const JOB_INDICATOR_RADIUS = 4;
 const JOB_INDICATOR_Y_OFFSET = -22;
@@ -86,6 +91,7 @@ export class CharacterRenderer {
   private parentContainer: Container;
   private cellSize: number;
   private graphics: Map<EntityId, CharacterGraphics> = new Map();
+  private tweenedPositions: Map<EntityId, Position2D> = new Map();
   private colors: ResolvedGameColors;
 
   /** Cached character texture (loaded via preloadAssets) */
@@ -136,12 +142,14 @@ export class CharacterRenderer {
    * @param selectedIds - Set of selected character IDs (supports multi-selection)
    * @param zLevel - Current z-level to filter characters by (optional)
    * @param jobProgress - Active job progress info per character (optional)
+   * @param deltaTime - Frame delta time in seconds (for spring smoothing)
    */
   update(
     characters: Map<EntityId, Character>,
     selectedIds: Set<EntityId>,
     zLevel?: number,
     jobProgress?: Map<EntityId, JobProgressInfo>,
+    deltaTime?: number,
   ): void {
     // Track which characters we've seen
     const seenIds = new Set<EntityId>();
@@ -169,8 +177,10 @@ export class CharacterRenderer {
       this.updateCharacterGraphics(
         charGraphics,
         character,
+        id,
         selectedIds.has(id),
         jobInfo?.jobType ?? null,
+        deltaTime,
       );
     }
 
@@ -180,6 +190,7 @@ export class CharacterRenderer {
         this.parentContainer.removeChild(charGraphics.container);
         charGraphics.container.destroy({ children: true });
         this.graphics.delete(id);
+        this.tweenedPositions.delete(id);
       }
     }
   }
@@ -420,13 +431,31 @@ export class CharacterRenderer {
   private updateCharacterGraphics(
     charGraphics: CharacterGraphics,
     character: Character,
+    id: EntityId,
     isSelected: boolean,
     jobType: string | null,
+    deltaTime?: number,
   ): void {
-    // Update position
-    const center = getCharacterCenterPosition(character, this.cellSize);
-    charGraphics.container.x = center.x;
-    charGraphics.container.y = center.y;
+    // Compute tick-based target position
+    const target = getCharacterCenterPosition(character, this.cellSize);
+
+    // Apply spring smoothing if we have deltaTime
+    let tweened = this.tweenedPositions.get(id);
+    if (!tweened) {
+      // First frame: snap to target
+      tweened = { x: target.x, y: target.y };
+      this.tweenedPositions.set(id, tweened);
+    } else if (deltaTime && deltaTime > 0) {
+      tweened.x = springLerp(tweened.x, target.x, SPRING_RATE, deltaTime);
+      tweened.y = springLerp(tweened.y, target.y, SPRING_RATE, deltaTime);
+    } else {
+      // No deltaTime (e.g. initial render) — snap to target
+      tweened.x = target.x;
+      tweened.y = target.y;
+    }
+
+    charGraphics.container.x = tweened.x;
+    charGraphics.container.y = tweened.y;
 
     // Update direction indicator
     const direction = getCharacterDirection(character);
@@ -461,6 +490,7 @@ export class CharacterRenderer {
       charGraphics.container.destroy({ children: true });
     }
     this.graphics.clear();
+    this.tweenedPositions.clear();
   }
 
   /**

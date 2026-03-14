@@ -20,5 +20,6 @@ export {
   lerpPosition3D,
   smootherStep,
   smoothStep,
+  springLerp,
 } from "./interpolation";
 export { MovementSystem } from "./movement-system";

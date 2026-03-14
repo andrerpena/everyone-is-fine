@@ -7,7 +7,7 @@ Columns: 8
 #
 
 # === BASICS (2) ===
-  0   0   0	Black
+  0   0   68	Black
   0   0   0	Void (transparent)
 
 # === GRAYS (6) ===
@@ -51,7 +51,7 @@ Columns: 8
 212 184 150	Sand
 
 # === SKIN & SPECIAL (4) ===
-245 222 179	Light Skin
+245 222 0	Light Skin
 193 154 107	Medium Skin
 139  90  43	Dark Skin
 107 142  35	Olive

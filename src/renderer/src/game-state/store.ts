@@ -568,7 +568,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       // Compute path if not already provided
       if (!moveCmd.path) {
-        const start: Position3D = { ...character.position };
+        // Snap to nearest tile so pathfinding starts from the correct position
+        // (avoids visual teleport when re-issuing move mid-movement)
+        const snapped = movementSystem.snapToNearestTile(characterId);
+        const start: Position3D = snapped ?? { ...character.position };
         const goal: Position3D = { ...moveCmd.destination, z: currentZLevel };
         const allowedTiles = getAllowedTilesForCharacter(
           character.allowedAreaId,
