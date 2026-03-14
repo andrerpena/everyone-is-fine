@@ -79,14 +79,8 @@ export class SelectModeHandler implements InteractionModeHandler {
       if (character.position.z !== ctx.zLevel) continue;
 
       // Calculate character center position in pixels
-      const charCenterX =
-        character.position.x * cellSize +
-        cellSize / 2 +
-        character.visualOffset.x * cellSize;
-      const charCenterY =
-        character.position.y * cellSize +
-        cellSize / 2 +
-        character.visualOffset.y * cellSize;
+      const charCenterX = character.position.x * cellSize + cellSize / 2;
+      const charCenterY = character.position.y * cellSize + cellSize / 2;
 
       const dx = centerX - charCenterX;
       const dy = centerY - charCenterY;

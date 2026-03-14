@@ -2,7 +2,7 @@
 // SIMULATION TYPES
 // =============================================================================
 
-import type { Position2D, Position3D } from "../world/types";
+import type { Position3D } from "../world/types";
 import type { BodyPartsState } from "./health/body-parts";
 import { createDefaultBodyParts } from "./health/body-parts";
 import type { Schedule } from "./schedule";
@@ -25,8 +25,6 @@ export type EntityId = string;
 export interface Entity {
   id: EntityId;
   position: Position3D;
-  /** Sub-tile offset for smooth visual movement (0-1 range) */
-  visualOffset: Position2D;
 }
 
 /** Character types */
@@ -303,7 +301,6 @@ export function createCharacter(
       gender: "male",
     },
     color: 0x4a90d9,
-    visualOffset: { x: 0, y: 0 },
     movement: {
       speed: 2, // 2 tiles per second
       path: null,

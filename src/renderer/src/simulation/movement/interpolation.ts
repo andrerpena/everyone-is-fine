@@ -22,17 +22,24 @@ export function getCharacterVisualPosition(
   character: Character,
   cellSize: number,
 ): Position2D {
-  const baseX = character.position.x * cellSize;
-  const baseY = character.position.y * cellSize;
+  const { position, movement } = character;
+  const baseX = position.x * cellSize;
+  const baseY = position.y * cellSize;
 
-  // Add visual offset (already in tile units, convert to pixels)
-  const offsetX = character.visualOffset.x * cellSize;
-  const offsetY = character.visualOffset.y * cellSize;
+  // Derive sub-tile offset from movement progress (no stored visualOffset needed)
+  if (
+    movement.isMoving &&
+    movement.path &&
+    movement.pathIndex < movement.path.length - 1
+  ) {
+    const current = movement.path[movement.pathIndex];
+    const next = movement.path[movement.pathIndex + 1];
+    const dx = (next.x - current.x) * movement.progress * cellSize;
+    const dy = (next.y - current.y) * movement.progress * cellSize;
+    return { x: baseX + dx, y: baseY + dy };
+  }
 
-  return {
-    x: baseX + offsetX,
-    y: baseY + offsetY,
-  };
+  return { x: baseX, y: baseY };
 }
 
 /**

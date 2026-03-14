@@ -120,7 +120,6 @@ export class MovementSystem {
       // Update character position to next waypoint
       this.entityStore.update(character.id, {
         position: { ...nextWaypoint },
-        visualOffset: { x: 0, y: 0 },
         movement: {
           ...movement,
           pathIndex: newPathIndex,
@@ -140,15 +139,8 @@ export class MovementSystem {
         }
       }
     } else {
-      // Still moving between waypoints
-      // Calculate visual offset for smooth rendering
-      const visualOffset = {
-        x: dx * newProgress,
-        y: dy * newProgress,
-      };
-
+      // Still moving between waypoints — update progress only
       this.entityStore.update(character.id, {
-        visualOffset,
         movement: {
           ...movement,
           progress: newProgress,
@@ -163,7 +155,6 @@ export class MovementSystem {
   private completeMovement(character: Character): void {
     // Clear movement state
     this.entityStore.update(character.id, {
-      visualOffset: { x: 0, y: 0 },
       movement: {
         ...character.movement,
         path: null,
@@ -200,7 +191,7 @@ export class MovementSystem {
 
     this.entityStore.update(characterId, {
       position: snapped,
-      visualOffset: { x: 0, y: 0 },
+
       movement: {
         ...character.movement,
         path: null,
@@ -249,7 +240,7 @@ export class MovementSystem {
 
     this.entityStore.update(characterId, {
       position: snapped,
-      visualOffset: { x: 0, y: 0 },
+
       movement: {
         ...character.movement,
         path: null,
@@ -275,7 +266,6 @@ export class MovementSystem {
     }
 
     this.entityStore.update(characterId, {
-      visualOffset: { x: 0, y: 0 },
       control: {
         ...character.control,
         mode: "imperative",
@@ -309,7 +299,7 @@ export class MovementSystem {
 
     this.entityStore.update(characterId, {
       position: snapped,
-      visualOffset: { x: 0, y: 0 },
+
       movement: {
         ...character.movement,
         path: null,

@@ -238,8 +238,8 @@ function MiniMap() {
       ctx.fillStyle = renderColors.characters.minimapDot;
       for (const character of simulation.characters.values()) {
         if (character.position.z === currentZLevel) {
-          const tx = character.position.x + character.visualOffset.x;
-          const ty = character.position.y + character.visualOffset.y;
+          const tx = character.position.x;
+          const ty = character.position.y;
           ctx.fillRect(tx - dotSize / 2, ty - dotSize / 2, dotSize, dotSize);
         }
       }
