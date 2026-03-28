@@ -285,3 +285,7 @@ storybook-static
 .worktrees/
 .security-key
 logs/security/
+
+# Electron
+out/
+release/
