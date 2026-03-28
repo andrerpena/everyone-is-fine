@@ -1,0 +1,40 @@
+appId: com.everyoneisfine.app
+productName: Everyone is fine
+directories:
+  buildResources: build
+  output: release
+files:
+  - out/**/*
+  - "!out/renderer/src/**"
+extraMetadata:
+  main: ./out/main/index.js
+mac:
+  artifactName: ${name}-${version}-${arch}.${ext}
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+    - target: zip
+      arch:
+        - x64
+        - arm64
+win:
+  artifactName: ${name}-${version}-setup.${ext}
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+linux:
+  artifactName: ${name}-${version}-${arch}.${ext}
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
