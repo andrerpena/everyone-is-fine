@@ -11,14 +11,17 @@ EveryoneIsFine is an AI-first game. Meaning, it's supposed to be programmed by a
 
 ### Development
 ```bash
-npm run dev              # Start development server with hot-reload
+npm run dev              # Start Electron app with hot-reload
 npm run storybook        # Run Storybook for component development
 ```
 
 ### Build & Production
 ```bash
 npm run build            # Typecheck and build for production
-npm run start            # Preview production build
+npm run start            # Preview production build in Electron
+npm run build:mac        # Build distributable for macOS
+npm run build:win        # Build distributable for Windows
+npm run build:linux      # Build distributable for Linux
 ```
 
 ### Code Quality
@@ -39,11 +42,13 @@ These commands must pass before considering any task complete.
 
 ## Architecture
 
-### Web Application
-The application is a React web app (PWA) with the following structure:
+### Electron Application
+The application is an Electron desktop app with the following structure:
 
-- **Source code** (`src/renderer/src/`): React application with UI components
-- **Storage**: IndexedDB + localStorage via web storage service
+- **Main process** (`src/main/`): Electron app lifecycle, window management, IPC handlers
+- **Preload** (`src/preload/`): Bridge between main and renderer, exposes typed APIs via contextBridge
+- **Renderer** (`src/renderer/src/`): React application with UI components
+- **Storage**: IndexedDB + localStorage (migrating to filesystem in future)
 
 ### Key Components
 
@@ -64,7 +69,8 @@ The application is a React web app (PWA) with the following structure:
 
 ### Technology Stack
 - **Framework**: React 19
-- **Build Tool**: Vite
+- **Desktop**: Electron (electron-vite for build, electron-builder for packaging)
+- **Build Tool**: Vite (via electron-vite)
 - **Language**: TypeScript
 - **Styling**: CSS Modules + Tailwind CSS v4
 - **UI Components**: Custom components with Storybook
@@ -77,10 +83,12 @@ The application is a React web app (PWA) with the following structure:
 - `@renderer`: Maps to `src/renderer/src/`
 
 ### Configuration Files
-- `vite.config.ts`: Vite build configuration
-- `tsconfig.json`: TypeScript configuration
+- `electron.vite.config.ts`: Electron-Vite build configuration (main, preload, renderer)
+- `electron-builder.yml`: Electron packaging/distribution configuration
+- `tsconfig.json`: Base TypeScript configuration
+- `tsconfig.node.json`: TypeScript config for main + preload (Node.js target)
+- `tsconfig.web.json`: TypeScript config for renderer (browser target)
 - `biome.json`: Biome linter/formatter configuration
-- `wrangler.jsonc`: Cloudflare Pages deployment configuration
 
 ### Spec Files (`.spec/`)
 - `.spec/north-star.md`: Project vision and long-term direction
