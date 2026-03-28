@@ -1,6 +1,6 @@
 import { join } from "node:path";
-import { electronApp, optimizer, is } from "@electron-toolkit/utils";
-import { BrowserWindow, app, shell } from "electron";
+import { electronApp, is, optimizer } from "@electron-toolkit/utils";
+import { app, BrowserWindow, shell } from "electron";
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
