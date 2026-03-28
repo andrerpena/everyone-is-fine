@@ -1,5 +1,5 @@
-import { contextBridge } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
+import { contextBridge } from "electron";
 
 // Expose electron APIs to the renderer process.
 // In the renderer, access via `window.electron` and `window.api`.
@@ -11,6 +11,8 @@ if (process.contextIsolated) {
     console.error(error);
   }
 } else {
-  window.electron = electronAPI;
-  window.api = {};
+  // biome-ignore lint/suspicious/noExplicitAny: Electron preload context has window but no DOM types
+  const win = window as any;
+  win.electron = electronAPI;
+  win.api = {};
 }

@@ -2,13 +2,15 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "composite": true,
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "outDir": "./out",
+    "resolveJsonModule": true,
     "types": ["node"]
   },
   "include": [
     "src/main/**/*",
     "src/preload/**/*",
-    "electron.vite.config.ts"
+    "electron.vite.config.ts",
+    "package.json"
   ]
 }
